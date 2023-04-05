@@ -16,11 +16,11 @@
 #define CENTER 2
 #define RIGHT 3
 
-int LED_R = 24;
-int LED_B = 26;
-int LED_G = 25;
-int LCD_BL = 14;
-int LCD_RST = 15;
+#define LED_R 24
+#define LED_B 26
+#define LED_G 25
+#define LCD_BL 14
+#define LCD_RST 15
 #define ON LOW
 #define OFF HIGH
 #define TFT_CS 10
@@ -29,15 +29,85 @@ int LCD_RST = 15;
 ILI9488_t3 display = ILI9488_t3(&SPI, TFT_CS, TFT_DC);
 Adafruit_FT6206 ts = Adafruit_FT6206();
 
-
-int screenWidth = 480;
-int screenHeight = 320;
+#define SCREEN_WIDTH 480
+#define SCREEN_HEIGHT 320
 
 int oldTouchX = 0;
 int oldTouchY = 0;
 
 
-int led = 13;
+// For touch controls
+int x, y;
+
+// Used for page control
+uint8_t nextPage = 0;
+uint8_t page = 0;
+bool hasDrawn = false;
+
+// *Used by background process*
+uint8_t selectedChannelOut = 0;
+uint8_t selectedSourceOut = 0;
+uint32_t updateClock = 0;
+bool isSerialOut = false;
+bool isSDOut = false;
+bool isMSGSpam = false;
+
+// General use variables
+uint8_t state = 0;
+
+// Filter range / Filter Mask
+uint32_t CAN0Filter = 0x000;
+uint32_t CAN0Mask = 0x000;
+uint32_t CAN1Filter = 0x000;
+uint32_t CAN1Mask = 0x000;
+uint32_t CANWiFiFilter = 0x000;
+uint32_t CANWiFiMask = 0x000;
+
+// Use to load pages in pieces to prevent blocking while loading entire page
+uint8_t graphicLoaderState = 0;
+
+// Simplifies getting x and y coords
+bool Touch_getXY()
+{
+    if (ts.touched())
+    {
+        TS_Point p = ts.getPoint();
+        x = p.y;
+        y = SCREEN_HEIGHT - p.x;
+
+        //Serial.print("X= ");
+        //Serial.print(x);
+        //Serial.print(" Y= ");
+        //Serial.println(y);
+        return true;
+    }
+    return false;
+}
+
+// Holds button down while pressed
+void waitForIt(int x_start, int y_start, int x_stop, int y_stop)
+{
+    //myGLCD.setColor(themeBackground);
+    display.drawRoundRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), 1, themeBackground);
+    while (ts.touched())
+    {
+        backgroundProcess();
+    }
+
+    //myGLCD.setColor(menuBtnBorder);
+    display.drawRoundRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), 1, menuBtnBorder);
+}
+void waitForItRect(int x_start, int y_start, int x_stop, int y_stop)
+{
+    //myGLCD.setColor(themeBackground);
+    display.drawRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), themeBackground);
+    while (ts.touched())
+    {
+        backgroundProcess();
+    }
+    //myGLCD.setColor(menuBtnBorder);
+    display.drawRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), menuBtnBorder);
+}
 
 void drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String button, int backgroundColor, int btnBorderColor, int btnTxtColor, int align) {
     int size, temp, offset;
@@ -177,24 +247,78 @@ void setup(void)
     Serial.println("This line will definitely appear in the serial monitor");
 }
 
+// Resets variables for page change
+void pageTransition()
+{
+    hasDrawn = false;
+    graphicLoaderState = 0;
+    page = nextPage;
+}
 
+// Button functions for the main menu
+void menuButtons()
+{
+    // Touch screen controls
+    if (Touch_getXY())
+    {
+        if ((x >= 5) && (x <= 125))
+        {
+            if ((y >= 32) && (y <= 83))
+            {
+                // CANBUS
+                waitForIt(5, 32, 125, 83);
+                nextPage = 0;
+                graphicLoaderState = 0;
+            }
+            if ((y >= 88) && (y <= 140))
+            {
+                // VEHTOOL
+                waitForIt(5, 88, 125, 140);
+                nextPage = 9;
+                graphicLoaderState = 0;
+            }
+            if ((y >= 145) && (y <= 197))
+            {
+                // RZRTOOL
+                waitForIt(5, 145, 125, 197);
+                nextPage = 18;
+                graphicLoaderState = 0;
+            }
+            if ((y >= 202) && (y <= 254))
+            {
+                // EXTRAFN
+                waitForIt(5, 202, 125, 254);
+                nextPage = 27;
+                graphicLoaderState = 0;
+            }
+            if ((y >= 259) && (y <= 312))
+            {
+                // SETTING
+                waitForIt(5, 259, 125, 312);
+                nextPage = 36;
+                graphicLoaderState = 0;
+            }
+        }
+    }
+}
 
+// All background process should be called from here
+void backgroundProcess()
+{
+    // TODO
+    menuButtons();
+    //updateTime();
+    //serialOut();
+    //SDCardOut();
+    //timedTXSend();
+}
+
+// Main loop
 void loop(void)
 {
-    if (ts.touched())
-    {
-        uint16_t touchX, touchY;
-        // Retrieve a point
-        TS_Point p = ts.getPoint();
+    // GUI
+    //pageControl();
 
-        touchX = p.y;
-        touchY = p.x;
-        touchY = 320 - touchY;
-        delay(20);
-        Serial.print("X= ");
-        Serial.print(touchX);
-        Serial.print(" Y= ");
-        Serial.println(touchY);
-    }
-
-}  // Main loop
+    // Background Processes
+    backgroundProcess();
+}  
