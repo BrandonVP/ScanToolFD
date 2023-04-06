@@ -6,18 +6,11 @@
 #include "test.h"
 
 void UserInterfaceClass::init()
-//void UserInterfaceClass::init(uint16_t xStart, uint16_t xStop, uint16_t yStart, uint16_t yStop, void* function)
 {
-	/*
-	this->xStart = xStart;
-	this->xStop = xStop;
-	this->yStart = yStart;
-	this->yStop = yStop;
-	assignedFunction = (void(*)())function;
-	*/
+
 }
 
-void UserInterfaceClass::setButton(uint16_t xStart, uint16_t xStop, uint16_t yStart, uint16_t yStop, bool usingPage, uint8_t page, void* function)
+void UserInterfaceClass::setButton(uint16_t xStart,  uint16_t yStart, uint16_t xStop, uint16_t yStop, bool usingPage, uint8_t page, void* function)
 {
 	this->xStart = xStart;
 	this->xStop = xStop;

@@ -66,7 +66,7 @@ uint32_t CANWiFiMask = 0x000;
 uint8_t graphicLoaderState = 0;
 
 const uint8_t RESERVED_MENU = 5;
-uint16_t buttonOnPage = RESERVED_MENU;
+uint16_t buttonsOnPage = 0;
 UserInterfaceClass userInterfaceButtons[40]; // First 10 are reserverd for menu
 
 
@@ -146,6 +146,44 @@ void drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String butto
     default:
         break;
     }
+}
+
+void drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int align, bool usingPage, uint8_t page, void* function)
+{
+	const uint8_t LETTER_WIDTH = 11;
+	const uint8_t SIDE_OFFSET = 2;
+	const uint8_t yMagicOffset = 6;
+	int stringLength, buttonWidth, offset;
+
+	userInterfaceButtons[buttonsOnPage++].setButton(x_start, y_start, x_stop, y_stop, usingPage, page, function);
+
+	// Print button
+	display.fillRoundRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), 1, btnBgColor);
+	display.drawRoundRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), 1, btnBorderColor);
+
+	// Print String with desired alignment
+	switch (align)
+	{
+	case 1: // Left
+		display.drawString(buttonText, x_start + 5, y_start + ((y_stop - y_start) / 2) - 8);
+		break;
+	case 2: // Center
+		// Calculate center
+		stringLength = buttonText.length() * LETTER_WIDTH;
+		buttonWidth = (x_stop - SIDE_OFFSET) - (x_start + SIDE_OFFSET);
+		offset = (x_start + SIDE_OFFSET) + (buttonWidth / 2) - (stringLength / 2);
+
+		display.setTextColor(btnTxtColor);
+		//display.setCursor(offset, y_start + ((y_stop - y_start) / 2) - yMagicOffset, false);
+		//display.println(button);
+		display.drawString(buttonText, offset, y_start + ((y_stop - y_start) / 2) - yMagicOffset);
+		break;
+	case 3: // Right
+		display.drawString(buttonText, x_start + 55, y_start + ((y_stop - y_start) / 2) - 8);
+		break;
+	default:
+		break;
+	}
 }
 
 //
@@ -1540,11 +1578,11 @@ void buttonMonitor()
 {
 	if (Touch_getXY())
 	{
-		for (uint8_t i = 0; i < buttonOnPage; i++)
+		for (uint8_t i = 0; i < buttonsOnPage; i++)
 		{
 			if ((x >= userInterfaceButtons[i].getXStart()) && (x <= userInterfaceButtons[i].getXStop()))
 			{
-				if ((y >= userInterfaceButtons[i].getYStart()) && (y <= userInterfaceButtons[i].getXStop()))
+				if ((y >= userInterfaceButtons[i].getYStart()) && (y <= userInterfaceButtons[i].getYStop()))
 				{
 					// CANBUS
 					waitForIt(userInterfaceButtons[i].getXStart(), userInterfaceButtons[i].getYStart(), userInterfaceButtons[i].getXStop(), userInterfaceButtons[i].getYStop());
@@ -1570,16 +1608,11 @@ void drawMenu()
     drawSquareBtn(0, 0, 130, 319, "", menuBackground, menuBackground, menuBackground, ALIGN_CENTER);
 
     // Draw Menu Buttons
-    drawRoundBtn(5, 32, 125, 83, F("CANBUS"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-	userInterfaceButtons[0].setButton(5, 32, 125, 83, true, CANBUS_MAIN, NULL);
-    drawRoundBtn(5, 88, 125, 140, F("VEHTOOL"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-	userInterfaceButtons[1].setButton(5, 88, 125, 140, true, VEHTOOL_MAIN, NULL);
-    drawRoundBtn(5, 145, 125, 197, F("UTVTOOL"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-	userInterfaceButtons[2].setButton(5, 145, 125, 197, true, UTVTOOL_MAIN, NULL);
-    drawRoundBtn(5, 202, 125, 254, F("TESTING"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-	userInterfaceButtons[3].setButton(5, 202, 125, 254, true, TESTING_MAIN, NULL);
-    drawRoundBtn(5, 259, 125, 312, F("SETTING"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-	userInterfaceButtons[4].setButton(5, 259, 125, 312, true, SETTING_MAIN, NULL);
+    drawRoundBtn(5, 32, 125, 83, F("CANBUS"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER, true, CANBUS_MAIN, NULL);
+    drawRoundBtn(5, 88, 125, 140, F("VEHTOOL"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER, true, CANBUS_MAIN, NULL);
+    drawRoundBtn(5, 145, 125, 197, F("UTVTOOL"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER, true, CANBUS_MAIN, NULL);
+    drawRoundBtn(5, 202, 125, 254, F("TESTING"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER, true, CANBUS_MAIN, NULL);
+    drawRoundBtn(5, 259, 125, 312, F("SETTING"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER, true, CANBUS_MAIN, NULL);
 }
 
 // -------------------------------------------------------------
@@ -1627,6 +1660,7 @@ void setup(void)
     display.println("Arial_12");
     delay(2000);
 
+	// drawMenu needs to be the first draw method called to correctly assign userInterface buttons to the first 5 positions
     drawMenu();
     drawCANBus();
 }
@@ -1639,59 +1673,11 @@ void pageTransition()
     page = nextPage;
 }
 
-// Button functions for the main menu
-void menuButtons()
-{
-    // Touch screen controls
-    if (Touch_getXY())
-    {
-        if ((x >= 5) && (x <= 125))
-        {
-            if ((y >= 32) && (y <= 83))
-            {
-                // CANBUS
-                waitForIt(5, 32, 125, 83);
-                nextPage = 0;
-                graphicLoaderState = 0;
-            }
-            if ((y >= 88) && (y <= 140))
-            {
-                // VEHTOOL
-                waitForIt(5, 88, 125, 140);
-                nextPage = 9;
-                graphicLoaderState = 0;
-            }
-            if ((y >= 145) && (y <= 197))
-            {
-                // RZRTOOL
-                waitForIt(5, 145, 125, 197);
-                nextPage = 18;
-                graphicLoaderState = 0;
-            }
-            if ((y >= 202) && (y <= 254))
-            {
-                // EXTRAFN
-                waitForIt(5, 202, 125, 254);
-                nextPage = 27;
-                graphicLoaderState = 0;
-            }
-            if ((y >= 259) && (y <= 312))
-            {
-                // SETTING
-                waitForIt(5, 259, 125, 312);
-                nextPage = 36;
-                graphicLoaderState = 0;
-            }
-        }
-    }
-}
-
 // All background process should be called from here
 void backgroundProcess()
 {
     // TODO
 	buttonMonitor();
-    //menuButtons();
     //updateTime();
     //serialOut();
     //SDCardOut();
