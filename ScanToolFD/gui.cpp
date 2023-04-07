@@ -185,3 +185,31 @@ void waitForItRect(int x_start, int y_start, int x_stop, int y_stop)
     }
     display.drawRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), menuBtnBorder);
 }
+
+//
+void buttonMonitor(UserInterfaceClass* buttons, uint8_t size)
+{
+    if (Touch_getXY())
+    {
+        for (uint8_t i = 0; i < size; i++)
+        {
+            if ((x >= buttons[i].getXStart()) && (x <= buttons[i].getXStop()))
+            {
+                if ((y >= buttons[i].getYStart()) && (y <= buttons[i].getYStop()))
+                {
+                    // CANBUS
+                    waitForIt(buttons[i].getXStart(), buttons[i].getYStart(), buttons[i].getXStop(), buttons[i].getYStop());
+                    if (buttons[i].getUsingPage())
+                    {
+                        nextPage = buttons[i].getPage();
+                    }
+                    else
+                    {
+                        buttons[i].callFunction();
+                    }
+                    graphicLoaderState = 0;
+                }
+            }
+        }
+    }
+}

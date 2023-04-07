@@ -1,4 +1,13 @@
-// userInterface.h
+/*
+ ===========================================================================
+ Name        : userInterface.h
+ Author      : Brandon Van Pelt
+ Created	 : 4/6/2023
+ Description :
+ ===========================================================================
+ */
+
+#include "gui.h"
 
 #ifndef _USERINTERFACE_h
 #define _USERINTERFACE_h
@@ -32,7 +41,6 @@ class UserInterfaceClass
 	void callFunction();
 };
 
-//extern UserInterfaceClass *UserInterface;
 
 #endif
 

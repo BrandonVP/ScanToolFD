@@ -7,7 +7,7 @@
  ===========================================================================
  */
 
-#include "common.h"
+//#include "common.h"
 
 #ifndef _VARIABLE_LOCK_H
 #define _VARIABLE_LOCK_H
@@ -28,7 +28,8 @@
 #define POS7 0x07
 
 #ifdef _VARIABLE_LOCK_C
-
+#include "gui.h"
+#include "config.h"
 uint8_t g_var8[8] = { 0,0,0,0,0,0,0,0 };
 uint8_t g_var8Lock = 0;
 uint16_t g_var16[8] = { 0,0,0,0,0,0,0,0 };

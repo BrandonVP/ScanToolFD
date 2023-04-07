@@ -3,9 +3,10 @@
  Name        : gui.h
  Author      : Brandon Van Pelt
  Created	 : 4/6/2023
- Description : 
+ Description :
  ===========================================================================
  */
+
 
 #ifndef _GUI_H
 #define _GUI_H
@@ -16,18 +17,26 @@
 #include "WProgram.h"
 #endif
 
+#include "userInterface.h"
+
 #ifdef _GUI_C
 
-#include "userInterface.h"
-#include "definitions.h"
+#include "config.h"
 #include <ILI9488_t3.h>      // Display
 #include <Adafruit_FT6206.h> // Touch
+
+uint8_t nextPage = 0;
+uint8_t page = 0;
 
 extern UserInterfaceClass userInterfaceButtons[40];
 extern uint16_t buttonsOnPage;
 extern Adafruit_FT6206 ts;
 extern ILI9488_t3 display;
 extern void backgroundProcess();
+extern bool Touch_getXY();
+extern int x, y;
+extern uint8_t nextPage;
+extern uint8_t graphicLoaderState;
 
 void drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int align);
 void drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int align, bool usingPage, uint8_t page, void* function);
@@ -35,6 +44,7 @@ void drawSquareBtn(int x_start, int y_start, int x_stop, int y_stop, String butt
 void drawSquareBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int align, bool usingPage, uint8_t page, void* function);
 void waitForIt(int x_start, int y_start, int x_stop, int y_stop);
 void waitForItRect(int x_start, int y_start, int x_stop, int y_stop);
+void buttonMonitor(UserInterfaceClass* buttons, uint8_t size);
 
 #else
 
@@ -44,6 +54,8 @@ extern void drawSquareBtn(int x_start, int y_start, int x_stop, int y_stop, Stri
 extern void drawSquareBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int align, bool usingPage, uint8_t page, void* function);
 extern void waitForIt(int x_start, int y_start, int x_stop, int y_stop);
 extern void waitForItRect(int x_start, int y_start, int x_stop, int y_stop);
-
+extern void buttonMonitor(UserInterfaceClass* buttons, uint8_t size);
+extern uint8_t nextPage;
+extern uint8_t page;
 #endif // _GUI_C
 #endif // _GUI_H

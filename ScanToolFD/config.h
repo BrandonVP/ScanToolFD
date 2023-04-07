@@ -1,5 +1,16 @@
 #pragma once
 
+// For LCD
+#define LED_R 24
+#define LED_B 26
+#define LED_G 25
+#define LCD_BL 14
+#define LCD_RST 15
+#define ON LOW
+#define OFF HIGH
+#define TFT_CS 10
+#define TFT_DC 9
+
 // Global LCD theme color variables
 #define themeBackground 0xFFFF // White
 #define menuBtnText 0xFFFF // White
@@ -7,17 +18,36 @@
 #define menuBtnColor 0xFC00 // Orange
 #define menuBackground 0xC618 //Silver
 
-//#define CAN0 1
-//#define CAN1 2
-//#define BOTH 3
-//#define CTX0 4
+// CAN Bus message configuration
+#define USE_CAN1			1 // Messages on CAN0
+#define USE_CAN2			2 // Messages on CAN1
+#define USE_CAN3			3 // Messages on CAN1
+#define USE_BOTH			4 // Messages on CAN0 and CAN1
+#define USE_BRIDGE_CAN1_RX  5 // Bridge CAN0 and CAN1 but only show CAN1 RX messages (One way capture)
+#define USE_BRIDGE_BOTH		6 // Bridge CAN0 and CAN1 and show both messages
+#define USE_WIFI			7 // Messages over WIFI
 
+//#define DEBUG(x)
+//#define DEBUG(x)  Serial.println(x);
+#define DEBUG_HEX(x, z)  SerialUSB.print(x, z);
+#define DEBUG(x)  SerialUSB.print(x);
+
+//#define DEBUG_ERROR(x)
+//#define DEBUG_ERROR(x)  Serial.println(x);
+#define DEBUG_ERROR(x)  SerialUSB.println(x);
+
+#define ECU_RX 0x7E8
 #define CAN_PID_ID 0x7DF
+
+// This defines the char length of a formatted message
+// Inpacts reading and writing from SD card class and message streaming from the canbus class
+#define MSG_STRING_LENGTH       (67)
+#define SD_CAPTURE_NUM_MSG      (10)
+#define SD_CAPTURE_BLOCK_SIZE   (SD_CAPTURE_NUM_MSG * MSG_STRING_LENGTH) // SD_CAPTURE_NUM_MSG * MSG_STRING_LENGTH
 
 #define PIDSAMPLES 5
 
-#define SDA 20
-#define SCL 21
+
 
 // For the draw shape functions
 #define ALIGN_LEFT 1
@@ -47,6 +77,11 @@ typedef bool error_t;
 
 // Loadbar
 #define DONE 8
+
+// Buttons
+#define MENU_BUTTON_SIZE 5
+#define APP_BUTTON_SIZE 30
+
 
 //
 #define PIDLIST "PIDScan.txt"

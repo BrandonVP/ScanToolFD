@@ -1,31 +1,40 @@
-//#include <kinetis_flexcan.h>
+/*
+ ===========================================================================
+ Name        : ScanToolFD.ino
+ Author      : Brandon Van Pelt
+ Created	 : 3/24/2023
+ Description : Main
+ ===========================================================================
+ */
+
+ /*=========================================================
+	 Todo List
+ ===========================================================
+
+
+ ===========================================================
+	 End Todo List
+ =========================================================*/
+ 
+ //#include <kinetis_flexcan.h>
 //#include <isotp_server.h>
 //#include <isotp.h>
 //#include <imxrt_flexcan.h>
-#include <FlexCAN_T4.h>
-//#include <circular_buffer.h>
+#include "CANBus.h"
 
-#include "gui.h"
-#include "test.h"
-#include "variableLock.h"
-#include "userInterface.h"
-#include "definitions.h"
+//#include <circular_buffer.h>
 #include <SPI.h>
 #include <Wire.h>
 #include <Adafruit_FT6206.h> // Touch
 #include <ILI9488_t3.h>      // Display
+
+#include "gui.h"
+#include "test.h"
+#include "variableLock.h"
+#include "config.h"
+
 #include "ili9488_t3_font_Arial.h"
 #include "ili9488_t3_font_ComicSansMS.h"
-
-#define LED_R 24
-#define LED_B 26
-#define LED_G 25
-#define LCD_BL 14
-#define LCD_RST 15
-#define ON LOW
-#define OFF HIGH
-#define TFT_CS 10
-#define TFT_DC 9
 
 ILI9488_t3 display = ILI9488_t3(&SPI, TFT_CS, TFT_DC);
 Adafruit_FT6206 ts = Adafruit_FT6206();
@@ -40,8 +49,6 @@ int oldTouchY = 0;
 int x, y;
 
 // Used for page control
-uint8_t nextPage = 0;
-uint8_t page = 0;
 bool hasDrawn = false;
 
 // *Used by background process*
@@ -55,20 +62,14 @@ bool isMSGSpam = false;
 // General use variables
 uint8_t state = 0;
 
-// Filter range / Filter Mask
-uint32_t CAN0Filter = 0x000;
-uint32_t CAN0Mask = 0x000;
-uint32_t CAN1Filter = 0x000;
-uint32_t CAN1Mask = 0x000;
-uint32_t CANWiFiFilter = 0x000;
-uint32_t CANWiFiMask = 0x000;
-
 // Use to load pages in pieces to prevent blocking while loading entire page
 uint8_t graphicLoaderState = 0;
 
 const uint8_t RESERVED_MENU = 5;
 uint16_t buttonsOnPage = 0;
-UserInterfaceClass userInterfaceButtons[40]; // First 10 are reserverd for menu
+UserInterfaceClass userInterfaceButtons[APP_BUTTON_SIZE];
+UserInterfaceClass userInterfaceMenuButtons[MENU_BUTTON_SIZE];
+extern void buttonMonitor(UserInterfaceClass* buttons, uint8_t size);
 
 //**************CAN BUS TEMP*****************/
 
@@ -89,7 +90,13 @@ bool Touch_getXY()
     return false;
 }
 
-
+// Resets variables for page change
+void pageTransition()
+{
+	hasDrawn = false;
+	graphicLoaderState = 0;
+	page = nextPage;
+}
 
 // Manages the different App pages
 void pageControl()
@@ -102,14 +109,14 @@ void pageControl()
 		{
 			if (1)//drawCANBus())
 			{
-				break;
+				//break;
 			}
 			hasDrawn = true;
 		}
 
 		// Call buttons or page method
 		//CANBusButtons();
-
+		Serial.println("here1");
 		// Release any variable locks if page changed
 		if (nextPage != page)
 		{
@@ -419,6 +426,7 @@ void pageControl()
 			hasDrawn = true;
 		}
 
+		/*
 		// Call buttons or page method
 		g_var8[POS0] = swipe(g_var32[POS1], g_var8[POS1], g_var16[POS1], g_var16[POS2], g_var16[POS3], g_var16[POS4]);
 		if ((g_var8[POS0] == SWIPE_DOWN || g_var8[POS0] == SWIPE_UP) && !Touch_getXY())
@@ -432,7 +440,7 @@ void pageControl()
 			nextPage = 1;
 			graphicLoaderState = 0;
 		}
-
+		*/
 		if (!Touch_getXY())
 		{
 			//readInCANMsg(selectedChannelOut);
@@ -475,15 +483,14 @@ void pageControl()
 		{
 			if (1)//drawVehicleTools())
 			{
-				break;
+				//break;
 			}
-
+			drawRoundBtn(140, 80, 305, 130, F("A"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
 			hasDrawn = true;
 		}
 
 		// Call buttons or page method
 		//VehicleToolButtons();
-
 		// Release any variable locks if page changed
 		if (nextPage != page)
 		{
@@ -519,7 +526,7 @@ void pageControl()
 			//can1.setFilterMask0(0x7E0, 0x7D0);
 
 			// Draw the load bar
-			loadBar(g_var8[POS1]++);
+			//loadBar(g_var8[POS1]++);
 
 			state = 0;
 			hasDrawn = true;
@@ -545,7 +552,7 @@ void pageControl()
 		// Draw page and lock variables
 		if (!hasDrawn)
 		{
-			if (hasPID == true)
+			if (1)//hasPID == true)
 			{
 				if (1)//drawPIDStream())
 				{
@@ -572,7 +579,7 @@ void pageControl()
 				// Read in the PID scan results
 				for (int i = 0; i < 80; i++)
 				{
-					arrayIn[i] = 0x00;
+					//arrayIn[i] = 0x00;
 				}
 				//sdCard.readFile(can1.getFullDir(), arrayIn);
 
@@ -581,7 +588,7 @@ void pageControl()
 			}
 			else
 			{
-				drawErrorMSG2(F("Error"), F("Please Perform"), F("PIDSCAN First"));
+				//drawErrorMSG2(F("Error"), F("Please Perform"), F("PIDSCAN First"));
 				g_var32[POS1] = millis();
 			}
 
@@ -589,7 +596,7 @@ void pageControl()
 			hasDrawn = true;
 		}
 
-		if (hasPID)
+		if (1)//hasPID)
 		{
 			// Call buttons or page method
 			//streamPIDS();
@@ -765,9 +772,9 @@ void pageControl()
 		{
 			if (1)//drawRZRTOOL())
 			{
-				break;
+				//break;
 			}
-
+			drawRoundBtn(140, 80, 305, 130, F("B"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
 			hasDrawn = true;
 		}
 
@@ -915,9 +922,9 @@ void pageControl()
 		{
 			if (1)//drawExtraFN())
 			{
-				break;
+				//break;
 			}
-
+			drawRoundBtn(140, 80, 305, 130, F("C"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
 			hasDrawn = true;
 		}
 
@@ -1028,8 +1035,8 @@ void pageControl()
 		if (state == 1)
 		{
 			//MSGSpam();
-			uint8_t input = keypadControllerDec(g_var8[POS1], g_var16[POS4]);
-			if (input == 0xF1)
+			//uint8_t input = keypadControllerDec(g_var8[POS1], g_var16[POS4]);
+			if (1)//input == 0xF1)
 			{
 				const uint8_t RUN_TIME_OFFSET_MS = 1; // Approximate time it takes send out a single messagein ms
 				g_var16[POS3] = g_var16[POS4] - RUN_TIME_OFFSET_MS;
@@ -1037,7 +1044,7 @@ void pageControl()
 				hasDrawn = false;
 				graphicLoaderState = 2;
 			}
-			if (input == 0xF0)
+			if (1)//input == 0xF0)
 			{
 				state = 0;
 				hasDrawn = false;
@@ -1047,15 +1054,15 @@ void pageControl()
 		if (state == 2)
 		{
 			//MSGSpam();
-			uint8_t input = keypadController(g_var8[POS1], g_var16[POS4]);
-			if (input == 0xF1)
+			//uint8_t input = keypadController(g_var8[POS1], g_var16[POS4]);
+			if (1)//input == 0xF1)
 			{
 				g_var16[POS2] = g_var16[POS4];
 				state = 0;
 				hasDrawn = false;
 				graphicLoaderState = 2;
 			}
-			if (input == 0xF0)
+			if (1)//input == 0xF0)
 			{
 				state = 0;
 				hasDrawn = false;
@@ -1065,15 +1072,15 @@ void pageControl()
 		if (state == 3)
 		{
 			//MSGSpam();
-			uint8_t input = keypadController(g_var8[POS1], g_var16[POS4]);
-			if (input == 0xF1)
+			//uint8_t input = keypadController(g_var8[POS1], g_var16[POS4]);
+			if (1)//input == 0xF1)
 			{
 				g_var16[POS1] = g_var16[POS4];
 				state = 0;
 				hasDrawn = false;
 				graphicLoaderState = 2;
 			}
-			if (input == 0xF0)
+			if (1)//input == 0xF0)
 			{
 				state = 0;
 				hasDrawn = false;
@@ -1232,9 +1239,9 @@ void pageControl()
 		{
 			if (1)//drawSettings())
 			{
-				break;
+				//break;
 			}
-
+			drawRoundBtn(140, 80, 305, 130, F("D"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
 			hasDrawn = true;
 		}
 
@@ -1429,60 +1436,27 @@ void pageControl()
 	}
 }
 
-//
-void drawCANBus() 
-{
-    drawSquareBtn(131, 55, 479, 319, "", themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
-    drawRoundBtn(140, 80, 305, 130, F("Capture"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-    drawRoundBtn(310, 80, 475, 130, F("Send"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-    drawRoundBtn(140, 135, 305, 185, F("Cap Files"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-    drawRoundBtn(310, 135, 475, 185, F("Baud"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-    drawRoundBtn(140, 190, 305, 240, F("FilterMask"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-    drawRoundBtn(310, 190, 475, 240, F("Auto Baud"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-    drawRoundBtn(140, 245, 305, 295, F(""), menuBackground, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-    drawRoundBtn(310, 245, 475, 295, F(""), menuBackground, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-}
 
-//
-void buttonMonitor()
-{
-	if (Touch_getXY())
-	{
-		for (uint8_t i = 0; i < buttonsOnPage; i++)
-		{
-			if ((x >= userInterfaceButtons[i].getXStart()) && (x <= userInterfaceButtons[i].getXStop()))
-			{
-				if ((y >= userInterfaceButtons[i].getYStart()) && (y <= userInterfaceButtons[i].getYStop()))
-				{
-					// CANBUS
-					waitForIt(userInterfaceButtons[i].getXStart(), userInterfaceButtons[i].getYStart(), userInterfaceButtons[i].getXStop(), userInterfaceButtons[i].getYStop());
-					if (userInterfaceButtons[i].getUsingPage())
-					{
-						nextPage = userInterfaceButtons[i].getPage();
-					}
-					else
-					{
-						userInterfaceButtons[i].callFunction();
-					}
-					graphicLoaderState = 0;
-				}
-			}
-		}
-	}
-}
 
-void drawMenu() 
+void createMenu() 
 {
+	uint8_t menuPosition = 0;
+
     // Draw Layout
     drawSquareBtn(0, 0, 479, 319, "", themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
     drawSquareBtn(0, 0, 130, 319, "", menuBackground, menuBackground, menuBackground, ALIGN_CENTER);
 
-    // Draw Menu Buttons
-    drawRoundBtn(5, 32, 125, 83, F("CANBUS"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER, true, CANBUS_MAIN, NULL);
-    drawRoundBtn(5, 88, 125, 140, F("VEHTOOL"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER, true, CANBUS_MAIN, NULL);
-    drawRoundBtn(5, 145, 125, 197, F("UTVTOOL"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER, true, CANBUS_MAIN, NULL);
-    drawRoundBtn(5, 202, 125, 254, F("TESTING"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER, true, CANBUS_MAIN, NULL);
-    drawRoundBtn(5, 259, 125, 312, F("SETTING"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER, true, CANBUS_MAIN, NULL);
+    // Create Menu Buttons
+    drawRoundBtn(5, 32, 125, 83, F("CANBUS"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
+	userInterfaceMenuButtons[menuPosition++].setButton(5, 32, 125, 83, true, CANBUS_MAIN, NULL);
+    drawRoundBtn(5, 88, 125, 140, F("VEHTOOL"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
+	userInterfaceMenuButtons[menuPosition++].setButton(5, 88, 125, 140, true, VEHTOOL_MAIN, NULL);
+    drawRoundBtn(5, 145, 125, 197, F("UTVTOOL"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
+	userInterfaceMenuButtons[menuPosition++].setButton(5, 145, 125, 197, true, UTVTOOL_MAIN, NULL);
+    drawRoundBtn(5, 202, 125, 254, F("TESTING"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
+	userInterfaceMenuButtons[menuPosition++].setButton(5, 202, 125, 254, true, TESTING_MAIN, NULL);
+    drawRoundBtn(5, 259, 125, 312, F("SETTING"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
+	userInterfaceMenuButtons[menuPosition++].setButton(5, 259, 125, 312, true, SETTING_MAIN, NULL);
 }
 
 // -------------------------------------------------------------
@@ -1531,35 +1505,41 @@ void setup(void)
     delay(2000);
 
 	// drawMenu needs to be the first draw method called to correctly assign userInterface buttons to the first 5 positions
-    drawMenu();
-    drawCANBus();
+	createMenu();
+    
+	// delete
+	drawSquareBtn(131, 55, 479, 319, "", themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
+	drawRoundBtn(140, 80, 305, 130, F("Capture"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
+	drawRoundBtn(310, 80, 475, 130, F("Send"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
+	drawRoundBtn(140, 135, 305, 185, F("Cap Files"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
+	drawRoundBtn(310, 135, 475, 185, F("Baud"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
+	drawRoundBtn(140, 190, 305, 240, F("FilterMask"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
+	drawRoundBtn(310, 190, 475, 240, F("Auto Baud"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
+	drawRoundBtn(140, 245, 305, 295, F(""), menuBackground, menuBtnBorder, menuBtnText, ALIGN_CENTER);
+	drawRoundBtn(310, 245, 475, 295, F(""), menuBackground, menuBtnBorder, menuBtnText, ALIGN_CENTER);
 }
 
-// Resets variables for page change
-void pageTransition()
-{
-    hasDrawn = false;
-    graphicLoaderState = 0;
-    page = nextPage;
-}
+
+/*=========================================================
+	Background Processes
+===========================================================*/
 
 // All background process should be called from here
 void backgroundProcess()
 {
-    // TODO
-	buttonMonitor();
+	buttonMonitor(userInterfaceMenuButtons, MENU_BUTTON_SIZE);
     //updateTime();
     //serialOut();
     //SDCardOut();
     //timedTXSend();
 }
 
-// Main loop
+/*=========================================================
+	Main loop
+===========================================================*/
+// Main loop runs the user interface and calls for background processes
 void loop(void)
 {
-    // GUI
-    //pageControl();
-
-    // Background Processes
+    pageControl();
     backgroundProcess();
 }  
