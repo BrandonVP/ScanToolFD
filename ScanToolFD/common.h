@@ -10,7 +10,11 @@
 //#include <due_can.h>
 #include "variableLock.h"
 //#include "OBD_CAN_SIMULATOR.h"
+#include <ILI9488_t3.h>      // Display
+#include <Adafruit_FT6206.h> // Touch
 #include "definitions.h"
+#include "userInterface.h"
+#include "gui.h"
 //#include "KeyInput.h"
 //#include "DueOverclock.h"
 
@@ -34,12 +38,12 @@
 #define DEBUG_ERROR(x)  SerialUSB.println(x);
 
 // CAN Bus message configuration
-#define CAN0			1 // Messages on CAN0
-#define CAN1			2 // Messages on CAN1
-#define BOTH			3 // Messages on CAN0 and CAN1
-#define BRIDGE_CAN1_RX  4 // Bridge CAN0 and CAN1 but only show CAN1 RX messages (One way capture)
-#define BRIDGE_BOTH		5 // Bridge CAN0 and CAN1 and show both messages
-#define WIFI			6 // Messages over WIFI
+#define USE_CAN0			1 // Messages on CAN0
+#define USE_CAN1			2 // Messages on CAN1
+#define USE_BOTH			3 // Messages on CAN0 and CAN1
+#define USE_BRIDGE_CAN1_RX  4 // Bridge CAN0 and CAN1 but only show CAN1 RX messages (One way capture)
+#define USE_BRIDGE_BOTH		5 // Bridge CAN0 and CAN1 and show both messages
+#define USE_WIFI			6 // Messages over WIFI
 
 typedef enum
 {
@@ -62,11 +66,16 @@ typedef enum
 extern uint8_t SmallFont[];
 extern uint8_t BigFont[];
 
+extern ILI9488_t3 display;
 // LCD display
 //(byte model, int RS, int WR, int CS, int RST, int SER)
 //extern UTFT myGLCD;
 //RTP: byte tclk, byte tcs, byte din, byte dout, byte irq
 //extern UTouch  myTouch;
+
+extern UserInterfaceClass userInterfaceButtons[40];
+extern uint16_t buttonsOnPage;
+extern Adafruit_FT6206 ts;
 
 // General use variables
 // Any non-background process function can use
@@ -104,7 +113,6 @@ extern bool isSerialOut;
 extern bool isSDOut;
 extern bool isMSGSpam;
 
-extern void menuButtons();
 extern void waitForIt(int x1, int y1, int x2, int y2);
 extern void drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String button, int backgroundColor, int btnBorderColor, int btnTxtColor, int align);
 extern void drawSquareBtn(int x_start, int y_start, int x_stop, int y_stop, String button, int backgroundColor, int btnBorderColor, int btnTxtColor, int align);

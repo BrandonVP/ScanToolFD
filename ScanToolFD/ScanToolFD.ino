@@ -1,3 +1,11 @@
+//#include <kinetis_flexcan.h>
+//#include <isotp_server.h>
+//#include <isotp.h>
+//#include <imxrt_flexcan.h>
+#include <FlexCAN_T4.h>
+//#include <circular_buffer.h>
+
+#include "gui.h"
 #include "test.h"
 #include "variableLock.h"
 #include "userInterface.h"
@@ -8,13 +16,6 @@
 #include <ILI9488_t3.h>      // Display
 #include "ili9488_t3_font_Arial.h"
 #include "ili9488_t3_font_ComicSansMS.h"
-
-// Global LCD theme color variables
-#define themeBackground 0xFFFF  // White
-#define menuBtnText 0xFFFF      // White
-#define menuBtnBorder 0x0000    // Black
-#define menuBtnColor 0xFC00     // Orange
-#define menuBackground 0xC618   //Silver
 
 #define LED_R 24
 #define LED_B 26
@@ -69,6 +70,7 @@ const uint8_t RESERVED_MENU = 5;
 uint16_t buttonsOnPage = 0;
 UserInterfaceClass userInterfaceButtons[40]; // First 10 are reserverd for menu
 
+//**************CAN BUS TEMP*****************/
 
 // Simplifies getting x and y coords
 bool Touch_getXY()
@@ -87,141 +89,7 @@ bool Touch_getXY()
     return false;
 }
 
-// Holds round button down while pressed
-void waitForIt(int x_start, int y_start, int x_stop, int y_stop)
-{
-    display.drawRoundRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), 1, themeBackground);
-    while (ts.touched())
-    {
-        // This is a blocking function so call backgroundProcess while looping
-        backgroundProcess();
-    }
-    display.drawRoundRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), 1, menuBtnBorder);
-}
 
-// Holds rectangle button down while pressed
-void waitForItRect(int x_start, int y_start, int x_stop, int y_stop)
-{
-    display.drawRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), themeBackground);
-    while (ts.touched())
-    {
-        // This is a blocking function so call backgroundProcess while looping
-        backgroundProcess();
-    }
-    display.drawRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), menuBtnBorder);
-}
-
-//
-void drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int align)
-{
-    const uint8_t LETTER_WIDTH = 11;
-    const uint8_t SIDE_OFFSET = 2;
-    const uint8_t yMagicOffset = 6;
-    int stringLength, buttonWidth, offset;
-
-    // Print button
-    display.fillRoundRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), 1, btnBgColor);
-    display.drawRoundRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), 1, btnBorderColor);
-
-    // Print String with desired alignment
-    switch (align) 
-    {
-    case 1: // Left
-        display.drawString(buttonText, x_start + 5, y_start + ((y_stop - y_start) / 2) - 8);
-        break;
-    case 2: // Center
-        // Calculate center
-        stringLength = buttonText.length() * LETTER_WIDTH;
-        buttonWidth = (x_stop - SIDE_OFFSET) - (x_start + SIDE_OFFSET);
-        offset = (x_start+SIDE_OFFSET) + (buttonWidth / 2) - (stringLength / 2);
-
-        display.setTextColor(btnTxtColor);
-        //display.setCursor(offset, y_start + ((y_stop - y_start) / 2) - yMagicOffset, false);
-        //display.println(button);
-        display.drawString(buttonText, offset, y_start + ((y_stop - y_start) / 2) - yMagicOffset);
-        break;
-    case 3: // Right
-        display.drawString(buttonText, x_start + 55, y_start + ((y_stop - y_start) / 2) - 8);
-        break;
-    default:
-        break;
-    }
-}
-
-void drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int align, bool usingPage, uint8_t page, void* function)
-{
-	const uint8_t LETTER_WIDTH = 11;
-	const uint8_t SIDE_OFFSET = 2;
-	const uint8_t yMagicOffset = 6;
-	int stringLength, buttonWidth, offset;
-
-	userInterfaceButtons[buttonsOnPage++].setButton(x_start, y_start, x_stop, y_stop, usingPage, page, function);
-
-	// Print button
-	display.fillRoundRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), 1, btnBgColor);
-	display.drawRoundRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), 1, btnBorderColor);
-
-	// Print String with desired alignment
-	switch (align)
-	{
-	case 1: // Left
-		display.drawString(buttonText, x_start + 5, y_start + ((y_stop - y_start) / 2) - 8);
-		break;
-	case 2: // Center
-		// Calculate center
-		stringLength = buttonText.length() * LETTER_WIDTH;
-		buttonWidth = (x_stop - SIDE_OFFSET) - (x_start + SIDE_OFFSET);
-		offset = (x_start + SIDE_OFFSET) + (buttonWidth / 2) - (stringLength / 2);
-
-		display.setTextColor(btnTxtColor);
-		//display.setCursor(offset, y_start + ((y_stop - y_start) / 2) - yMagicOffset, false);
-		//display.println(button);
-		display.drawString(buttonText, offset, y_start + ((y_stop - y_start) / 2) - yMagicOffset);
-		break;
-	case 3: // Right
-		display.drawString(buttonText, x_start + 55, y_start + ((y_stop - y_start) / 2) - 8);
-		break;
-	default:
-		break;
-	}
-}
-
-//
-void drawSquareBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int align)
-{
-    const uint8_t LETTER_WIDTH = 11;
-    const uint8_t SIDE_OFFSET = 2;
-    const uint8_t yMagicOffset = 6;
-    int stringLength, buttonWidth, offset;
-
-    // Print button
-    display.fillRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), btnBgColor);
-    display.drawRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), btnBorderColor);
-
-    // Print String with desired alignment
-    switch (align) 
-    {
-    case 1: // Left
-        display.drawString(buttonText, x_start + 5, y_start + ((y_stop - y_start) / 2) - 8);
-        break;
-    case 2: // Center
-        // Calculate center
-        stringLength = buttonText.length() * LETTER_WIDTH;
-        buttonWidth = (x_stop - SIDE_OFFSET) - (x_start + SIDE_OFFSET);
-        offset = (x_start + SIDE_OFFSET) + (buttonWidth / 2) - (stringLength / 2);
-
-        display.setTextColor(btnTxtColor);
-        //display.setCursor(offset, y_start + ((y_stop - y_start) / 2) - yMagicOffset, false);
-        //display.println(button);
-        display.drawString(buttonText, offset, y_start + ((y_stop - y_start) / 2) - yMagicOffset);
-        break;
-    case 3: // Right
-        display.drawString(buttonText, x_start + 55, y_start + ((y_stop - y_start) / 2) - 8);
-        break;
-    default:
-        break;
-    }
-}
 
 // Manages the different App pages
 void pageControl()
@@ -1561,6 +1429,7 @@ void pageControl()
 	}
 }
 
+//
 void drawCANBus() 
 {
     drawSquareBtn(131, 55, 479, 319, "", themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
@@ -1574,6 +1443,7 @@ void drawCANBus()
     drawRoundBtn(310, 245, 475, 295, F(""), menuBackground, menuBtnBorder, menuBtnText, ALIGN_CENTER);
 }
 
+//
 void buttonMonitor()
 {
 	if (Touch_getXY())

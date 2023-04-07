@@ -7,10 +7,10 @@
 #define menuBtnColor 0xFC00 // Orange
 #define menuBackground 0xC618 //Silver
 
-#define CAN0 1
-#define CAN1 2
-#define BOTH 3
-#define CTX0 4
+//#define CAN0 1
+//#define CAN1 2
+//#define BOTH 3
+//#define CTX0 4
 
 #define CAN_PID_ID 0x7DF
 
