@@ -25,9 +25,9 @@ class UserInterfaceClass
 	 uint16_t xStop = 0;
 	 uint16_t yStart = 0;
 	 uint16_t yStop = 0;
-	 bool usePage = true;
+	 bool usePage = false;
 	 uint8_t page = 0;
-	 void(*assignedFunction)(void);
+	 void(*assignedFunction)(void) = NULL;
 
  public:
 	void init();

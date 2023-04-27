@@ -10,12 +10,14 @@
 #include "userInterface.h"
 #include "test.h"
 
+extern void testf();
+
 void UserInterfaceClass::init()
 {
 
 }
 
-void UserInterfaceClass::setButton(uint16_t xStart,  uint16_t yStart, uint16_t xStop, uint16_t yStop, bool usingPage, uint8_t page, void* function)
+void UserInterfaceClass::setButton(uint16_t xStart,  uint16_t yStart, uint16_t xStop, uint16_t yStop, bool usingPage, uint8_t page, void* func)
 {
 	this->xStart = xStart;
 	this->xStop = xStop;
@@ -27,7 +29,7 @@ void UserInterfaceClass::setButton(uint16_t xStart,  uint16_t yStart, uint16_t x
 	}
 	else
 	{
-		assignedFunction = (void(*)())function;
+		assignedFunction = (void(*)())func;
 	}
 }
 

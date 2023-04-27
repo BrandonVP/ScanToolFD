@@ -67,8 +67,8 @@ uint8_t graphicLoaderState = 0;
 
 const uint8_t RESERVED_MENU = 5;
 uint16_t buttonsOnPage = 0;
-UserInterfaceClass userInterfaceButtons[APP_BUTTON_SIZE];
-UserInterfaceClass userInterfaceMenuButtons[MENU_BUTTON_SIZE];
+UserInterfaceClass userInterfaceButton[APP_BUTTON_SIZE];
+UserInterfaceClass userInterfaceMenuButton[MENU_BUTTON_SIZE];
 extern void buttonMonitor(UserInterfaceClass* buttons, uint8_t size);
 
 //**************CAN BUS TEMP*****************/
@@ -116,7 +116,6 @@ void pageControl()
 
 		// Call buttons or page method
 		//CANBusButtons();
-		Serial.println("here1");
 		// Release any variable locks if page changed
 		if (nextPage != page)
 		{
@@ -1437,6 +1436,12 @@ void pageControl()
 }
 
 
+void testf()
+{
+	drawRoundBtn(140, 80, 305, 130, F("WORKS!"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
+}
+
+void testf(void);
 
 void createMenu() 
 {
@@ -1448,15 +1453,20 @@ void createMenu()
 
     // Create Menu Buttons
     drawRoundBtn(5, 32, 125, 83, F("CANBUS"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-	userInterfaceMenuButtons[menuPosition++].setButton(5, 32, 125, 83, true, CANBUS_MAIN, NULL);
+	userInterfaceMenuButton[menuPosition++].setButton(5, 32, 125, 83, true, CANBUS_MAIN, NULL);
+
     drawRoundBtn(5, 88, 125, 140, F("VEHTOOL"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-	userInterfaceMenuButtons[menuPosition++].setButton(5, 88, 125, 140, true, VEHTOOL_MAIN, NULL);
+	//userInterfaceMenuButton[menuPosition++].setButton(5, 88, 125, 140, true, VEHTOOL_MAIN, NULL);
+	userInterfaceMenuButton[menuPosition++].setButton(5, 88, 125, 140, false, VEHTOOL_MAIN, (void*)testf);
+
     drawRoundBtn(5, 145, 125, 197, F("UTVTOOL"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-	userInterfaceMenuButtons[menuPosition++].setButton(5, 145, 125, 197, true, UTVTOOL_MAIN, NULL);
+	userInterfaceMenuButton[menuPosition++].setButton(5, 145, 125, 197, true, UTVTOOL_MAIN, NULL);
+
     drawRoundBtn(5, 202, 125, 254, F("TESTING"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-	userInterfaceMenuButtons[menuPosition++].setButton(5, 202, 125, 254, true, TESTING_MAIN, NULL);
+	userInterfaceMenuButton[menuPosition++].setButton(5, 202, 125, 254, true, TESTING_MAIN, NULL);
+
     drawRoundBtn(5, 259, 125, 312, F("SETTING"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-	userInterfaceMenuButtons[menuPosition++].setButton(5, 259, 125, 312, true, SETTING_MAIN, NULL);
+	userInterfaceMenuButton[menuPosition++].setButton(5, 259, 125, 312, true, SETTING_MAIN, NULL);
 }
 
 // -------------------------------------------------------------
@@ -1527,7 +1537,7 @@ void setup(void)
 // All background process should be called from here
 void backgroundProcess()
 {
-	buttonMonitor(userInterfaceMenuButtons, MENU_BUTTON_SIZE);
+	buttonMonitor(userInterfaceMenuButton, MENU_BUTTON_SIZE);
     //updateTime();
     //serialOut();
     //SDCardOut();

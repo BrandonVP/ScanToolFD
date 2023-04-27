@@ -199,7 +199,7 @@ void buttonMonitor(UserInterfaceClass* buttons, uint8_t size)
                 {
                     // CANBUS
                     waitForIt(buttons[i].getXStart(), buttons[i].getYStart(), buttons[i].getXStop(), buttons[i].getYStop());
-                    if (buttons[i].getUsingPage())
+                    if (buttons[i].getUsingPage() == true)
                     {
                         nextPage = buttons[i].getPage();
                     }
