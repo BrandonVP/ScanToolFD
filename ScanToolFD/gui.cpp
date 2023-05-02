@@ -9,7 +9,7 @@
 
 #define _GUI_C
 #include "gui.h"
-
+#include "userInterface.h"
  //
 void drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int align)
 {
@@ -55,7 +55,8 @@ void drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String butto
     const uint8_t yMagicOffset = 6;
     int stringLength, buttonWidth, offset;
 
-    userInterfaceButtons[buttonsOnPage++].setButton(x_start, y_start, x_stop, y_stop, usingPage, page, function);
+    // TODO
+    //userInterfaceButtons[buttonsOnPage++].setButton(x_start, y_start, x_stop, y_stop, usingPage, page, function);
 
     // Print button
     display.fillRoundRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), 1, btnBgColor);
@@ -94,7 +95,8 @@ void drawSquareBtn(int x_start, int y_start, int x_stop, int y_stop, String butt
 	const uint8_t yMagicOffset = 6;
 	int stringLength, buttonWidth, offset;
 
-	userInterfaceButtons[buttonsOnPage++].setButton(x_start, y_start, x_stop, y_stop, usingPage, page, function);
+    // TODO
+	//userInterfaceButtons[buttonsOnPage++].setButton(x_start, y_start, x_stop, y_stop, usingPage, page, function);
 
 	// Print button
 	display.fillRoundRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), 1, btnBgColor);
@@ -211,5 +213,26 @@ void buttonMonitor(UserInterfaceClass* buttons, uint8_t size)
                 }
             }
         }
+    }
+}
+
+bool drawPage(UserInterfaceClass* buttons, uint8_t &btn, uint8_t buttonsToPrint)
+{
+    if (btn == 0)
+    {
+        drawSquareBtn(131, 55, 479, 319, "", themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
+        btn++;
+    }
+    else
+    {
+        drawSquareBtn(buttons[btn].getXStart(), buttons[btn].getYStart(), buttons[btn].getXStop(), buttons[btn].getYStop(), buttons[btn].getBtnName(), buttons[btn].getBtnColor(), buttons[btn].getBtnBorder(), buttons[btn].getBtnText(), buttons[btn++].getAlign());
+    }
+    if (btn == buttonsToPrint)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
     }
 }
