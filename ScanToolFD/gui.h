@@ -47,7 +47,7 @@ void waitForItRect(int x_start, int y_start, int x_stop, int y_stop);
 void buttonMonitor(UserInterfaceClass* buttons, uint8_t size);
 
 #else
-
+// TODO extern?
 extern void drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int align);
 extern void drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int align, bool usingPage, uint8_t page, void* function);
 extern void drawSquareBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int align);
@@ -55,6 +55,7 @@ extern void drawSquareBtn(int x_start, int y_start, int x_stop, int y_stop, Stri
 extern void waitForIt(int x_start, int y_start, int x_stop, int y_stop);
 extern void waitForItRect(int x_start, int y_start, int x_stop, int y_stop);
 extern void buttonMonitor(UserInterfaceClass* buttons, uint8_t size);
+extern bool drawPage(UserInterfaceClass*, uint8_t&, uint8_t);
 extern uint8_t nextPage;
 extern uint8_t page;
 #endif // _GUI_C

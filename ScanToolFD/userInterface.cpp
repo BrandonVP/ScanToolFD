@@ -17,7 +17,7 @@ void UserInterfaceClass::init()
 
 }
 
-void UserInterfaceClass::setButton(uint16_t xStart,  uint16_t yStart, uint16_t xStop, uint16_t yStop, bool usingPage, uint8_t page, void* func, String btnName, uint16_t btnColor, uint16_t btnBorder, uint16_t btnText, uint8_t align)
+void UserInterfaceClass::setButton(uint16_t xStart,  uint16_t yStart, uint16_t xStop, uint16_t yStop, bool usingPage, uint8_t page, void* func, String btnText, uint8_t align)
 {
 	this->xStart = xStart;
 	this->xStop = xStop;
@@ -32,9 +32,6 @@ void UserInterfaceClass::setButton(uint16_t xStart,  uint16_t yStart, uint16_t x
 	{
 		assignedFunction = (void(*)())func;
 	}
-	this->btnName = btnName;
-	this->btnColor = btnColor;
-	this->btnBorder = btnBorder;
 	this->btnText = btnText;
 	this->align = align;
 }
@@ -74,22 +71,7 @@ void UserInterfaceClass::callFunction()
 	assignedFunction();
 }
 
-bool UserInterfaceClass::getBtnName()
-{
-	return this->btnName;
-}
-
-bool UserInterfaceClass::getBtnColor()
-{
-	return this->btnColor;
-}
-
-bool UserInterfaceClass::getBtnBorder()
-{
-	return this->btnBorder;
-}
-
-bool UserInterfaceClass::getBtnText()
+String UserInterfaceClass::getBtnText()
 {
 	return this->btnText;
 }

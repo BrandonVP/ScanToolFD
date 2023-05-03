@@ -16,6 +16,7 @@
 	 End Todo List
  =========================================================*/
  
+#include "CANBusCapture.h"
  //#include <kinetis_flexcan.h>
 //#include <isotp_server.h>
 //#include <isotp.h>
@@ -69,7 +70,6 @@ uint16_t buttonsOnPage = 0;
 UserInterfaceClass userInterfaceButtons[APP_BUTTON_SIZE];
 UserInterfaceClass userInterfaceMenuButton[MENU_BUTTON_SIZE];
 
-//**************CAN BUS TEMP*****************/
 // Simplifies getting x and y coords
 bool Touch_getXY()
 {
@@ -78,10 +78,6 @@ bool Touch_getXY()
         TS_Point p = ts.getPoint();
         x = p.y;
         y = SCREEN_HEIGHT - p.x;
-        //Serial.print("X= ");
-        //Serial.print(x);
-        //Serial.print(" Y= ");
-        //Serial.println(y);
         return true;
     }
     return false;
@@ -104,10 +100,15 @@ void pageControl()
 		// Draw page and lock variables
 		if (!hasDrawn)
 		{
-			drawRoundBtn(140, 80, 305, 130, F("a!"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-			if (1)//drawCANBus())
+			if (graphicLoaderState == 0)
 			{
-				//break;
+				createCANBusBtns();
+				graphicLoaderState++;
+				break;
+			}
+			if (drawPage(userInterfaceButtons, graphicLoaderState, 8))
+			{
+				break;
 			}
 			hasDrawn = true;
 		}
@@ -147,29 +148,15 @@ void pageControl()
 }
 
 //
-void createMenu() 
+void createMenuBtns() 
 {
+	// Create Menu Buttons
 	uint8_t menuPosition = 0;
-
-    // Draw Layout
-    drawSquareBtn(0, 0, 479, 319, "", themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
-    drawSquareBtn(0, 0, 130, 319, "", menuBackground, menuBackground, menuBackground, ALIGN_CENTER);
-
-    // Create Menu Buttons
-    drawRoundBtn(5, 32, 125, 83, F("CANBUS"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-	userInterfaceMenuButton[menuPosition++].setButton(5, 32, 125, 83, true, CANBUS_MAIN, NULL, F("CANBUS"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-
-    drawRoundBtn(5, 88, 125, 140, F("VEHTOOL"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-	userInterfaceMenuButton[menuPosition++].setButton(5, 88, 125, 140, true, VEHTOOL_MAIN, NULL, F("VEHTOOL"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-
-    drawRoundBtn(5, 145, 125, 197, F("UTVTOOL"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-	userInterfaceMenuButton[menuPosition++].setButton(5, 145, 125, 197, true, UTVTOOL_MAIN, NULL, F("UTVTOOL"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-
-    drawRoundBtn(5, 202, 125, 254, F("TESTING"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-	userInterfaceMenuButton[menuPosition++].setButton(5, 202, 125, 254, true, TESTING_MAIN, NULL, F("TESTING"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-
-    drawRoundBtn(5, 259, 125, 312, F("SETTING"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-	userInterfaceMenuButton[menuPosition++].setButton(5, 259, 125, 312, true, SETTING_MAIN, NULL, F("SETTING"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
+	userInterfaceMenuButton[menuPosition++].setButton(5, 32, 125, 83, true, CANBUS_MAIN, NULL, F("CANBUS"), ALIGN_CENTER);
+	userInterfaceMenuButton[menuPosition++].setButton(5, 88, 125, 140, true, VEHTOOL_MAIN, NULL, F("VEHTOOL"), ALIGN_CENTER);
+	userInterfaceMenuButton[menuPosition++].setButton(5, 145, 125, 197, true, UTVTOOL_MAIN, NULL, F("UTVTOOL"), ALIGN_CENTER);
+	userInterfaceMenuButton[menuPosition++].setButton(5, 202, 125, 254, true, TESTING_MAIN, NULL, F("TESTING"), ALIGN_CENTER);
+	userInterfaceMenuButton[menuPosition++].setButton(5, 259, 125, 312, true, SETTING_MAIN, NULL, F("SETTING"), ALIGN_CENTER);
 }
 
 // -------------------------------------------------------------
@@ -217,26 +204,22 @@ void setup(void)
     display.println("Arial_12");
     delay(2000);
 
-	// drawMenu needs to be the first draw method called to correctly assign userInterface buttons to the first 5 positions
-	createMenu();
+	// Clear LCD
+	drawSquareBtn(0, 0, 479, 319, "", themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
+	drawSquareBtn(0, 0, 130, 319, "", menuBackground, menuBackground, menuBackground, ALIGN_CENTER);
+
+	// Create button objects
+	createMenuBtns();
     
-	// delete
-	drawSquareBtn(131, 55, 479, 319, "", themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
-	drawRoundBtn(140, 80, 305, 130, F("Capture"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-	drawRoundBtn(310, 80, 475, 130, F("Send"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-	drawRoundBtn(140, 135, 305, 185, F("Cap Files"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-	drawRoundBtn(310, 135, 475, 185, F("Baud"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-	drawRoundBtn(140, 190, 305, 240, F("FilterMask"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-	drawRoundBtn(310, 190, 475, 240, F("Auto Baud"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-	drawRoundBtn(140, 245, 305, 295, F(""), menuBackground, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-	drawRoundBtn(310, 245, 475, 295, F(""), menuBackground, menuBtnBorder, menuBtnText, ALIGN_CENTER);
+	// Draw Menu
+	while (drawPage(userInterfaceMenuButton, graphicLoaderState ,5));
+	graphicLoaderState = 0;
 }
 
 
 /*=========================================================
 	Background Processes
 ===========================================================*/
-
 // All background process should be called from here
 void backgroundProcess()
 {

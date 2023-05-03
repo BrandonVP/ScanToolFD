@@ -216,23 +216,26 @@ void buttonMonitor(UserInterfaceClass* buttons, uint8_t size)
     }
 }
 
-bool drawPage(UserInterfaceClass* buttons, uint8_t &btn, uint8_t buttonsToPrint)
+bool drawPage(UserInterfaceClass* buttons, uint8_t &pos, uint8_t buttonsToPrint)
 {
+    uint8_t btn = pos - 1;
     if (btn == 0)
     {
         drawSquareBtn(131, 55, 479, 319, "", themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
-        btn++;
+        drawRoundBtn(buttons[btn].getXStart(), buttons[btn].getYStart(), buttons[btn].getXStop(), buttons[btn].getYStop(), buttons[btn].getBtnText(), menuBtnColor, menuBtnBorder, menuBtnText, buttons[btn].getAlign());
+        pos++;
     }
     else
     {
-        drawSquareBtn(buttons[btn].getXStart(), buttons[btn].getYStart(), buttons[btn].getXStop(), buttons[btn].getYStop(), buttons[btn].getBtnName(), buttons[btn].getBtnColor(), buttons[btn].getBtnBorder(), buttons[btn].getBtnText(), buttons[btn++].getAlign());
+        drawRoundBtn(buttons[btn].getXStart(), buttons[btn].getYStart(), buttons[btn].getXStop(), buttons[btn].getYStop(), buttons[btn].getBtnText(), menuBtnColor, menuBtnBorder, menuBtnText, buttons[btn].getAlign());
+        pos++;
     }
     if (btn == buttonsToPrint)
     {
-        return true;
+        return false;
     }
     else
     {
-        return false;
+        return true;
     }
 }

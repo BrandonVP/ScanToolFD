@@ -7,7 +7,7 @@
 //#include "OBD_CAN_SIMULATOR.h"
 #include <ILI9488_t3.h>      // Display
 #include <Adafruit_FT6206.h> // Touch
-#include "definitions.h"
+//#include "definitions.h"
 #include "userInterface.h"
 #include "gui.h"
 //#include "KeyInput.h"

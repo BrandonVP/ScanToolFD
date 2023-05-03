@@ -28,15 +28,12 @@ class UserInterfaceClass
 	 bool usePage = false;
 	 uint8_t page = 0;
 	 void(*assignedFunction)(void) = NULL;
-	 String btnName;
-	 uint16_t btnColor;
-	 uint16_t btnBorder;
-	 uint16_t btnText;
+	 String btnText;
 	 uint8_t align;
 
  public:
 	void init();
-	void setButton(uint16_t, uint16_t, uint16_t, uint16_t, bool, uint8_t, void*, String, uint16_t, uint16_t, uint16_t, uint8_t);
+	void setButton(uint16_t, uint16_t, uint16_t, uint16_t, bool, uint8_t, void*, String, uint8_t);
 	uint16_t getXStart();
 	uint16_t getXStop();
 	uint16_t getYStart();
@@ -44,10 +41,7 @@ class UserInterfaceClass
 	uint8_t getPage();
 	bool getUsingPage();
 	void callFunction();
-	bool getBtnName();
-	bool getBtnColor();
-	bool getBtnBorder();
-	bool getBtnText();
+	String getBtnText();
 	bool getAlign();
 };
 
