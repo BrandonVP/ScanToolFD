@@ -8,7 +8,6 @@
  */
 
 #include "userInterface.h"
-#include "test.h"
 
 extern void testf();
 
@@ -17,7 +16,7 @@ void UserInterfaceClass::init()
 
 }
 
-void UserInterfaceClass::setButton(uint16_t xStart,  uint16_t yStart, uint16_t xStop, uint16_t yStop, bool usingPage, uint8_t page, void* func, String btnText, uint8_t align)
+void UserInterfaceClass::setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, bool usingPage, uint8_t page, void* func, String btnText, uint8_t alignText)
 {
 	this->xStart = xStart;
 	this->xStop = xStop;
@@ -33,7 +32,7 @@ void UserInterfaceClass::setButton(uint16_t xStart,  uint16_t yStart, uint16_t x
 		assignedFunction = (void(*)())func;
 	}
 	this->btnText = btnText;
-	this->align = align;
+	this->align = alignText;
 }
 
 uint16_t UserInterfaceClass::getXStart()
@@ -76,7 +75,7 @@ String UserInterfaceClass::getBtnText()
 	return this->btnText;
 }
 
-bool UserInterfaceClass::getAlign()
+uint8_t UserInterfaceClass::getAlign()
 {
 	return this->align;
 }

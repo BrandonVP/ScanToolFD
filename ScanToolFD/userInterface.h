@@ -42,7 +42,7 @@ class UserInterfaceClass
 	bool getUsingPage();
 	void callFunction();
 	String getBtnText();
-	bool getAlign();
+	uint8_t getAlign();
 };
 
 

@@ -36,9 +36,6 @@
     <ClInclude Include="config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="test.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="gui.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -51,15 +48,15 @@
     <ClInclude Include="CANBusCapture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="fonts\def_ili9341_fonts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="userInterface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="variableLock.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="gui.cpp">
@@ -71,5 +68,25 @@
     <ClCompile Include="CANBusCapture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="fonts\glcdfont.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="fonts\font_Crystal.txt">
+      <Filter>Misc Files</Filter>
+    </Text>
+    <Text Include="fonts\font_Droid.txt">
+      <Filter>Misc Files</Filter>
+    </Text>
+    <Text Include="fonts\font_Logisoso.txt">
+      <Filter>Misc Files</Filter>
+    </Text>
+    <Text Include="fonts\font_Michroma.txt">
+      <Filter>Misc Files</Filter>
+    </Text>
+    <Text Include="fonts\font_NunitoLight.txt">
+      <Filter>Misc Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

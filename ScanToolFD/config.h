@@ -12,11 +12,20 @@
 #define TFT_DC 9
 
 // Global LCD theme color variables
-#define themeBackground 0xFFFF // White
+
+#define themeBackground 0x424B // White
 #define menuBtnText 0xFFFF // White
+#define menuBtnBorder 0x869B // Black
+#define menuBtnColor 0x0516// Button Blue
+#define menuBackground 0x5B0E // Dark top menu background
+
+/*
+#define themeBackground 0xFFFF // White
+#define menuBtnText 0x0000 // White
 #define menuBtnBorder 0x0000 // Black
 #define menuBtnColor 0xFC00 // Orange
 #define menuBackground 0xC618 //Silver
+*/
 
 // CAN Bus message configuration
 #define USE_CAN1			1 // Messages on CAN0

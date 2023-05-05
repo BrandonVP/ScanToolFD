@@ -11,19 +11,21 @@
 #include "gui.h"
 #include "userInterface.h"
  //
-void drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int align)
+void drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int alignText)
 {
     const uint8_t LETTER_WIDTH = 11;
     const uint8_t SIDE_OFFSET = 2;
     const uint8_t yMagicOffset = 6;
     int stringLength, buttonWidth, offset;
 
+    
+
     // Print button
     display.fillRoundRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), 1, btnBgColor);
     display.drawRoundRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), 1, btnBorderColor);
-
+    display.setTextColor(btnTxtColor);
     // Print String with desired alignment
-    switch (align)
+    switch (alignText)
     {
     case 1: // Left
         display.drawString(buttonText, x_start + 5, y_start + ((y_stop - y_start) / 2) - 8);
@@ -33,8 +35,6 @@ void drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String butto
         stringLength = buttonText.length() * LETTER_WIDTH;
         buttonWidth = (x_stop - SIDE_OFFSET) - (x_start + SIDE_OFFSET);
         offset = (x_start + SIDE_OFFSET) + (buttonWidth / 2) - (stringLength / 2);
-
-        display.setTextColor(btnTxtColor);
         //display.setCursor(offset, y_start + ((y_stop - y_start) / 2) - yMagicOffset, false);
         //display.println(button);
         display.drawString(buttonText, offset, y_start + ((y_stop - y_start) / 2) - yMagicOffset);
@@ -218,19 +218,20 @@ void buttonMonitor(UserInterfaceClass* buttons, uint8_t size)
 
 bool drawPage(UserInterfaceClass* buttons, uint8_t &pos, uint8_t buttonsToPrint)
 {
-    uint8_t btn = pos - 1;
-    if (btn == 0)
+    uint8_t btn = pos - 2;
+    if (pos == 1)
     {
         drawSquareBtn(131, 55, 479, 319, "", themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
-        drawRoundBtn(buttons[btn].getXStart(), buttons[btn].getYStart(), buttons[btn].getXStop(), buttons[btn].getYStop(), buttons[btn].getBtnText(), menuBtnColor, menuBtnBorder, menuBtnText, buttons[btn].getAlign());
+        //drawRoundBtn(buttons[btn].getXStart(), buttons[btn].getYStart(), buttons[btn].getXStop(), buttons[btn].getYStop(), buttons[btn].getBtnText(), menuBtnColor, menuBtnBorder, menuBtnText, buttons[btn].getAlign());
         pos++;
+        return 1;
     }
     else
     {
         drawRoundBtn(buttons[btn].getXStart(), buttons[btn].getYStart(), buttons[btn].getXStop(), buttons[btn].getYStop(), buttons[btn].getBtnText(), menuBtnColor, menuBtnBorder, menuBtnText, buttons[btn].getAlign());
         pos++;
     }
-    if (btn == buttonsToPrint)
+    if (btn+1 == buttonsToPrint)
     {
         return false;
     }

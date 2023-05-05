@@ -1,4 +1,0 @@
-// test.h
-
-void test();
-

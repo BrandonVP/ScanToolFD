@@ -16,12 +16,12 @@
 	 End Todo List
  =========================================================*/
  
-#include "CANBusCapture.h"
+
  //#include <kinetis_flexcan.h>
 //#include <isotp_server.h>
 //#include <isotp.h>
 //#include <imxrt_flexcan.h>
-#include "CANBus.h"
+
 
 //#include <circular_buffer.h>
 #include <SPI.h>
@@ -29,13 +29,16 @@
 #include <Adafruit_FT6206.h> // Touch
 #include <ILI9488_t3.h>      // Display
 
-#include "gui.h"
-#include "test.h"
+#include "CANBusCapture.h"
+#include "CANBus.h"
 #include "variableLock.h"
 #include "config.h"
+#include "gui.h"
 
 #include "ili9488_t3_font_Arial.h"
 #include "ili9488_t3_font_ComicSansMS.h"
+#include "ili9488_t3_font_ArialBold.h"
+
 
 ILI9488_t3 display = ILI9488_t3(&SPI, TFT_CS, TFT_DC);
 Adafruit_FT6206 ts = Adafruit_FT6206();
@@ -91,6 +94,39 @@ void pageTransition()
 	page = nextPage;
 }
 
+void createCANBusBaudBtns()
+{
+	uint8_t btnPos = 0;
+	userInterfaceButtons[btnPos++].setButton(140, 275, 300, 315, true, 0, NULL, F("Set CAN0"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(305, 275, 475, 315, true, 0, NULL, F("Set CAN1"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(305, 60, 475, 100, true, 0, NULL, F("CAN0"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(305, 150, 475, 190, true, 0, NULL, F("CAN1"), ALIGN_CENTER);
+}
+
+void createCANBusCaptureBtns()
+{
+	uint8_t btnPos = 0;
+	
+	userInterfaceButtons[btnPos++].setButton(135, 110, 235, 150, true, 0, NULL, F("CAN1FD"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(135, 150, 235, 190, true, 0, NULL, F("CAN2"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(135, 190, 235, 230, true, 0, NULL, F("CAN3"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(135, 230, 235, 270, true, 0, NULL, F("Wireless"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(135, 270, 235, 310, true, 0, NULL, F(""), ALIGN_CENTER);
+	
+	userInterfaceButtons[btnPos++].setButton(240, 110, 340, 150, true, 0, NULL, F("LCD"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(240, 150, 340, 190, true, 0, NULL, F("Serial"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(240, 190, 340, 230, true, 0, NULL, F("SD Card"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(240, 230, 340, 270, true, 0, NULL, F("Wireless"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(240, 270, 340, 310, true, 0, NULL, F(""), ALIGN_CENTER);
+
+	// Non button prints
+	userInterfaceButtons[btnPos++].setButton(135, 55, 235, 95, true, 0, NULL, F("INPUT"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(240, 55, 340, 95, true, 0, NULL, F("OUTPUT"), ALIGN_CENTER);
+
+
+}
+
+
 // Manages the different App pages
 void pageControl()
 {
@@ -114,7 +150,59 @@ void pageControl()
 		}
 
 		// Call buttons or page method
-		//CANBusButtons();
+		buttonMonitor(userInterfaceButtons, 8);
+
+		// Release any variable locks if page changed
+		if (nextPage != page)
+		{
+			pageTransition();
+		}
+		break;
+	case 1: // CAN Bus Capture
+		// Draw page and lock variables
+		if (!hasDrawn)
+		{
+			if (graphicLoaderState == 0)
+			{
+				createCANBusCaptureBtns();
+				graphicLoaderState++;
+				break;
+			}
+			if (drawPage(userInterfaceButtons, graphicLoaderState, 12))
+			{
+				break;
+			}
+			hasDrawn = true;
+		}
+
+		// Call buttons or page method
+		buttonMonitor(userInterfaceButtons, 10);
+
+		// Release any variable locks if page changed
+		if (nextPage != page)
+		{
+			pageTransition();
+		}
+		break;
+	case 2: // CAN Bus Capture
+		// Draw page and lock variables
+		if (!hasDrawn)
+		{
+			if (graphicLoaderState == 0)
+			{
+				createCANBusBaudBtns();
+				graphicLoaderState++;
+				break;
+			}
+			if (drawPage(userInterfaceButtons, graphicLoaderState, 4))
+			{
+				break;
+			}
+			hasDrawn = true;
+		}
+
+		// Call buttons or page method
+		buttonMonitor(userInterfaceButtons, 4);
 
 		// Release any variable locks if page changed
 		if (nextPage != page)
@@ -159,6 +247,7 @@ void createMenuBtns()
 	userInterfaceMenuButton[menuPosition++].setButton(5, 259, 125, 312, true, SETTING_MAIN, NULL, F("SETTING"), ALIGN_CENTER);
 }
 
+
 // -------------------------------------------------------------
 void setup(void)
 {
@@ -198,8 +287,9 @@ void setup(void)
     delay(1000);
     display.fillScreen(ILI9488_WHITE);
     delay(1000);
-    display.setTextColor(ILI9488_BLACK);
-    display.setFont(Arial_12);
+
+    display.setTextColor(ILI9488_RED);
+    display.setFont(Arial_14_Bold);
     //display.setFont(ComicSansMS_12);
     display.println("Arial_12");
     delay(2000);

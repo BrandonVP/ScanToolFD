@@ -75,7 +75,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\ScanToolFD;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\teensy\hardware\avr\1.57.2\libraries\FlexCAN_T4;$(ProjectDir)Libraries\SPI\1.0\SPI;$(ProjectDir)Libraries\Wire\1.0\Wire;$(ProjectDir)..\..\..\..\Documents\Arduino\libraries\Adafruit_FT6206_Library;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\teensy\hardware\avr\1.57.2\libraries\ILI9488_t3\src;$(ProjectDir)Libraries\Wire\1.0\Wire\utility;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\teensy\hardware\avr\1.57.2\cores\teensy4;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\teensy\hardware\avr\1.57.2\cores\teensy4\avr;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\teensy\hardware\avr\1.57.2\cores\teensy4\debug;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\teensy\hardware\avr\1.57.2\cores\teensy4\util;$(ProjectDir)..\..\SCANTO~1\SCANTO~1;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\arduino\tools\avr-gcc\7.3.0-atmel3.6.1-arduino7\\lib\gcc\avr\7.3.0\include;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\arduino\tools\avr-gcc\7.3.0-atmel3.6.1-arduino7\avr\include;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\arduino\tools\avr-gcc\7.3.0-atmel3.6.1-arduino7\\lib\gcc\avr\7.3.0\include;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\arduino\tools\avr-gcc\7.3.0-atmel3.6.1-arduino7\avr\include-fixed;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\arduino\tools\avr-gcc\7.3.0-atmel3.6.1-arduino7\avr\include\avr;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\arduino\tools\avr-gcc\7.3.0-atmel3.6.1-arduino7\lib\gcc\avr\4.9.2\include;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\arduino\tools\avr-gcc\7.3.0-atmel3.6.1-arduino7\lib\gcc\avr\4.9.2\include;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\arduino\tools\avr-gcc\7.3.0-atmel3.6.1-arduino7\lib\gcc\avr\4.9.3\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\ScanToolFD;$(ProjectDir)Libraries\SPI\1.0\SPI;$(ProjectDir)Libraries\Wire\1.0\Wire;$(ProjectDir)..\..\..\..\Documents\Arduino\libraries\Adafruit_FT6206_Library;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\teensy\hardware\avr\1.57.2\libraries\ILI9488_t3\src;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\teensy\hardware\avr\1.57.2\libraries\FlexCAN_T4;$(ProjectDir)Libraries\Wire\1.0\Wire\utility;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\teensy\hardware\avr\1.57.2\cores\teensy4;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\teensy\hardware\avr\1.57.2\cores\teensy4\avr;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\teensy\hardware\avr\1.57.2\cores\teensy4\debug;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\teensy\hardware\avr\1.57.2\cores\teensy4\util;$(ProjectDir)..\..\SCANTO~1\SCANTO~1;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\arduino\tools\avr-gcc\7.3.0-atmel3.6.1-arduino7\\lib\gcc\avr\7.3.0\include;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\arduino\tools\avr-gcc\7.3.0-atmel3.6.1-arduino7\avr\include;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\arduino\tools\avr-gcc\7.3.0-atmel3.6.1-arduino7\\lib\gcc\avr\7.3.0\include;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\arduino\tools\avr-gcc\7.3.0-atmel3.6.1-arduino7\avr\include-fixed;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\arduino\tools\avr-gcc\7.3.0-atmel3.6.1-arduino7\avr\include\avr;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\arduino\tools\avr-gcc\7.3.0-atmel3.6.1-arduino7\lib\gcc\avr\4.9.2\include;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\arduino\tools\avr-gcc\7.3.0-atmel3.6.1-arduino7\lib\gcc\avr\4.9.2\include;$(ProjectDir)..\..\..\..\AppData\Local\arduino15\packages\arduino\tools\avr-gcc\7.3.0-atmel3.6.1-arduino7\lib\gcc\avr\4.9.3\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>$(ProjectDir)__vm\.ScanToolFD.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <IgnoreStandardIncludePath>true</IgnoreStandardIncludePath>
       <PreprocessorDefinitions>__AVR_imxrt1062__;__AVR_IMXRT1062__;_VMDEBUG=1;__IMXRT1062__;TEENSYDUINO=157;ARDUINO=108010;ARDUINO_TEENSY40;F_CPU=600000000;USB_SERIAL;LAYOUT_US_ENGLISH;__cplusplus=201103L;_VMICRO_INTELLISENSE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -125,9 +125,9 @@
     <ClInclude Include="CANBusCapture.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="config.h" />
+    <ClInclude Include="fonts\def_ili9341_fonts.h" />
     <ClInclude Include="gui.h" />
     <ClInclude Include="PIDS.h" />
-    <ClInclude Include="test.h" />
     <ClInclude Include="userInterface.h" />
     <ClInclude Include="variableLock.h" />
     <ClInclude Include="__vm\.ScanToolFD.vsarduino.h" />
@@ -135,10 +135,17 @@
   <ItemGroup>
     <ClCompile Include="CANBus.cpp" />
     <ClCompile Include="CANBusCapture.cpp" />
+    <ClCompile Include="fonts\glcdfont.c" />
     <ClCompile Include="gui.cpp" />
-    <ClCompile Include="test.cpp" />
     <ClCompile Include="userInterface.cpp" />
     <ClCompile Include="variableLock.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="fonts\font_Crystal.txt" />
+    <Text Include="fonts\font_Droid.txt" />
+    <Text Include="fonts\font_Logisoso.txt" />
+    <Text Include="fonts\font_Michroma.txt" />
+    <Text Include="fonts\font_NunitoLight.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
