@@ -107,25 +107,40 @@ void createCANBusCaptureBtns()
 {
 	uint8_t btnPos = 0;
 	
-	userInterfaceButtons[btnPos++].setButton(135, 110, 235, 150, true, 0, NULL, F("CAN1FD"), ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(135, 150, 235, 190, true, 0, NULL, F("CAN2"), ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(135, 190, 235, 230, true, 0, NULL, F("CAN3"), ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(135, 230, 235, 270, true, 0, NULL, F("Wireless"), ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(135, 270, 235, 310, true, 0, NULL, F(""), ALIGN_CENTER);
-	
-	userInterfaceButtons[btnPos++].setButton(240, 110, 340, 150, true, 0, NULL, F("LCD"), ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(240, 150, 340, 190, true, 0, NULL, F("Serial"), ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(240, 190, 340, 230, true, 0, NULL, F("SD Card"), ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(240, 230, 340, 270, true, 0, NULL, F("Wireless"), ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(240, 270, 340, 310, true, 0, NULL, F(""), ALIGN_CENTER);
-
-	// Non button prints
-	userInterfaceButtons[btnPos++].setButton(135, 55, 235, 95, true, 0, NULL, F("INPUT"), ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(240, 55, 340, 95, true, 0, NULL, F("OUTPUT"), ALIGN_CENTER);
-
-
+	userInterfaceButtons[btnPos++].setButton(370, 190, 470, 240, true, 0, NULL, F("START"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(370, 260, 470, 310, true, 0, NULL, F("STOP"), ALIGN_CENTER);
 }
 
+void createToolBtns()
+{
+	uint8_t btnPos = 0;
+	userInterfaceButtons[btnPos++].setButton(55, 80, 220, 120, true, 1, NULL, F("PID Scan"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(260, 80, 425, 120, true, 2, NULL, F("PID Stream"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(55, 140, 220, 180, true, 0, NULL, F("Get VIN"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(260, 140, 425, 180, true, 0, NULL, F("DTC"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(55, 200, 220, 240, true, 0, NULL, F("OBD Simulator"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(260, 200, 425, 240, true, 0, NULL, F("Gauges"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(55, 260, 220, 300, true, 0, NULL, F("TX Spam"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(260, 260, 425, 300, true, 0, NULL, F(""), ALIGN_CENTER);
+}
+
+void createSettingsBtns()
+{
+	uint8_t btnPos = 0;
+	userInterfaceButtons[btnPos++].setButton(55, 80, 220, 120, true, 1, NULL, F("Memory"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(260, 80, 425, 120, true, 2, NULL, F("About"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(55, 140, 220, 180, true, 0, NULL, F("WiFi MAC"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(260, 140, 425, 180, true, 0, NULL, F("Overclock"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(55, 200, 220, 240, true, 0, NULL, F("Reset WiFi"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(260, 200, 425, 240, true, 0, NULL, F("Set Time"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(55, 260, 220, 300, true, 0, NULL, F("Dongle"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(260, 260, 425, 300, true, 0, NULL, F("Reset"), ALIGN_CENTER);
+}
+
+void clearAppSpace()
+{
+	drawSquareBtn(0, 51, 480, 320, "", themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
+}
 
 // Manages the different App pages
 void pageControl()
@@ -139,10 +154,11 @@ void pageControl()
 			if (graphicLoaderState == 0)
 			{
 				createCANBusBtns();
+				clearAppSpace();
 				graphicLoaderState++;
 				break;
 			}
-			if (drawPage(userInterfaceButtons, graphicLoaderState, 8))
+			if (drawPage(userInterfaceButtons, graphicLoaderState, 6))
 			{
 				break;
 			}
@@ -150,7 +166,7 @@ void pageControl()
 		}
 
 		// Call buttons or page method
-		buttonMonitor(userInterfaceButtons, 8);
+		buttonMonitor(userInterfaceButtons, 6);
 
 		// Release any variable locks if page changed
 		if (nextPage != page)
@@ -165,10 +181,18 @@ void pageControl()
 			if (graphicLoaderState == 0)
 			{
 				createCANBusCaptureBtns();
+				clearAppSpace();
+
+				// Menu frames
+				drawSquareBtn(10, 80, 180, 310, "", menuBackground, frameBorder, menuBackground, ALIGN_CENTER);
+				drawSquareBtn(190, 80, 360, 310, "", menuBackground, frameBorder, menuBackground, ALIGN_CENTER);
+				drawRoundBtn(10, 55, 180, 75, "Select Source", themeBackground, themeBackground, menuBtnTextColor, ALIGN_CENTER);
+				drawRoundBtn(190, 55, 360, 75, "Select Output", themeBackground, themeBackground, menuBtnTextColor, ALIGN_CENTER);
+
 				graphicLoaderState++;
 				break;
 			}
-			if (drawPage(userInterfaceButtons, graphicLoaderState, 12))
+			if (drawPage(userInterfaceButtons, graphicLoaderState, 2))
 			{
 				break;
 			}
@@ -176,7 +200,13 @@ void pageControl()
 		}
 
 		// Call buttons or page method
-		buttonMonitor(userInterfaceButtons, 10);
+		/*
+		int temp = subMenuButtonMonitor(userInterfaceButtons, 2);
+		if (temp >= 0)
+		{
+			Serial.println(temp);
+		}
+		*/
 
 		// Release any variable locks if page changed
 		if (nextPage != page)
@@ -191,6 +221,7 @@ void pageControl()
 			if (graphicLoaderState == 0)
 			{
 				createCANBusBaudBtns();
+				clearAppSpace();
 				graphicLoaderState++;
 				break;
 			}
@@ -210,15 +241,47 @@ void pageControl()
 			pageTransition();
 		}
 		break;
-	case 9: // Filter Mask
+	case 9: // Tools
 		// Draw page and lock variables
 		if (!hasDrawn)
 		{
-			drawRoundBtn(140, 80, 305, 130, F("b!"), menuBtnColor, menuBtnBorder, menuBtnText, ALIGN_CENTER);
-			if (1)
+			if (graphicLoaderState == 0)
 			{
-				
-				
+				createToolBtns();
+				clearAppSpace();
+				graphicLoaderState++;
+				break;
+			}
+			if (drawPage(userInterfaceButtons, graphicLoaderState, 8))
+			{
+				break;
+			}
+			hasDrawn = true;
+		}
+
+		// Call buttons or page method
+
+
+		// Release any variable locks if page changed
+		if (nextPage != page)
+		{
+			pageTransition();
+		}
+		break;
+	case 36: // Settings
+		// Draw page and lock variables
+		if (!hasDrawn)
+		{
+			if (graphicLoaderState == 0)
+			{
+				createSettingsBtns();
+				clearAppSpace();
+				graphicLoaderState++;
+				break;
+			}
+			if (drawPage(userInterfaceButtons, graphicLoaderState, 8))
+			{
+				break;
 			}
 			hasDrawn = true;
 		}
@@ -240,11 +303,18 @@ void createMenuBtns()
 {
 	// Create Menu Buttons
 	uint8_t menuPosition = 0;
+	
+	userInterfaceMenuButton[menuPosition++].setButton(160, 0, 260, 40, true, CANBUS_MAIN, NULL, F("CAN Bus"), ALIGN_CENTER);
+	userInterfaceMenuButton[menuPosition++].setButton(270, 0, 370, 40, true, VEHTOOL_MAIN, NULL, F("Tools"), ALIGN_CENTER);
+	userInterfaceMenuButton[menuPosition++].setButton(375, 0, 475, 40, true, SETTING_MAIN, NULL, F("Settings"), ALIGN_CENTER);
+
+	/*
 	userInterfaceMenuButton[menuPosition++].setButton(5, 32, 125, 83, true, CANBUS_MAIN, NULL, F("CANBUS"), ALIGN_CENTER);
 	userInterfaceMenuButton[menuPosition++].setButton(5, 88, 125, 140, true, VEHTOOL_MAIN, NULL, F("VEHTOOL"), ALIGN_CENTER);
 	userInterfaceMenuButton[menuPosition++].setButton(5, 145, 125, 197, true, UTVTOOL_MAIN, NULL, F("UTVTOOL"), ALIGN_CENTER);
 	userInterfaceMenuButton[menuPosition++].setButton(5, 202, 125, 254, true, TESTING_MAIN, NULL, F("TESTING"), ALIGN_CENTER);
 	userInterfaceMenuButton[menuPosition++].setButton(5, 259, 125, 312, true, SETTING_MAIN, NULL, F("SETTING"), ALIGN_CENTER);
+	*/
 }
 
 
@@ -282,21 +352,18 @@ void setup(void)
     }
 
     display.begin();
-    display.fillScreen(ILI9488_BLUE);
+    display.fillScreen(ILI9488_BLACK);
     display.setRotation(1);
-    delay(1000);
-    display.fillScreen(ILI9488_WHITE);
-    delay(1000);
-
-    display.setTextColor(ILI9488_RED);
-    display.setFont(Arial_14_Bold);
+    display.setFont(Arial_14);
     //display.setFont(ComicSansMS_12);
-    display.println("Arial_12");
-    delay(2000);
+    //display.println("Arial_12");
 
 	// Clear LCD
 	drawSquareBtn(0, 0, 479, 319, "", themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
-	drawSquareBtn(0, 0, 130, 319, "", menuBackground, menuBackground, menuBackground, ALIGN_CENTER);
+	drawSquareBtn(0, 0, 480, 45, "", menuBackground, menuBackground, menuBackground, ALIGN_CENTER);
+	drawSquareBtn(0, 45, 480, 50, "", menuBorder, menuBorder, menuBorder, ALIGN_CENTER);
+	drawSquareBtn(160, 45, 260, 50, "", menuBtnColor, menuBtnColor, menuBtnColor, ALIGN_CENTER);
+	//drawSquareBtn(0, 0, 130, 319, "", menuBackground, menuBackground, menuBackground, ALIGN_CENTER);
 
 	// Create button objects
 	createMenuBtns();
@@ -324,6 +391,7 @@ void backgroundProcess()
 	Main loop
 ===========================================================*/
 // Main loop runs the user interface and calls for background processes
+uint32_t timer1 = 0;
 void loop(void)
 {
     pageControl();
