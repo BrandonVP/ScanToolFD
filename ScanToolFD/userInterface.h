@@ -25,22 +25,20 @@ class UserInterfaceClass
 	 uint16_t xStop = 0;
 	 uint16_t yStart = 0;
 	 uint16_t yStop = 0;
-	 bool usePage = false;
 	 uint8_t page = 0;
-	 void(*assignedFunction)(void) = NULL;
+	 bool isRound = true;
 	 String btnText;
-	 uint8_t align;
+	 uint8_t align = 1;
 
  public:
 	void init();
-	void setButton(uint16_t, uint16_t, uint16_t, uint16_t, bool, uint8_t, void*, String, uint8_t);
+	void setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint8_t page, bool isRound, String btnText, uint8_t alignText);
 	uint16_t getXStart();
 	uint16_t getXStop();
 	uint16_t getYStart();
 	uint16_t getYStop();
 	uint8_t getPage();
-	bool getUsingPage();
-	void callFunction();
+	bool getIsRound();
 	String getBtnText();
 	uint8_t getAlign();
 };

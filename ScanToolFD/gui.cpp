@@ -10,6 +10,8 @@
 #define _GUI_C
 #include "gui.h"
 #include "userInterface.h"
+#include "config.h"
+
  //
 void drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int alignText)
 {
@@ -92,6 +94,7 @@ void drawSquareBtn(int x_start, int y_start, int x_stop, int y_stop, String butt
     }
 }
 
+
 // Holds round button down while pressed
 void waitForIt(int x_start, int y_start, int x_stop, int y_stop)
 {
@@ -101,7 +104,7 @@ void waitForIt(int x_start, int y_start, int x_stop, int y_stop)
     }
     else
     {
-        drawSquareBtn(0, 45, 480, 50, "", 0x39E8, 0x39E8, 0x39E8, ALIGN_CENTER);
+        drawSquareBtn(0, 45, 480, 50, "", menuBorder, menuBorder, menuBorder, ALIGN_CENTER);
     }
     
     while (ts.touched())
@@ -142,16 +145,15 @@ void buttonMonitor(UserInterfaceClass* buttons, uint8_t size)
             {
                 if ((y >= buttons[i].getYStart()) && (y <= buttons[i].getYStop()))
                 {
-                    // CANBUS
-                    waitForIt(buttons[i].getXStart(), buttons[i].getYStart(), buttons[i].getXStop(), buttons[i].getYStop());
-                    if (buttons[i].getUsingPage() == true)
+                    if (buttons[i].getIsRound())
                     {
-                        nextPage = buttons[i].getPage();
+                        waitForIt(buttons[i].getXStart(), buttons[i].getYStart(), buttons[i].getXStop(), buttons[i].getYStop());
                     }
                     else
                     {
-                        buttons[i].callFunction();
+                        waitForItRect(buttons[i].getXStart(), buttons[i].getYStart(), buttons[i].getXStop(), buttons[i].getYStop());
                     }
+                    nextPage = buttons[i].getPage();
                     graphicLoaderState = 0;
                 }
             }
@@ -170,8 +172,14 @@ int subMenuButtonMonitor(UserInterfaceClass* buttons, uint8_t size)
             {
                 if ((y >= buttons[i].getYStart()) && (y <= buttons[i].getYStop()))
                 {
-                    // CANBUS
-                    waitForIt(buttons[i].getXStart(), buttons[i].getYStart(), buttons[i].getXStop(), buttons[i].getYStop());
+                    if (buttons[i].getIsRound())
+                    {
+                        waitForIt(buttons[i].getXStart(), buttons[i].getYStart(), buttons[i].getXStop(), buttons[i].getYStop());
+                    }
+                    else
+                    {
+                        waitForItRect(buttons[i].getXStart(), buttons[i].getYStart(), buttons[i].getXStop(), buttons[i].getYStop());
+                    }
                     return buttons[i].getPage();
                 }
             }
@@ -185,7 +193,16 @@ bool drawPage(UserInterfaceClass* buttons, uint8_t &pos, uint8_t buttonsToPrint)
     uint8_t btn = pos - 1;
     if (buttonsToPrint != 0)
     {
-        drawRoundBtn(buttons[btn].getXStart(), buttons[btn].getYStart(), buttons[btn].getXStop(), buttons[btn].getYStop(), buttons[btn].getBtnText(), menuBtnColor, menuBtnBorder, menuBtnText, buttons[btn].getAlign());
+        Serial.print("isRound: ");
+        Serial.println(buttons[btn].getIsRound());
+        if (buttons[btn].getIsRound())
+        {
+            drawRoundBtn(buttons[btn].getXStart(), buttons[btn].getYStart(), buttons[btn].getXStop(), buttons[btn].getYStop(), buttons[btn].getBtnText(), menuBtnColor, menuBtnBorder, menuBtnText, buttons[btn].getAlign());
+        }
+        else
+        {
+            drawSquareBtn(buttons[btn].getXStart(), buttons[btn].getYStart(), buttons[btn].getXStop(), buttons[btn].getYStop(), buttons[btn].getBtnText(), menuBackground, menuBackground, menuBtnText, buttons[btn].getAlign());
+        }
         pos++;
     }
     if (pos > buttonsToPrint)
@@ -196,4 +213,10 @@ bool drawPage(UserInterfaceClass* buttons, uint8_t &pos, uint8_t buttonsToPrint)
     {
         return true;
     }
+}
+
+//
+void drawButton(UserInterfaceClass* button, uint16_t buttonColor, uint16_t buttonBorderColor, uint16_t buttonTextColor)
+{
+    drawRoundBtn(button->getXStart(), button->getYStart(), button->getXStop(), button->getYStop(), button->getBtnText(), buttonColor, buttonBorderColor, buttonTextColor, button->getAlign());
 }

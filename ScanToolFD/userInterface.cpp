@@ -16,21 +16,14 @@ void UserInterfaceClass::init()
 
 }
 
-void UserInterfaceClass::setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, bool usingPage, uint8_t page, void* func, String btnText, uint8_t alignText)
+void UserInterfaceClass::setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint8_t page, bool isRound, String btnText, uint8_t alignText)
 {
 	this->xStart = xStart;
 	this->xStop = xStop;
 	this->yStart = yStart;
 	this->yStop = yStop;
-	usePage = usingPage;
-	if (usingPage)
-	{
-		this->page = page;
-	}
-	else
-	{
-		assignedFunction = (void(*)())func;
-	}
+	this->page = page;
+	this->isRound = isRound;
 	this->btnText = btnText;
 	this->align = alignText;
 }
@@ -60,14 +53,9 @@ uint8_t UserInterfaceClass::getPage()
 	return this->page;
 }
 
-bool UserInterfaceClass::getUsingPage()
+bool UserInterfaceClass::getIsRound()
 {
-	return this->usePage;
-}
-
-void UserInterfaceClass::callFunction()
-{
-	assignedFunction();
+	return this->isRound;
 }
 
 String UserInterfaceClass::getBtnText()
