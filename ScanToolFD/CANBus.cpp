@@ -12,89 +12,111 @@
 #include "PIDS.h"
 #include "config.h"
 
- // Initialize can2 and set the baud rates here
-void CANBus::startCAN1(uint32_t start, uint32_t end)
+ // Initialize can1 and set the baud rates here
+void CANBus::initialize_CAN1()
 {
-	//can1.begin(getBaud0());
-	//can1.watchForRange(start, end);
+	
 
-	// Do not use extended frames
-	//CANOut.extended = false;
-
-	// Message length
-	//CANOut.length = 8;
 }
 
 // Initialize can2 and set the baud rates here
-void CANBus::startCAN2(uint32_t start, uint32_t end)
+void CANBus::initialize_CAN2()
 {
-	//can2.begin(getBaud1());
-	//can2.watchForRange(start, end);
+
+
+
+}
+
+// Initialize can3 FD and set the baud rates here
+void CANBus::initialize_CAN3_FD()
+{
+
+
+
 }
 
 // Set can1 Filter and Mask
-void CANBus::setFilterMask0(uint32_t filter, uint32_t mask)
+void CANBus::setFilterMaskCAN1(uint32_t filter, uint32_t mask)
 {
-	for (uint8_t i = 0; i < 7; i++)
-	{
-		//can1.setRXFilter(i, filter, mask, false);
-	}
+
+
 }
 
 // Set can2 Filter and Mask
-void CANBus::setFilterMask1(uint32_t filter, uint32_t mask)
+void CANBus::setFilterMaskCAN2(uint32_t filter, uint32_t mask)
 {
-	for (uint8_t i = 0; i < 7; i++)
-	{
-		//can2.setRXFilter(i, filter, mask, false);
-	}
+
+
 }
 
-// Set baud rate for CAN Bus
-void CANBus::setBaud0(uint32_t newBaud)
+// Set can3 FD Filter and Mask
+void CANBus::setFilterMaskCAN3_FD(uint32_t filter, uint32_t mask)
 {
-	//can1.set_baudrate(newBaud);
+
+
+}
+
+// Set can1 Filter and Mask
+void CANBus::setBaudCAN1(uint32_t baud)
+{
+
+
+}
+
+// Set can2 Filter and Mask
+void CANBus::setBaudCAN2(uint32_t baud)
+{
+
+
+}
+
+// Set can3 FD Filter and Mask
+void CANBus::setBaudCAN3_FD(uint32_t baud)
+{
+
+
+}
+
+// Set can1 Filter and Mask
+uint32_t CANBus::getBaudCAN1()
+{
+
+
+}
+
+// Set can2 Filter and Mask
+uint32_t CANBus::getBaudCAN2()
+{
+
+
+}
+
+// Set can3 FD Filter and Mask
+uint32_t CANBus::getBaudCAN3_FD()
+{
+
+
 }
 
 //
-void CANBus::setBaud1(uint32_t newBaud)
+void CAN1_Callback(const CAN_message_t& msg)
 {
-	//can2.set_baudrate(newBaud);
-}
 
-// Get the current baud rate
-uint32_t CANBus::getBaud0()
-{
-	return 1;// can1.getBusSpeed();
 }
 
 //
-uint32_t CANBus::getBaud1()
+void CAN2_Callback(const CAN_message_t& msg)
 {
-	return 1;// can2.getBusSpeed();
+
 }
 
 //
-uint32_t CANBus::findBaudRate0()
+void CAN3_FD_Callback(const CANFD_message_t& msg)
 {
-	return 1;//can1.beginAutoSpeed();
-}
 
-//
-uint32_t CANBus::findBaudRate1()
-{
-	return 1;// can2.beginAutoSpeed();
 }
 
 
-// PID callback
-void ECUtraffic(CAN_message_t* inccan1)
-{
-	// TODO fix message number
-	char buffer[MSG_STRING_LENGTH];
-	//sprintf(buffer, "%8d    %9f    %04X   %d   %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\r\n", 0, (float)millis(), inccan1->id, inccan1->length, inccan1->data.bytes[0], inccan1->data.bytes[1], inccan1->data.bytes[2], inccan1->data.bytes[3], inccan1->data.bytes[4], inccan1->data.bytes[5], inccan1->data.bytes[6], inccan1->data.bytes[7]);
-	SERIAL_CAPTURE(buffer);
-}
 
 //
 void CANBus::sendCANOut(uint8_t channel, CAN_message_t CANBus, bool serialOut)

@@ -27,20 +27,6 @@
 #define SERIAL_CAPTURE(x) Serial.print(x);
 #define SD_CAPTURE(x, y) SDCardBuffer(x, y)
 
-// States for serial transfer
-#define START_BYTE              (0)
-#define PACKET_LENGTH           (1)
-#define CAN_BUS_ID1             (2)
-#define CAN_BUS_ID2             (3)
-#define CAN_BUS_LENGTH          (4)
-#define CAN_BUS_DATA            (5)
-#define END_BYTE                (6)
-// Serial transfer
-#define STARTING_BYTE           (0xFE)
-#define ENDING_BYTE             (0xFD)
-#define PACKET_SIZE             (0x0A)
-
-extern void SDCardBuffer(char*, bool);
 
 class CANBus
 {
@@ -73,16 +59,23 @@ private:
 
 
 public:
-	void startCAN1(uint32_t, uint32_t);
-	void startCAN2(uint32_t, uint32_t);
-	void setFilterMask0(uint32_t, uint32_t);
-	void setFilterMask1(uint32_t, uint32_t);
-	uint32_t findBaudRate0();
-	uint32_t findBaudRate1();
-	void setBaud0(uint32_t);
-	void setBaud1(uint32_t);
-	uint32_t getBaud0();
-	uint32_t getBaud1();
+	void initialize_CAN1();
+	void initialize_CAN2();
+	void initialize_CAN3_FD();
+
+	void setFilterMaskCAN1(uint32_t, uint32_t);
+	void setFilterMaskCAN2(uint32_t, uint32_t);
+	void setFilterMaskCAN3_FD(uint32_t, uint32_t);
+
+	void setBaudCAN1(uint32_t);
+	void setBaudCAN2(uint32_t);
+	void setBaudCAN3_FD(uint32_t);
+
+	uint32_t getBaudCAN1();
+	uint32_t getBaudCAN2();
+	uint32_t getBaudCAN3_FD();
+
+
 	uint8_t requestVIN(uint16_t, bool);
 	bool VINReady();
 	String getVIN();
@@ -94,7 +87,6 @@ public:
 	bool SerialOutCAN(uint8_t);
 	void sendCANOut(uint8_t, CAN_message_t, bool);
 	bool LCDOutCAN(uint8_t*, uint8_t&, uint32_t&, uint8_t);
-	void resetMessageNum();
 	void SDCardBuffer(char*, bool);
 };
 #endif

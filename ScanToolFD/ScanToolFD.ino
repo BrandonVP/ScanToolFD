@@ -15,15 +15,16 @@
  ===========================================================
 	 End Todo List
  =========================================================*/
- 
 
- //#include <kinetis_flexcan.h>
+
+//#include <kinetis_flexcan.h>
 //#include <isotp_server.h>
 //#include <isotp.h>
 //#include <imxrt_flexcan.h>
-
-
 //#include <circular_buffer.h>
+
+//#include <Adafruit_GFX.h>
+#include "serialTransfer.h"
 #include <SPI.h>
 #include <Wire.h>
 #include <Adafruit_FT6206.h> // Touch
@@ -38,7 +39,23 @@
 #include "ili9488_t3_font_Arial.h"
 #include "ili9488_t3_font_ComicSansMS.h"
 #include "ili9488_t3_font_ArialBold.h"
+#include "font_OpenSans.h"
+#include "font_DroidSans.h"
+#include "font_Michroma.h"
+#include "font_Crystal.h"
+#include "font_ChanceryItalic.h"
+/*
+#include "font_Arial.h"
+#include "font_ArialBold.h"
+#include "font_ComicSansMS.h"
+#include "font_OpenSans.h"
+#include "font_DroidSans.h"
+#include "font_Michroma.h"
+#include "font_Crystal.h"
+#include "font_ChanceryItalic.h"
 
+#include "Fonts/FreeSansOblique12pt7b.h"
+*/
 
 ILI9488_t3 display = ILI9488_t3(&SPI, TFT_CS, TFT_DC);
 Adafruit_FT6206 ts = Adafruit_FT6206();
@@ -78,14 +95,14 @@ UserInterfaceClass userInterfaceMenuButton[MENU_BUTTON_SIZE];
 // Simplifies getting x and y coords
 bool Touch_getXY()
 {
-    if (ts.touched())
-    {
-        TS_Point p = ts.getPoint();
-        x = p.y;
-        y = SCREEN_HEIGHT - p.x;
-        return true;
-    }
-    return false;
+	if (ts.touched())
+	{
+		TS_Point p = ts.getPoint();
+		x = p.y;
+		y = SCREEN_HEIGHT - p.x;
+		return true;
+	}
+	return false;
 }
 
 // Resets variables for page change
@@ -101,7 +118,7 @@ void createCANBusBaudBtns()
 	uint8_t btnPos = 0;
 	userInterfaceButtons[btnPos++].setButton(140, 275, 300, 315, 0, true, F("Set CAN0"), ALIGN_CENTER);
 	userInterfaceButtons[btnPos++].setButton(305, 275, 475, 315, 0, true, F("Set CAN1"), ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(305,  60, 475, 100, 0, true, F("CAN0"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(305, 60, 475, 100, 0, true, F("CAN0"), ALIGN_CENTER);
 	userInterfaceButtons[btnPos++].setButton(305, 150, 475, 190, 0, true, F("CAN1"), ALIGN_CENTER);
 }
 
@@ -110,12 +127,12 @@ void createCANBusCaptureBtns()
 	uint8_t btnPos = 0;
 	//10, 75, 160, 270
 	//(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint8_t page, bool isRound, String btnText, uint8_t alignText);
-	userInterfaceButtons[btnPos++].setButton(100, 275, 220, 315, 0, true,  F("START"),    ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(260, 275, 380, 315, 0, true,  F("STOP"),     ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton( 10,  80, 160, 120, 0, false, F("CAN0 FD"),  ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton( 10, 120, 160, 160, 0, false, F("CAN1"),     ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton( 10, 160, 160, 200, 0, false, F("CAN2"),     ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton( 10, 200, 160, 240, 0, false, F("Wireless"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(100, 275, 220, 315, 0, true, F("START"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(260, 275, 380, 315, 0, true, F("STOP"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(10, 80, 160, 120, 0, false, F("CAN0 FD"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(10, 120, 160, 160, 0, false, F("CAN1"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(10, 160, 160, 200, 0, false, F("CAN2"), ALIGN_CENTER);
+	userInterfaceButtons[btnPos++].setButton(10, 200, 160, 240, 0, false, F("Wireless"), ALIGN_CENTER);
 }
 
 void createToolBtns()
@@ -209,10 +226,10 @@ void pageControl()
 			hasDrawn = true;
 		}
 
-		
+
 		results = subMenuButtonMonitor(userInterfaceButtons, 6);
-	
-		
+
+
 
 		// Release any variable locks if page changed
 		if (nextPage != page)
@@ -286,11 +303,46 @@ void pageControl()
 				graphicLoaderState++;
 				break;
 			}
-			if (drawPage(userInterfaceButtons, graphicLoaderState, 8))
+			if (0)//drawPage(userInterfaceButtons, graphicLoaderState, 8))
 			{
 				break;
 			}
 			hasDrawn = true;
+
+
+			display.fillScreen(ILI9488_BLACK);
+			display.setTextColor(ILI9488_WHITE);  display.setTextSize(4);
+			display.enableScroll();
+			display.setScrollTextArea(20, 20, 120, 240);
+			display.setScrollBackgroundColor(ILI9488_GREEN);
+
+
+			display.setCursor(20, 20);
+
+			display.setTextColor(ILI9488_BLACK);
+
+			for (int i = 0; i < 20; i++) {
+				display.print("  this is line ");
+				display.println(i);
+				delay(500);
+			}
+
+			display.fillScreen(ILI9488_BLACK);
+			display.setScrollTextArea(40, 50, 120, 120);
+			display.setScrollBackgroundColor(ILI9488_GREEN);
+
+			display.setTextSize(1);
+			display.setCursor(40, 50);
+
+			for (int i = 0; i < 20; i++) {
+				display.print("  this is line ");
+				display.println(i);
+				delay(500);
+			}
+
+
+
+
 		}
 
 		// Call buttons or page method
@@ -306,11 +358,11 @@ void pageControl()
 }
 
 //
-void createMenuBtns() 
+void createMenuBtns()
 {
 	// Create Menu Buttons
 	uint8_t menuPosition = 0;
-	
+
 	userInterfaceMenuButton[menuPosition++].setButton(160, 0, 260, 40, CANBUS_MAIN, true, F("CAN Bus"), ALIGN_CENTER);
 	userInterfaceMenuButton[menuPosition++].setButton(270, 0, 370, 40, VEHTOOL_MAIN, true, F("Tools"), ALIGN_CENTER);
 	userInterfaceMenuButton[menuPosition++].setButton(375, 0, 475, 40, SETTING_MAIN, true, F("Settings"), ALIGN_CENTER);
@@ -320,36 +372,38 @@ void createMenuBtns()
 // -------------------------------------------------------------
 void setup(void)
 {
-    Serial.begin(9600); // USB is always 12 or 480 Mbit/sec
+	Serial.begin(9600); // USB is always 12 or 480 Mbit/sec
 
-    pinMode(LED_R, OUTPUT);
-    pinMode(LED_G, OUTPUT);
-    pinMode(LED_B, OUTPUT);
-    pinMode(LCD_BL, OUTPUT);
+	pinMode(LED_R, OUTPUT);
+	pinMode(LED_G, OUTPUT);
+	pinMode(LED_B, OUTPUT);
+	pinMode(LCD_BL, OUTPUT);
 
-    digitalWrite(LCD_BL, HIGH);
-    digitalWrite(LED_B, OFF);
-    digitalWrite(LED_G, OFF);
-    digitalWrite(LED_R, OFF);
-    digitalWrite(LED_R, ON);
-    delay(200);
-    digitalWrite(LED_R, OFF);
+	digitalWrite(LCD_BL, HIGH);
+	digitalWrite(LED_B, OFF);
+	digitalWrite(LED_G, OFF);
+	digitalWrite(LED_R, OFF);
+	digitalWrite(LED_R, ON);
+	delay(200);
+	digitalWrite(LED_R, OFF);
 
-    digitalWrite(LED_G, ON);
-    delay(200);
-    digitalWrite(LED_G, OFF);
+	digitalWrite(LED_G, ON);
+	delay(200);
+	digitalWrite(LED_G, OFF);
 
-    digitalWrite(LED_B, ON);
-    delay(200);
-    digitalWrite(LED_B, OFF);
+	digitalWrite(LED_B, ON);
+	delay(200);
+	digitalWrite(LED_B, OFF);
 
 	ts.begin(40);
-    display.begin();
-    display.fillScreen(ILI9488_BLACK);
-    display.setRotation(1);
-    display.setFont(Arial_14);
-    //display.setFont(ComicSansMS_12);
-    //display.println("Arial_12");
+	display.begin();
+	display.fillScreen(ILI9488_BLACK);
+	display.setRotation(1);
+	//display.setFont(Arial_14);
+	//display.setFont(ComicSansMS_12);
+	//display.setFont(Michroma_12);
+	//display.setFont(Crystal_18_Italic);
+	//display.setFont(Michroma_12);
 
 	// Clear LCD
 	drawSquareBtn(0, 0, 479, 319, "", themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
@@ -359,9 +413,9 @@ void setup(void)
 
 	// Create button objects
 	createMenuBtns();
-    
+
 	// Draw Menu
-	while (drawPage(userInterfaceMenuButton, graphicLoaderState ,3));
+	while (drawPage(userInterfaceMenuButton, graphicLoaderState, 3));
 	graphicLoaderState = 0;
 }
 
@@ -373,10 +427,10 @@ void setup(void)
 void backgroundProcess()
 {
 	buttonMonitor(userInterfaceMenuButton, MENU_BUTTON_SIZE);
-    //updateTime();
-    //serialOut();
-    //SDCardOut();
-    //timedTXSend();
+	//updateTime();
+	//serialOut();
+	//SDCardOut();
+	//timedTXSend();
 }
 
 /*=========================================================
@@ -385,6 +439,6 @@ void backgroundProcess()
 // Main loop runs the user interface and calls for background processes
 void loop(void)
 {
-    pageControl();
-    backgroundProcess();
-}  
+	pageControl();
+	backgroundProcess();
+}

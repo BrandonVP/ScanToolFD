@@ -51,6 +51,9 @@
     <ClInclude Include="fonts\def_ili9341_fonts.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="serialTransfer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="userInterface.cpp">
@@ -69,6 +72,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="fonts\glcdfont.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="serialTransfer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

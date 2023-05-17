@@ -34,6 +34,8 @@ void drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String butto
         display.setTextColor(btnTxtColor);
     }
 
+    //display.setTextDatum(0);
+
     // Print String with desired alignment
     switch (alignText)
     {
@@ -47,6 +49,7 @@ void drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String butto
         offset = (x_start + SIDE_OFFSET) + (buttonWidth / 2) - (stringLength / 2);
         //display.setCursor(offset, y_start + ((y_stop - y_start) / 2) - yMagicOffset, false);
         //display.println(button);
+        //display.drawString(buttonText, x_start + (x_stop - x_start), y_start + (y_stop - y_start));
         display.drawString(buttonText, offset, y_start + ((y_stop - y_start) / 2) - yMagicOffset);
         break;
     case 3: // Right
