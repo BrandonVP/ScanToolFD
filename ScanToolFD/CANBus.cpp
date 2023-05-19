@@ -12,6 +12,25 @@
 #include "PIDS.h"
 #include "config.h"
 
+/*
+ //
+void CAN1_Callback(const CAN_message_t& msg)
+{
+
+}
+
+//
+void CAN2_Callback(const CAN_message_t& msg)
+{
+
+}
+
+//
+void CAN3_FD_Callback(const CANFD_message_t& msg)
+{
+
+}
+
  // Initialize can1 and set the baud rates here
 void CANBus::initialize_CAN1()
 {
@@ -98,23 +117,49 @@ uint32_t CANBus::getBaudCAN3_FD()
 
 }
 
-//
-void CAN1_Callback(const CAN_message_t& msg)
+// Set can1 Filter and Mask
+void CANBus::EnableCAN1()
 {
+
 
 }
 
-//
-void CAN2_Callback(const CAN_message_t& msg)
+// Set can2 Filter and Mask
+void CANBus::EnableCAN2()
 {
+
 
 }
 
-//
-void CAN3_FD_Callback(const CANFD_message_t& msg)
+// Set can3 FD Filter and Mask
+void CANBus::EnableCAN3_FD()
 {
 
+
 }
+
+// Set can1 Filter and Mask
+void CANBus::DisableCAN1()
+{
+
+
+}
+
+// Set can2 Filter and Mask
+void CANBus::DisableCAN2()
+{
+
+
+}
+
+// Set can3 FD Filter and Mask
+void CANBus::DisableCAN3_FD()
+{
+
+
+}
+*/
+
 
 
 

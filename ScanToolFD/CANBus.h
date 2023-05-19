@@ -57,7 +57,12 @@ private:
 		  0xB1, 0xB2, 0xB3, 0xB4, 0xB5, 0xB6, 0xB7, 0xB8, 0xB9, 0xBA, 0xBB, 0xBC, 0xBD, 0xBE, 0xBF, 0xC0 }
 	};
 
+	/*
+	struct config {
 
+
+	}config;
+	*/
 public:
 	void initialize_CAN1();
 	void initialize_CAN2();
@@ -70,6 +75,14 @@ public:
 	void setBaudCAN1(uint32_t);
 	void setBaudCAN2(uint32_t);
 	void setBaudCAN3_FD(uint32_t);
+
+	void EnableCAN1();
+	void EnableCAN2();
+	void EnableCAN3_FD();
+
+	void DisableCAN1();
+	void DisableCAN2();
+	void DisableCAN3_FD();
 
 	uint32_t getBaudCAN1();
 	uint32_t getBaudCAN2();

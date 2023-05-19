@@ -16,7 +16,7 @@
 	 End Todo List
  =========================================================*/
 
-
+#include <FlexCAN_T4.h>
 //#include <kinetis_flexcan.h>
 //#include <isotp_server.h>
 //#include <isotp.h>
@@ -91,6 +91,9 @@ uint8_t graphicLoaderState = 0;
 
 UserInterfaceClass userInterfaceButtons[APP_BUTTON_SIZE];
 UserInterfaceClass userInterfaceMenuButton[MENU_BUTTON_SIZE];
+
+FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> Can0;
+FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> Can1;
 
 // Simplifies getting x and y coords
 bool Touch_getXY()
@@ -368,6 +371,31 @@ void createMenuBtns()
 	userInterfaceMenuButton[menuPosition++].setButton(375, 0, 475, 40, SETTING_MAIN, true, F("Settings"), ALIGN_CENTER);
 }
 
+void canSniff1(const CAN_message_t& msg) {
+	Serial.print("1 MB "); Serial.print(msg.mb);
+	Serial.print("  OVERRUN: "); Serial.print(msg.flags.overrun);
+	Serial.print("  LEN: "); Serial.print(msg.len);
+	Serial.print(" EXT: "); Serial.print(msg.flags.extended);
+	Serial.print(" TS: "); Serial.print(msg.timestamp);
+	Serial.print(" ID: "); Serial.print(msg.id, HEX);
+	Serial.print(" Buffer: ");
+	for (uint8_t i = 0; i < msg.len; i++) {
+		Serial.print(msg.buf[i], HEX); Serial.print(" ");
+	} Serial.println();
+}
+
+void canSniff2(const CAN_message_t& msg) {
+	Serial.print("2 MB "); Serial.print(msg.mb);
+	Serial.print("  OVERRUN: "); Serial.print(msg.flags.overrun);
+	Serial.print("  LEN: "); Serial.print(msg.len);
+	Serial.print(" EXT: "); Serial.print(msg.flags.extended);
+	Serial.print(" TS: "); Serial.print(msg.timestamp);
+	Serial.print(" ID: "); Serial.print(msg.id, HEX);
+	Serial.print(" Buffer: ");
+	for (uint8_t i = 0; i < msg.len; i++) {
+		Serial.print(msg.buf[i], HEX); Serial.print(" ");
+	} Serial.println();
+}
 
 // -------------------------------------------------------------
 void setup(void)
@@ -400,7 +428,7 @@ void setup(void)
 	display.fillScreen(ILI9488_BLACK);
 	display.setRotation(1);
 	//display.setFont(Arial_14);
-	//display.setFont(ComicSansMS_12);
+	display.setFont(ComicSansMS_12);
 	//display.setFont(Michroma_12);
 	//display.setFont(Crystal_18_Italic);
 	//display.setFont(Michroma_12);
@@ -417,6 +445,23 @@ void setup(void)
 	// Draw Menu
 	while (drawPage(userInterfaceMenuButton, graphicLoaderState, 3));
 	graphicLoaderState = 0;
+
+	Can0.begin();
+	Can0.setBaudRate(500000);
+	Can0.setMaxMB(16);
+	Can0.enableFIFO();
+	Can0.enableFIFOInterrupt();
+	Can0.onReceive(canSniff1);
+	Can0.mailboxStatus();
+
+	Can1.begin();
+	Can1.setBaudRate(500000);
+	Can1.setMaxMB(16);
+	Can1.enableFIFO();
+	Can1.enableFIFOInterrupt();
+	Can1.onReceive(canSniff2);
+	Can1.mailboxStatus();
+	Can1.disableFIFOInterrupt();
 }
 
 
@@ -441,4 +486,19 @@ void loop(void)
 {
 	pageControl();
 	backgroundProcess();
+
+	Can0.events();
+
+	static uint32_t timeout = millis();
+
+	if (millis() - timeout > 200)
+	{
+		CAN_message_t msg;
+		msg.id = 1;
+		for (uint8_t i = 0; i < 8; i++) msg.buf[i] = i + 1;
+		Can0.write(msg);
+		msg.id = 2;
+		Can1.write(msg);
+		timeout = millis();
+	}
 }
