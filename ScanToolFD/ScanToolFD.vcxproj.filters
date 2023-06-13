@@ -54,6 +54,9 @@
     <ClInclude Include="serialTransfer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="KeyInput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="userInterface.cpp">
@@ -75,6 +78,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="serialTransfer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="KeyInput.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

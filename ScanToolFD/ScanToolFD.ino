@@ -24,6 +24,7 @@
 //#include <circular_buffer.h>
 
 //#include <Adafruit_GFX.h>
+#include "KeyInput.h"
 #include "serialTransfer.h"
 #include <SPI.h>
 #include <Wire.h>
