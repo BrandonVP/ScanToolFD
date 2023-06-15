@@ -16,14 +16,27 @@
 	 End Todo List
  =========================================================*/
 
-#include <FlexCAN_T4.h>
-//#include <kinetis_flexcan.h>
-//#include <isotp_server.h>
-//#include <isotp.h>
-//#include <imxrt_flexcan.h>
-//#include <circular_buffer.h>
+ /*=========================================================
+	 README
+ ===========================================================
+	To create a new page:
+	1.) Assign page in page control
+	2.) Create buttons
+	3.) Call function to draw buttons in assigned page switch statement hasDrawn section
+	4.) Call function to monitor button press in assigned page switch statement loop section
 
-//#include <Adafruit_GFX.h>
+ ===========================================================
+	 End README
+ =========================================================*/
+
+#include <FlexCAN_T4.h>
+ //#include <kinetis_flexcan.h>
+ //#include <isotp_server.h>
+ //#include <isotp.h>
+ //#include <imxrt_flexcan.h>
+ //#include <circular_buffer.h>
+
+ //#include <Adafruit_GFX.h>
 #include "KeyInput.h"
 #include "serialTransfer.h"
 #include <SPI.h>
@@ -36,15 +49,14 @@
 #include "variableLock.h"
 #include "config.h"
 #include "gui.h"
+#include "KeyInput.h"
 
 #include "ili9488_t3_font_Arial.h"
 #include "ili9488_t3_font_ComicSansMS.h"
 #include "ili9488_t3_font_ArialBold.h"
-#include "font_OpenSans.h"
-#include "font_DroidSans.h"
+#include "font_AwesomeF180.h"
 #include "font_Michroma.h"
-#include "font_Crystal.h"
-#include "font_ChanceryItalic.h"
+
 /*
 #include "font_Arial.h"
 #include "font_ArialBold.h"
@@ -216,9 +228,9 @@ void pageControl()
 				drawSquareBtn(10, 75, 160, 270, "", menuBackground, frameBorder, menuBackground, ALIGN_CENTER);
 				drawSquareBtn(165, 75, 315, 270, "", menuBackground, frameBorder, menuBackground, ALIGN_CENTER);
 				drawSquareBtn(320, 75, 470, 270, "", menuBackground, frameBorder, menuBackground, ALIGN_CENTER);
-				drawRoundBtn(10, 55, 160, 70, "Source", themeBackground, themeBackground, menuBtnTextColor, ALIGN_LEFT);
-				drawRoundBtn(165, 55, 315, 70, "Output", themeBackground, themeBackground, menuBtnTextColor, ALIGN_LEFT);
-				drawRoundBtn(320, 55, 470, 70, "Selected", themeBackground, themeBackground, menuBtnTextColor, ALIGN_LEFT);
+				drawRoundBtn(10, 55, 160, 70, "Source", themeBackground, themeBackground, menuBtnTextColor, ALIGN_LEFT, 20);
+				drawRoundBtn(165, 55, 315, 70, "Output", themeBackground, themeBackground, menuBtnTextColor, ALIGN_LEFT, 20);
+				drawRoundBtn(320, 55, 470, 70, "Selected", themeBackground, themeBackground, menuBtnTextColor, ALIGN_LEFT, 20);
 
 				graphicLoaderState++;
 				break;
@@ -262,6 +274,32 @@ void pageControl()
 
 		// Call buttons or page method
 		buttonMonitor(userInterfaceButtons, 4);
+
+		// Release any variable locks if page changed
+		if (nextPage != page)
+		{
+			pageTransition();
+		}
+		break;
+	case 3: // CAN Bus Capture
+		// Draw page and lock variables
+		if (!hasDrawn)
+		{
+			if (graphicLoaderState == 0)
+			{
+				createKeyboardButtons();
+				graphicLoaderState++;
+				break;
+			}
+			if (drawPage(userKeyButtons, graphicLoaderState, 41))
+			{
+				break;
+			}
+			hasDrawn = true;
+		}
+
+		// Call buttons or page method
+		subMenuButtonMonitor(userKeyButtons, 41);
 
 		// Release any variable locks if page changed
 		if (nextPage != page)
@@ -317,7 +355,7 @@ void pageControl()
 			display.fillScreen(ILI9488_BLACK);
 			display.setTextColor(ILI9488_WHITE);  display.setTextSize(4);
 			display.enableScroll();
-			display.setScrollTextArea(20, 20, 120, 240);
+			display.setScrollTextArea(20, 20, 120, 318);
 			display.setScrollBackgroundColor(ILI9488_GREEN);
 
 
@@ -325,24 +363,31 @@ void pageControl()
 
 			display.setTextColor(ILI9488_BLACK);
 
-			for (int i = 0; i < 20; i++) {
+			for (int i = 0; i < 5; i++) {
 				display.print("  this is line ");
 				display.println(i);
 				delay(500);
 			}
 
-			display.fillScreen(ILI9488_BLACK);
-			display.setScrollTextArea(40, 50, 120, 120);
-			display.setScrollBackgroundColor(ILI9488_GREEN);
+			display.setCursor(100, 20);
 
-			display.setTextSize(1);
-			display.setCursor(40, 50);
-
-			for (int i = 0; i < 20; i++) {
+			for (int i = 5; i < 8; i++) {
 				display.print("  this is line ");
 				display.println(i);
 				delay(500);
 			}
+
+			display.setCursor(140, 20);
+
+			for (int i = 8; i < 12; i++) {
+				display.print("  this is line too ");
+				display.println(i);
+				delay(500);
+			}
+
+
+			delay(4000);
+			nextPage = 0;
 
 
 
@@ -429,8 +474,10 @@ void setup(void)
 	display.fillScreen(ILI9488_BLACK);
 	display.setRotation(1);
 	//display.setFont(Arial_14);
-	display.setFont(ComicSansMS_12);
-	//display.setFont(Michroma_12);
+	//display.setFont(AwesomeF180_12);
+	display.setFont(Michroma_11);
+	//display.setFont(ComicSansMS_12);
+	//display.setFont(OpenSans12);
 	//display.setFont(Crystal_18_Italic);
 	//display.setFont(Michroma_12);
 

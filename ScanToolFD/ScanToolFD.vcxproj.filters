@@ -57,6 +57,24 @@
     <ClInclude Include="KeyInput.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ILI9341_fonts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ili9488_t3_font_Arial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ili9488_t3_font_ArialBold.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ili9488_t3_font_ComicSansMS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\AppData\Local\arduino15\packages\teensy\hardware\avr\1.57.2\libraries\ILI9488_t3\src\font_AwesomeF180.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\AppData\Local\arduino15\packages\teensy\hardware\avr\1.57.2\libraries\ILI9488_t3\src\font_Michroma.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="userInterface.cpp">
@@ -74,31 +92,26 @@
     <ClCompile Include="CANBusCapture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="fonts\glcdfont.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="serialTransfer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="KeyInput.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="fonts\font_Crystal.txt">
-      <Filter>Misc Files</Filter>
-    </Text>
-    <Text Include="fonts\font_Droid.txt">
-      <Filter>Misc Files</Filter>
-    </Text>
-    <Text Include="fonts\font_Logisoso.txt">
-      <Filter>Misc Files</Filter>
-    </Text>
-    <Text Include="fonts\font_Michroma.txt">
-      <Filter>Misc Files</Filter>
-    </Text>
-    <Text Include="fonts\font_NunitoLight.txt">
-      <Filter>Misc Files</Filter>
-    </Text>
+    <ClCompile Include="ili9488_t3_font_Arial.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ili9488_t3_font_ArialBold.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ili9488_t3_font_ComicSansMS.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\AppData\Local\arduino15\packages\teensy\hardware\avr\1.57.2\libraries\ILI9488_t3\src\font_AwesomeF180.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\AppData\Local\arduino15\packages\teensy\hardware\avr\1.57.2\libraries\ILI9488_t3\src\font_Michroma.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

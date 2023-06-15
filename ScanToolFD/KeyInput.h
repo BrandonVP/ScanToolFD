@@ -7,6 +7,8 @@
  ===========================================================================
  */
 
+#include "common.h"
+
 #ifndef _KEYINPUT_H
 #define _KEYINPUT_H
 
@@ -40,6 +42,7 @@ uint8_t keyboardController(uint8_t&);
 
 extern char keyboardInput[9];
 extern uint8_t keypadInput[4];
+extern UserInterfaceClass userKeyButtons[41];
 
 extern void resetKeypad();
 extern void drawKeypad();
@@ -48,9 +51,10 @@ extern uint8_t keypadController(uint8_t&, uint16_t&);
 extern void drawKeypadDec();
 extern int keypadButtonsDec();
 extern uint8_t keypadControllerDec(uint8_t&, uint16_t&);
-extern void drawkeyboard();
+extern bool drawkeyboard(uint8_t&);
 extern int keyboardButtons();
 extern uint8_t keyboardController(uint8_t&);
+void createKeyboardButtons();
 
 #endif // _KEYINPUT_C
 #endif // _KEYINPUT_H

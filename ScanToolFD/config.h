@@ -16,7 +16,7 @@
 #define themeBackground 0x424B // White
 #define menuBtnText 0xFFFF // White
 #define menuBtnTextColor 0xBE18 // White-ish
-#define menuBtnBorder 0x869B // Black
+#define menuBtnBorder 0x869B // 
 #define menuBtnColor 0x0516// Button Blue
 #define menuBackground 0x5B0E // Dark top menu background
 #define menuBorder 0x39E8 // Dark top menu background
