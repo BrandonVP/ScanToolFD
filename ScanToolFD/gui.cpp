@@ -21,21 +21,10 @@ void drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String butto
     int stringLength, buttonWidth, offset;
 
     // Print button
-    if (y_stop <= 50)
-    {
-        display.fillRoundRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), 0, menuBackground);
-        display.drawRoundRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), 0, menuBackground);
-        display.setTextColor(0xBE18);
-    }
-    else
-    {
-        display.fillRoundRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), radius, btnBgColor);
-        display.drawRoundRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), radius, btnBorderColor);
-        display.drawRoundRect(x_start+1, y_start+1, (x_stop - x_start)-2, (y_stop - y_start)-2, radius, btnBorderColor);
-        display.setTextColor(btnTxtColor);
-    }
-
-    //display.setTextDatum(0);
+    display.fillRoundRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), radius, btnBgColor);
+    display.drawRoundRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), radius, btnBorderColor);
+    display.drawRoundRect(x_start+1, y_start+1, (x_stop - x_start)-2, (y_stop - y_start)-2, radius, btnBorderColor);
+    display.setTextColor(btnTxtColor);
 
     // Print String with desired alignment
     switch (alignText)
@@ -46,8 +35,10 @@ void drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String butto
     case 2: // Center
         // Calculate center
         stringLength = buttonText.length() * LETTER_WIDTH;
-        buttonWidth = (x_stop - SIDE_OFFSET) - (x_start + SIDE_OFFSET);
-        offset = (x_start + SIDE_OFFSET) + (buttonWidth / 2) - (stringLength / 2);
+        buttonWidth = (x_stop) - (x_start);
+        //buttonWidth = (x_stop - SIDE_OFFSET) - (x_start + SIDE_OFFSET);
+        offset = (x_start - SIDE_OFFSET) + (buttonWidth / 2) - (stringLength / 2);
+        //offset = (x_start + SIDE_OFFSET) + (buttonWidth / 2) - (stringLength / 2);
         //display.setCursor(offset, y_start + ((y_stop - y_start) / 2) - yMagicOffset, false);
         //display.println(button);
         //display.drawString(buttonText, x_start + (x_stop - x_start), y_start + (y_stop - y_start));
