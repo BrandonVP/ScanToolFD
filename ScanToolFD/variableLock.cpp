@@ -46,9 +46,10 @@
  // Prints error message for failed lock attempt
 bool lockError(uint8_t position, uint8_t size)
 {
-	char buffer[20];
+	// TODO: 
+	//char buffer[20];
 	//sprintf(buffer, "uint%d_t pos %d", size, position);
-	drawSquareBtn(131, 55, 479, 319, "", themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
+	//drawSquareBtn(131, 55, 479, 319, "", themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
 	//drawErrorMSG2(F("  Lock Error"), buffer, F("already locked!"));
 	return true;
 }

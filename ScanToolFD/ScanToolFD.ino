@@ -182,8 +182,8 @@ void clearAppSpace()
 	drawSquareBtn(0, 51, 480, 320, "", themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
 }
 
-// Manages the different App pages
-void pageControl()
+// Manages the loading and unloading of different user Apps
+void appManager()
 {
 	int8_t results = 0;
 	switch (page)
@@ -532,13 +532,12 @@ void backgroundProcess()
 // Main loop runs the user interface and calls for background processes
 void loop(void)
 {
-	pageControl();
+	appManager();
 	backgroundProcess();
 
+
 	Can0.events();
-
 	static uint32_t timeout = millis();
-
 	if (millis() - timeout > 200)
 	{
 		CAN_message_t msg;

@@ -136,9 +136,9 @@ void buttonMonitor(UserInterfaceClass* buttons, uint8_t size)
     {
         for (uint8_t i = 0; i < size; i++)
         {
-            if ((x >= buttons[i].getXStart()) && (x <= buttons[i].getXStop()))
+            if ((x >= buttons[i].getXStart()) && (x <= buttons[i].getXStop()) && (y >= buttons[i].getYStart()) && (y <= buttons[i].getYStop()))
             {
-                if ((y >= buttons[i].getYStart()) && (y <= buttons[i].getYStop()))
+                if (buttons[i].getIsClickable())
                 {
                     if (buttons[i].getIsRound())
                     {
@@ -162,9 +162,9 @@ int subMenuButtonMonitor(UserInterfaceClass* buttons, uint8_t size)
     {
         for (uint8_t i = 0; i < size; i++)
         {
-            if ((x >= buttons[i].getXStart()) && (x <= buttons[i].getXStop()))
+            if ((x >= buttons[i].getXStart()) && (x <= buttons[i].getXStop()) && (y >= buttons[i].getYStart()) && (y <= buttons[i].getYStop()))
             {
-                if ((y >= buttons[i].getYStart()) && (y <= buttons[i].getYStop()))
+                if (buttons[i].getIsClickable())
                 {
                     if (buttons[i].getIsRound())
                     {

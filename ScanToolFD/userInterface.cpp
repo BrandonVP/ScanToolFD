@@ -9,7 +9,6 @@
 
 #include "userInterface.h"
 #include "config.h"
-extern void testf();
 
 void UserInterfaceClass::init()
 {
@@ -23,7 +22,8 @@ void UserInterfaceClass::setButton(uint16_t xStart, uint16_t yStart, uint16_t xS
 	this->yStart = yStart;
 	this->yStop = yStop;
 	this->page = page;
-	this->isRound = isRound;
+	this->setClickable(true);
+	this->setShape(isRound);
 	this->roundBtnRadius = 20;
 	this->btnText = btnText;
 	this->align = ALIGN_CENTER;
@@ -39,7 +39,8 @@ void UserInterfaceClass::setButton(uint16_t xStart, uint16_t yStart, uint16_t xS
 	this->yStart = yStart;
 	this->yStop = yStop;
 	this->page = page;
-	this->isRound = isRound;
+	this->setClickable(true);
+	this->setShape(isRound);
 	this->roundBtnRadius = 20;
 	this->btnText = btnText;
 	this->align = alignText;
@@ -55,13 +56,38 @@ void UserInterfaceClass::setButton(uint16_t xStart, uint16_t yStart, uint16_t xS
 	this->yStart = yStart;
 	this->yStop = yStop;
 	this->page = page;
-	this->isRound = isRound;
+	this->setClickable(true);
+	this->setShape(isRound);
 	this->roundBtnRadius = radius;
 	this->btnText = btnText;
 	this->align = alignText;
 	this->bodyColor = btnC;
 	this->borderColor = borderC;
 	this->textColor = textC;
+}
+
+void UserInterfaceClass::setShape(uint8_t isRound)
+{
+	if (isRound)
+	{
+		btnSettings |= (1 << IS_ROUND_POSITION);
+	}
+	else
+	{
+		btnSettings &= ~(1 << IS_ROUND_POSITION);
+	}
+}
+
+void UserInterfaceClass::setClickable(uint8_t isClickable)
+{
+	if (isClickable)
+	{
+		btnSettings |= (1 << IS_CLICKABLE_POSITION);
+	}
+	else
+	{
+		btnSettings &= ~(1 << IS_CLICKABLE_POSITION);
+	}
 }
 
 uint16_t UserInterfaceClass::getXStart()
@@ -91,7 +117,16 @@ uint8_t UserInterfaceClass::getPage()
 
 bool UserInterfaceClass::getIsRound()
 {
-	return this->isRound;
+	bool isRound;
+	(CHECK_BIT(this->btnSettings, IS_ROUND_POSITION)) ? isRound = true : isRound = false;
+	return isRound;
+}
+
+bool UserInterfaceClass::getIsClickable()
+{
+	bool isClickable;
+	(CHECK_BIT(this->btnSettings, IS_CLICKABLE_POSITION)) ? isClickable = true : isClickable = false;
+	return isClickable;
 }
 
 uint8_t UserInterfaceClass::getRadius()

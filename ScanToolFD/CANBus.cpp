@@ -229,9 +229,9 @@ uint8_t CANBus::getPIDList(uint8_t state, uint8_t range, uint8_t bank)
 {
 	
 	// Message used to requrest range of PIDS
-	byte frame[8] = { 0x02, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-	char buffer[MSG_STRING_LENGTH];
-	frame[2] = range;
+	//byte frame[8] = { 0x02, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+	//char buffer[MSG_STRING_LENGTH];
+	//frame[2] = range;
 	uint8_t endState = state;
 	/*
 	switch (state)
@@ -398,11 +398,11 @@ uint8_t CANBus::requestVIN(uint16_t state, bool saveSD)
 uint8_t CANBus::PIDStream(uint8_t& value, bool saveToSD)
 {
 	// Frames to request VIN
-	uint8_t PIDRequest[8] = { 0x02, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+	//uint8_t PIDRequest[8] = { 0x02, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
 	// Waits to recieve all messages
-	bool isWait = true;
-	uint8_t PID = 0;
+	//bool isWait = true;
+	//uint8_t PID = 0;
 	uint8_t result = 0;
 
 	/*
