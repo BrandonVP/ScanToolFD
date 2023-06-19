@@ -48,14 +48,14 @@ void buttonMonitor(UserInterfaceClass* buttons, uint8_t size);
 
 #else
 // TODO extern?
-void drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int align, int radius);
-void drawSquareBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int align);
+void GUI_drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int align, int radius);
+void GUI_drawSquareBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int align);
 void waitForIt(int x_start, int y_start, int x_stop, int y_stop, int radius, int borderC);
 void waitForItRect(int x_start, int y_start, int x_stop, int y_stop, int radius, int borderC);
-void buttonMonitor(UserInterfaceClass* buttons, uint8_t size);
-int subMenuButtonMonitor(UserInterfaceClass* buttons, uint8_t size);
-bool drawPage(UserInterfaceClass* buttons, uint8_t& pos, uint8_t buttonsToPrint);
-void drawButton(UserInterfaceClass* button, uint16_t buttonColor, uint16_t buttonBorderColor, uint16_t buttonTextColor);
+void GUI_buttonMonitor(UserInterfaceClass* buttons, uint8_t size);
+int GUI_subMenuButtonMonitor(UserInterfaceClass* buttons, uint8_t size);
+bool GUI_drawPage(UserInterfaceClass* buttons, uint8_t& pos, uint8_t buttonsToPrint);
+void GUI_drawButton(UserInterfaceClass* button, uint16_t buttonColor, uint16_t buttonBorderColor, uint16_t buttonTextColor);
 extern uint8_t nextPage;
 extern uint8_t page;
 #endif // _GUI_C

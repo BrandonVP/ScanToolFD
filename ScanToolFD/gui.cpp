@@ -13,7 +13,7 @@
 #include "config.h"
 
  //
-void drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int alignText, int radius)
+void GUI_drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int alignText, int radius)
 {
     const uint8_t LETTER_WIDTH = 11;
     const uint8_t SIDE_OFFSET = 2;
@@ -23,7 +23,7 @@ void drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String butto
     // Print button
     display.fillRoundRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), radius, btnBgColor);
     display.drawRoundRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), radius, btnBorderColor);
-    display.drawRoundRect(x_start+1, y_start+1, (x_stop - x_start)-2, (y_stop - y_start)-2, radius, btnBorderColor);
+    display.drawRoundRect(x_start + 1, y_start + 1, (x_stop - x_start) - 2, (y_stop - y_start) - 2, radius, btnBorderColor);
     display.setTextColor(btnTxtColor);
 
     // Print String with desired alignment
@@ -35,7 +35,7 @@ void drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String butto
     case 2: // Center
         // Calculate center
         stringLength = buttonText.length() * LETTER_WIDTH;
-        buttonWidth = (x_stop) - (x_start);
+        buttonWidth = (x_stop)-(x_start);
         //buttonWidth = (x_stop - SIDE_OFFSET) - (x_start + SIDE_OFFSET);
         offset = (x_start - SIDE_OFFSET) + (buttonWidth / 2) - (stringLength / 2);
         //offset = (x_start + SIDE_OFFSET) + (buttonWidth / 2) - (stringLength / 2);
@@ -53,7 +53,7 @@ void drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String butto
 }
 
 //
-void drawSquareBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int align)
+void GUI_drawSquareBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int align)
 {
     const uint8_t LETTER_WIDTH = 11;
     const uint8_t SIDE_OFFSET = 2;
@@ -91,17 +91,17 @@ void drawSquareBtn(int x_start, int y_start, int x_stop, int y_stop, String butt
 
 
 // Holds round button down while pressed
-void waitForIt(int x_start, int y_start, int x_stop, int y_stop, int radius, int borderC)
+void GUI_waitForIt(int x_start, int y_start, int x_stop, int y_stop, int radius, int borderC, int clickBorderC)
 {
     if (y_stop > 50)
     {
-        display.drawRoundRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), radius, themeBackground);
+        display.drawRoundRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), radius, clickBorderC);
     }
     else
     {
-        drawSquareBtn(0, 45, 480, 50, "", menuBorder, menuBorder, menuBorder, ALIGN_CENTER);
+        GUI_drawSquareBtn(0, 45, 480, 50, "", menuBorder, menuBorder, menuBorder, ALIGN_CENTER);
     }
-    
+
     while (ts.touched())
     {
         // This is a blocking function so call backgroundProcess while looping
@@ -113,14 +113,14 @@ void waitForIt(int x_start, int y_start, int x_stop, int y_stop, int radius, int
     }
     else
     {
-        drawSquareBtn(x_start, 45, x_stop, 50, "", menuBtnColor, menuBtnColor, borderC, ALIGN_CENTER);
+        GUI_drawSquareBtn(x_start, 45, x_stop, 50, "", menuBtnColor, menuBtnColor, borderC, ALIGN_CENTER);
     }
 }
 
 // Holds rectangle button down while pressed
-void waitForItRect(int x_start, int y_start, int x_stop, int y_stop, int radius, int borderC)
+void GUI_waitForItRect(int x_start, int y_start, int x_stop, int y_stop, int radius, int borderC, int clickBorderC)
 {
-    display.drawRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), themeBackground);
+    display.drawRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), clickBorderC);
     while (ts.touched())
     {
         // This is a blocking function so call backgroundProcess while looping
@@ -130,7 +130,7 @@ void waitForItRect(int x_start, int y_start, int x_stop, int y_stop, int radius,
 }
 
 //
-void buttonMonitor(UserInterfaceClass* buttons, uint8_t size)
+void GUI_buttonMonitor(UserInterfaceClass* buttons, uint8_t size)
 {
     if (Touch_getXY())
     {
@@ -142,21 +142,21 @@ void buttonMonitor(UserInterfaceClass* buttons, uint8_t size)
                 {
                     if (buttons[i].getIsRound())
                     {
-                        waitForIt(buttons[i].getXStart(), buttons[i].getYStart(), buttons[i].getXStop(), buttons[i].getYStop(), buttons[i].getRadius(), buttons[i].getBorderColor());
+                        GUI_waitForIt(buttons[i].getXStart(), buttons[i].getYStart(), buttons[i].getXStop(), buttons[i].getYStop(), buttons[i].getRadius(), buttons[i].getBorderColor(), buttons[i].getClickBorderColor());
                     }
                     else
                     {
-                        waitForItRect(buttons[i].getXStart(), buttons[i].getYStart(), buttons[i].getXStop(), buttons[i].getYStop(), buttons[i].getRadius(), buttons[i].getBorderColor());
+                        GUI_waitForItRect(buttons[i].getXStart(), buttons[i].getYStart(), buttons[i].getXStop(), buttons[i].getYStop(), buttons[i].getRadius(), buttons[i].getBorderColor(), buttons[i].getClickBorderColor());
                     }
-                    nextPage = buttons[i].getPage();
+                    nextPage = buttons[i].getClickReturn();
                 }
             }
         }
     }
 }
 
-//
-int subMenuButtonMonitor(UserInterfaceClass* buttons, uint8_t size)
+// Returns button clickReturn value - No press returns -1
+int GUI_subMenuButtonMonitor(UserInterfaceClass* buttons, uint8_t size)
 {
     if (Touch_getXY())
     {
@@ -168,13 +168,13 @@ int subMenuButtonMonitor(UserInterfaceClass* buttons, uint8_t size)
                 {
                     if (buttons[i].getIsRound())
                     {
-                        waitForIt(buttons[i].getXStart(), buttons[i].getYStart(), buttons[i].getXStop(), buttons[i].getYStop(), buttons[i].getRadius(), buttons[i].getBorderColor());
+                        GUI_waitForIt(buttons[i].getXStart(), buttons[i].getYStart(), buttons[i].getXStop(), buttons[i].getYStop(), buttons[i].getRadius(), buttons[i].getBorderColor(), buttons[i].getClickBorderColor());
                     }
                     else
                     {
-                        waitForItRect(buttons[i].getXStart(), buttons[i].getYStart(), buttons[i].getXStop(), buttons[i].getYStop(), buttons[i].getRadius(), buttons[i].getBorderColor());
+                        GUI_waitForItRect(buttons[i].getXStart(), buttons[i].getYStart(), buttons[i].getXStop(), buttons[i].getYStop(), buttons[i].getRadius(), buttons[i].getBorderColor(), buttons[i].getClickBorderColor());
                     }
-                    return buttons[i].getPage();
+                    return buttons[i].getClickReturn();
                 }
             }
         }
@@ -183,20 +183,18 @@ int subMenuButtonMonitor(UserInterfaceClass* buttons, uint8_t size)
 }
 
 //
-bool drawPage(UserInterfaceClass* buttons, uint8_t &pos, uint8_t buttonsToPrint)
+bool GUI_drawPage(UserInterfaceClass* buttons, uint8_t& pos, uint8_t buttonsToPrint)
 {
     uint8_t btn = pos - 1;
     if (buttonsToPrint != 0)
     {
-        Serial.print("isRound: ");
-        Serial.println(buttons[btn].getIsRound());
         if (buttons[btn].getIsRound())
         {
-            drawRoundBtn(buttons[btn].getXStart(), buttons[btn].getYStart(), buttons[btn].getXStop(), buttons[btn].getYStop(), buttons[btn].getBtnText(), buttons[btn].getBtnColor(), buttons[btn].getBorderColor(), buttons[btn].getTextColor(), buttons[btn].getAlign(), buttons[btn].getRadius());
+            GUI_drawRoundBtn(buttons[btn].getXStart(), buttons[btn].getYStart(), buttons[btn].getXStop(), buttons[btn].getYStop(), buttons[btn].getBtnText(), buttons[btn].getBtnColor(), buttons[btn].getBorderColor(), buttons[btn].getTextColor(), buttons[btn].getAlign(), buttons[btn].getRadius());
         }
         else
         {
-            drawSquareBtn(buttons[btn].getXStart(), buttons[btn].getYStart(), buttons[btn].getXStop(), buttons[btn].getYStop(), buttons[btn].getBtnText(), buttons[btn].getBtnColor(), buttons[btn].getBorderColor(), buttons[btn].getTextColor(), buttons[btn].getAlign());
+            GUI_drawSquareBtn(buttons[btn].getXStart(), buttons[btn].getYStart(), buttons[btn].getXStop(), buttons[btn].getYStop(), buttons[btn].getBtnText(), buttons[btn].getBtnColor(), buttons[btn].getBorderColor(), buttons[btn].getTextColor(), buttons[btn].getAlign());
         }
         pos++;
     }
@@ -211,7 +209,7 @@ bool drawPage(UserInterfaceClass* buttons, uint8_t &pos, uint8_t buttonsToPrint)
 }
 
 //
-void drawButton(UserInterfaceClass* button, uint16_t buttonColor, uint16_t buttonBorderColor, uint16_t buttonTextColor)
+void GUI_drawButton(UserInterfaceClass* button, uint16_t buttonColor, uint16_t buttonBorderColor, uint16_t buttonTextColor)
 {
-    drawRoundBtn(button->getXStart(), button->getYStart(), button->getXStop(), button->getYStop(), button->getBtnText(), button->getBtnColor(), button->getBorderColor(), button->getTextColor(), button->getAlign(), button->getRadius());
+    GUI_drawRoundBtn(button->getXStart(), button->getYStart(), button->getXStop(), button->getYStop(), button->getBtnText(), button->getBtnColor(), button->getBorderColor(), button->getTextColor(), button->getAlign(), button->getRadius());
 }

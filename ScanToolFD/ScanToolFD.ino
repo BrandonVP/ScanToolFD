@@ -85,6 +85,9 @@ int x, y;
 // Used for page control
 bool hasDrawn = false;
 
+uint8_t CANBusOut = 0;
+uint32_t messageNum = 0;
+
 // Use to load pages in pieces to prevent blocking while loading entire page
 uint8_t graphicLoaderState = 0;
 
@@ -102,7 +105,8 @@ uint8_t graphicLoaderState = 0;
 
 //uint16_t buttonsOnPage = 0;
 
-UserInterfaceClass userInterfaceButtons[APP_BUTTON_SIZE];
+UserInterfaceClass userInterfaceButton[APP_BUTTON_SIZE];
+UserInterfaceClass userInterfaceCaptureButton[CAPTURE_BUTTON_SIZE];
 UserInterfaceClass userInterfaceMenuButton[MENU_BUTTON_SIZE];
 
 FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> Can0;
@@ -132,74 +136,63 @@ void pageTransition()
 void createCANBusBaudBtns()
 {
 	uint8_t btnPos = 0;
-	userInterfaceButtons[btnPos++].setButton(140, 275, 300, 315, 0, true, F("Set CAN0"), ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(305, 275, 475, 315, 0, true, F("Set CAN1"), ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(305, 60, 475, 100, 0, true, F("CAN0"), ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(305, 150, 475, 190, 0, true, F("CAN1"), ALIGN_CENTER);
-}
-
-void createCANBusCaptureBtns()
-{
-	uint8_t btnPos = 0;
-	//10, 75, 160, 270
-	//(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint8_t page, bool isRound, String btnText, uint8_t alignText);
-	userInterfaceButtons[btnPos++].setButton(100, 275, 220, 315, 0, true, F("START"), ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(260, 275, 380, 315, 0, true, F("STOP"), ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(10, 80, 160, 120, 0, false, F("CAN0 FD"), ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(10, 120, 160, 160, 0, false, F("CAN1"), ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(10, 160, 160, 200, 0, false, F("CAN2"), ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(10, 200, 160, 240, 0, false, F("Wireless"), ALIGN_CENTER);
+	userInterfaceButton[btnPos++].setButton(140, 275, 300, 315, 0, true, F("Set CAN0"), ALIGN_CENTER);
+	userInterfaceButton[btnPos++].setButton(305, 275, 475, 315, 0, true, F("Set CAN1"), ALIGN_CENTER);
+	userInterfaceButton[btnPos++].setButton(305, 60, 475, 100, 0, true, F("CAN0"), ALIGN_CENTER);
+	userInterfaceButton[btnPos++].setButton(305, 150, 475, 190, 0, true, F("CAN1"), ALIGN_CENTER);
 }
 
 void createToolBtns()
 {
 	uint8_t btnPos = 0;
-	userInterfaceButtons[btnPos++].setButton(55, 80, 220, 120, 1, true, F("PID Scan"), ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(260, 80, 425, 120, 2, true, F("PID Stream"), ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(55, 140, 220, 180, 0, true, F("Get VIN"), ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(260, 140, 425, 180, 0, true, F("DTC"), ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(55, 200, 220, 240, 0, true, F("OBD Simulator"), ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(260, 200, 425, 240, 0, true, F("Gauges"), ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(55, 260, 220, 300, 0, true, F("TX Spam"), ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(260, 260, 425, 300, 0, true, F(""), ALIGN_CENTER);
+	userInterfaceButton[btnPos++].setButton(55, 80, 220, 120, 1, true, F("PID Scan"), ALIGN_CENTER);
+	userInterfaceButton[btnPos++].setButton(260, 80, 425, 120, 2, true, F("PID Stream"), ALIGN_CENTER);
+	userInterfaceButton[btnPos++].setButton(55, 140, 220, 180, 0, true, F("Get VIN"), ALIGN_CENTER);
+	userInterfaceButton[btnPos++].setButton(260, 140, 425, 180, 0, true, F("DTC"), ALIGN_CENTER);
+	userInterfaceButton[btnPos++].setButton(55, 200, 220, 240, 0, true, F("OBD Simulator"), ALIGN_CENTER);
+	userInterfaceButton[btnPos++].setButton(260, 200, 425, 240, 0, true, F("Gauges"), ALIGN_CENTER);
+	userInterfaceButton[btnPos++].setButton(55, 260, 220, 300, 0, true, F("TX Spam"), ALIGN_CENTER);
+	userInterfaceButton[btnPos++].setButton(260, 260, 425, 300, 0, true, F(""), ALIGN_CENTER);
 }
 
 void createSettingsBtns()
 {
 	uint8_t btnPos = 0;
-	userInterfaceButtons[btnPos++].setButton(55, 80, 220, 120, 1, true, F("Memory"), ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(260, 80, 425, 120, 2, true, F("About"), ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(55, 140, 220, 180, 0, true, F("WiFi MAC"), ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(260, 140, 425, 180, 0, true, F("Overclock"), ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(55, 200, 220, 240, 0, true, F("Reset WiFi"), ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(260, 200, 425, 240, 0, true, F("Set Time"), ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(55, 260, 220, 300, 0, true, F("Dongle"), ALIGN_CENTER);
-	userInterfaceButtons[btnPos++].setButton(260, 260, 425, 300, 0, true, F("Reset"), ALIGN_CENTER);
+	userInterfaceButton[btnPos++].setButton(55, 80, 220, 120, 1, true, F("Memory"), ALIGN_CENTER);
+	userInterfaceButton[btnPos++].setButton(260, 80, 425, 120, 2, true, F("About"), ALIGN_CENTER);
+	userInterfaceButton[btnPos++].setButton(55, 140, 220, 180, 0, true, F("WiFi MAC"), ALIGN_CENTER);
+	userInterfaceButton[btnPos++].setButton(260, 140, 425, 180, 0, true, F("Overclock"), ALIGN_CENTER);
+	userInterfaceButton[btnPos++].setButton(55, 200, 220, 240, 0, true, F("Reset WiFi"), ALIGN_CENTER);
+	userInterfaceButton[btnPos++].setButton(260, 200, 425, 240, 0, true, F("Set Time"), ALIGN_CENTER);
+	userInterfaceButton[btnPos++].setButton(55, 260, 220, 300, 0, true, F("Dongle"), ALIGN_CENTER);
+	userInterfaceButton[btnPos++].setButton(260, 260, 425, 300, 0, true, F("Reset"), ALIGN_CENTER);
 }
 
 void clearAppSpace()
 {
-	drawSquareBtn(0, 51, 480, 320, "", themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
+	GUI_drawSquareBtn(0, 51, 480, 320, "", themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
 }
 
 // Manages the loading and unloading of different user Apps
 void appManager()
 {
 	int8_t results = 0;
+	error_t e = 0;
+
 	switch (page)
 	{
-	case 0: /*========== CANBUS ==========*/
+	case APP_CANBUS_TOOLS: /*========== CANBUS ==========*/
 		// Draw page and lock variables
 		if (!hasDrawn)
 		{
 			if (graphicLoaderState == 0)
 			{
-				createCANBusBtns();
+				CAPTURE_createMenuBtns();
 				clearAppSpace();
 				graphicLoaderState++;
 				break;
 			}
-			if (drawPage(userInterfaceButtons, graphicLoaderState, 6))
+			if (GUI_drawPage(userInterfaceButton, graphicLoaderState, 6))
 			{
 				break;
 			}
@@ -207,7 +200,7 @@ void appManager()
 		}
 
 		// Call buttons or page method
-		buttonMonitor(userInterfaceButtons, 6);
+		GUI_buttonMonitor(userInterfaceButton, 6);
 
 		// Release any variable locks if page changed
 		if (nextPage != page)
@@ -215,46 +208,37 @@ void appManager()
 			pageTransition();
 		}
 		break;
-	case 1: // CAN Bus Capture
+	case APP_CAPTURE : // CAN Bus Capture
 		// Draw page and lock variables
 		if (!hasDrawn)
 		{
 			if (graphicLoaderState == 0)
 			{
-				createCANBusCaptureBtns();
+				
 				clearAppSpace();
 
-				// Menu frames
-				drawSquareBtn(10, 75, 160, 270, "", menuBackground, frameBorder, menuBackground, ALIGN_CENTER);
-				drawSquareBtn(165, 75, 315, 270, "", menuBackground, frameBorder, menuBackground, ALIGN_CENTER);
-				drawSquareBtn(320, 75, 470, 270, "", menuBackground, frameBorder, menuBackground, ALIGN_CENTER);
-				drawRoundBtn(10, 55, 160, 70, "Source", themeBackground, themeBackground, menuBtnTextColor, ALIGN_LEFT, 20);
-				drawRoundBtn(165, 55, 315, 70, "Output", themeBackground, themeBackground, menuBtnTextColor, ALIGN_LEFT, 20);
-				drawRoundBtn(320, 55, 470, 70, "Selected", themeBackground, themeBackground, menuBtnTextColor, ALIGN_LEFT, 20);
+		
 
 				graphicLoaderState++;
 				break;
 			}
-			if (drawPage(userInterfaceButtons, graphicLoaderState, 6))
+			if (GUI_drawPage(userInterfaceCaptureButton, graphicLoaderState, 15))
 			{
 				break;
 			}
 			hasDrawn = true;
 		}
 
-
-		results = subMenuButtonMonitor(userInterfaceButtons, 6);
-
-
+		// Call buttons or page method
+		CAPTURE_captureConfig();
 
 		// Release any variable locks if page changed
 		if (nextPage != page)
 		{
-			Serial.println("Leaving");
 			pageTransition();
 		}
 		break;
-	case 2: // CAN Bus Capture
+	case 2: // 
 		// Draw page and lock variables
 		if (!hasDrawn)
 		{
@@ -265,7 +249,7 @@ void appManager()
 				graphicLoaderState++;
 				break;
 			}
-			if (drawPage(userInterfaceButtons, graphicLoaderState, 4))
+			if (GUI_drawPage(userInterfaceButton, graphicLoaderState, 4))
 			{
 				break;
 			}
@@ -273,7 +257,7 @@ void appManager()
 		}
 
 		// Call buttons or page method
-		buttonMonitor(userInterfaceButtons, 4);
+		GUI_buttonMonitor(userInterfaceButton, 4);
 
 		// Release any variable locks if page changed
 		if (nextPage != page)
@@ -281,7 +265,7 @@ void appManager()
 			pageTransition();
 		}
 		break;
-	case 3: // CAN Bus Capture
+	case 3: // 
 		// Draw page and lock variables
 		if (!hasDrawn)
 		{
@@ -291,7 +275,7 @@ void appManager()
 				graphicLoaderState++;
 				break;
 			}
-			if (drawPage(userKeyButtons, graphicLoaderState, 41))
+			if (GUI_drawPage(userKeyButtons, graphicLoaderState, 42))
 			{
 				break;
 			}
@@ -299,7 +283,7 @@ void appManager()
 		}
 
 		// Call buttons or page method
-		subMenuButtonMonitor(userKeyButtons, 41);
+		GUI_subMenuButtonMonitor(userKeyButtons, 42);
 
 		// Release any variable locks if page changed
 		if (nextPage != page)
@@ -318,7 +302,7 @@ void appManager()
 				graphicLoaderState++;
 				break;
 			}
-			if (drawPage(userInterfaceButtons, graphicLoaderState, 8))
+			if (GUI_drawPage(userInterfaceButton, graphicLoaderState, 8))
 			{
 				break;
 			}
@@ -351,7 +335,7 @@ void appManager()
 			}
 			hasDrawn = true;
 
-
+			/*
 			display.fillScreen(ILI9488_BLACK);
 			display.setTextColor(ILI9488_WHITE);  display.setTextSize(4);
 			display.enableScroll();
@@ -389,7 +373,7 @@ void appManager()
 			delay(4000);
 			nextPage = 0;
 
-
+			*/
 
 
 		}
@@ -417,30 +401,30 @@ void createMenuBtns()
 	userInterfaceMenuButton[menuPosition++].setButton(375, 0, 475, 40, SETTING_MAIN, true, 0, F("Settings"), ALIGN_CENTER, menuBackground, menuBackground, menuBtnTextColor);
 }
 
-void canSniff1(const CAN_message_t& msg) {
-	Serial.print("1 MB "); Serial.print(msg.mb);
-	Serial.print("  OVERRUN: "); Serial.print(msg.flags.overrun);
-	Serial.print("  LEN: "); Serial.print(msg.len);
-	Serial.print(" EXT: "); Serial.print(msg.flags.extended);
-	Serial.print(" TS: "); Serial.print(msg.timestamp);
-	Serial.print(" ID: "); Serial.print(msg.id, HEX);
-	Serial.print(" Buffer: ");
-	for (uint8_t i = 0; i < msg.len; i++) {
-		Serial.print(msg.buf[i], HEX); Serial.print(" ");
-	} Serial.println();
+
+void canSniff1(const CAN_message_t& msg) 
+{
+	if (CANBusOut == 10)
+	{
+		Serial.printf("%8d    %9d    %04X   %d   %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\r\n", ++messageNum, millis(), msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
+	}
+	else if (CANBusOut == 2)
+	{
+
+	}
 }
 
-void canSniff2(const CAN_message_t& msg) {
-	Serial.print("2 MB "); Serial.print(msg.mb);
-	Serial.print("  OVERRUN: "); Serial.print(msg.flags.overrun);
-	Serial.print("  LEN: "); Serial.print(msg.len);
-	Serial.print(" EXT: "); Serial.print(msg.flags.extended);
-	Serial.print(" TS: "); Serial.print(msg.timestamp);
-	Serial.print(" ID: "); Serial.print(msg.id, HEX);
-	Serial.print(" Buffer: ");
-	for (uint8_t i = 0; i < msg.len; i++) {
-		Serial.print(msg.buf[i], HEX); Serial.print(" ");
-	} Serial.println();
+
+void canSniff2(const CAN_message_t& msg) 
+{
+	if (CANBusOut == 10)
+	{
+		Serial.printf("%8d    %9d    %04X   %d   %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\r\n", ++messageNum, millis(), msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
+	}
+	else if (CANBusOut == 2)
+	{
+
+	}
 }
 
 // -------------------------------------------------------------
@@ -482,16 +466,16 @@ void setup(void)
 	//display.setFont(Michroma_12);
 
 	// Clear LCD
-	drawSquareBtn(0, 0, 479, 319, "", themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
-	drawSquareBtn(0, 0, 480, 45, "", menuBackground, menuBackground, menuBackground, ALIGN_CENTER);
-	drawSquareBtn(0, 45, 480, 50, "", menuBorder, menuBorder, menuBorder, ALIGN_CENTER);
-	drawSquareBtn(160, 45, 260, 50, "", menuBtnColor, menuBtnColor, menuBtnColor, ALIGN_CENTER);
+	GUI_drawSquareBtn(0, 0, 479, 319, "", themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
+	GUI_drawSquareBtn(0, 0, 480, 45, "", menuBackground, menuBackground, menuBackground, ALIGN_CENTER);
+	GUI_drawSquareBtn(0, 45, 480, 50, "", menuBorder, menuBorder, menuBorder, ALIGN_CENTER);
+	GUI_drawSquareBtn(160, 45, 260, 50, "", menuBtnColor, menuBtnColor, menuBtnColor, ALIGN_CENTER);
 
 	// Create button objects
 	createMenuBtns();
 
 	// Draw Menu
-	while (drawPage(userInterfaceMenuButton, graphicLoaderState, 3));
+	while (GUI_drawPage(userInterfaceMenuButton, graphicLoaderState, 3));
 	graphicLoaderState = 0;
 
 	Can0.begin();
@@ -510,6 +494,9 @@ void setup(void)
 	Can1.onReceive(canSniff2);
 	Can1.mailboxStatus();
 	Can1.disableFIFOInterrupt();
+
+
+	CAPTURE_createCaptureBtns();
 }
 
 
@@ -519,7 +506,7 @@ void setup(void)
 // All background process should be called from here
 void backgroundProcess()
 {
-	buttonMonitor(userInterfaceMenuButton, MENU_BUTTON_SIZE);
+	GUI_buttonMonitor(userInterfaceMenuButton, MENU_BUTTON_SIZE);
 	//updateTime();
 	//serialOut();
 	//SDCardOut();

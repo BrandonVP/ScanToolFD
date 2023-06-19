@@ -24,37 +24,15 @@
 
 #ifdef _KEYINPUT_C
 
-char keyboardInput[9];
-uint8_t keypadInput[5] = { 0, 0, 0, 0 };
-
-void resetKeypad();
-void drawKeypad();
-int keypadButtons();
-uint8_t keypadController(uint8_t&, uint16_t&);
-void drawKeypadDec();
-int keypadButtonsDec();
-uint8_t keypadControllerDec(uint8_t&, uint16_t&);
-void drawkeyboard();
-int keyboardButtons();
+UserInterfaceClass userKeyButtons[43];
+void createKeyboardButtons();
 uint8_t keyboardController(uint8_t&);
 
 #else
 
-extern char keyboardInput[9];
-extern uint8_t keypadInput[4];
-extern UserInterfaceClass userKeyButtons[41];
-
-extern void resetKeypad();
-extern void drawKeypad();
-extern int keypadButtons();
-extern uint8_t keypadController(uint8_t&, uint16_t&);
-extern void drawKeypadDec();
-extern int keypadButtonsDec();
-extern uint8_t keypadControllerDec(uint8_t&, uint16_t&);
-extern bool drawkeyboard(uint8_t&);
-extern int keyboardButtons();
-extern uint8_t keyboardController(uint8_t&);
+extern UserInterfaceClass userKeyButtons[43];
 void createKeyboardButtons();
+uint8_t keyboardController(uint8_t&);
 
 #endif // _KEYINPUT_C
 #endif // _KEYINPUT_H

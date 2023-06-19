@@ -15,54 +15,75 @@ void UserInterfaceClass::init()
 
 }
 
-void UserInterfaceClass::setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint8_t page, bool isRound, String btnText)
+void UserInterfaceClass::setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint8_t clickReturn, bool isRound, String btnText)
 {
 	this->xStart = xStart;
 	this->xStop = xStop;
 	this->yStart = yStart;
 	this->yStop = yStop;
-	this->page = page;
+	this->clickReturn = clickReturn;
 	this->setClickable(true);
 	this->setShape(isRound);
 	this->roundBtnRadius = 20;
 	this->btnText = btnText;
 	this->align = ALIGN_CENTER;
-	this->bodyColor = menuBtnColor;
+	this->backgroundColor = menuBtnColor;
 	this->borderColor = menuBtnBorder;
+	this->clickBorderColor = menuBtnColor;
 	this->textColor = menuBtnText;
 }
 
-void UserInterfaceClass::setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint8_t page, bool isRound, String btnText, uint8_t alignText)
+void UserInterfaceClass::setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint8_t clickReturn, bool isRound, String btnText, uint8_t alignText)
 {
 	this->xStart = xStart;
 	this->xStop = xStop;
 	this->yStart = yStart;
 	this->yStop = yStop;
-	this->page = page;
+	this->clickReturn = clickReturn;
 	this->setClickable(true);
 	this->setShape(isRound);
 	this->roundBtnRadius = 20;
 	this->btnText = btnText;
 	this->align = alignText;
-	this->bodyColor = menuBtnColor;
+	this->backgroundColor = menuBtnColor;
 	this->borderColor = menuBtnBorder;
+	this->clickBorderColor = menuBtnColor;
 	this->textColor = menuBtnText;
 }
 
-void UserInterfaceClass::setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint8_t page, bool isRound, uint8_t radius, String btnText, uint8_t alignText, uint16_t btnC, uint16_t borderC, uint16_t textC)
+void UserInterfaceClass::setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint8_t clickReturn, bool isRound, uint8_t radius, String btnText, uint8_t alignText, uint16_t btnC, uint16_t borderC, uint16_t textC)
 {
 	this->xStart = xStart;
 	this->xStop = xStop;
 	this->yStart = yStart;
 	this->yStop = yStop;
-	this->page = page;
+	this->clickReturn = clickReturn;
 	this->setClickable(true);
 	this->setShape(isRound);
 	this->roundBtnRadius = radius;
 	this->btnText = btnText;
 	this->align = alignText;
-	this->bodyColor = btnC;
+	this->backgroundColor = btnC;
 	this->borderColor = borderC;
+	this->clickBorderColor = borderC;
+	this->textColor = textC;
+}
+
+void UserInterfaceClass::setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint8_t clickReturn, bool isRound, uint8_t radius, String btnText, uint8_t alignText, uint16_t btnC, uint16_t borderC, uint16_t clickBorderC, uint16_t textC)
+{
+	this->xStart = xStart;
+	this->xStop = xStop;
+	this->yStart = yStart;
+	this->yStop = yStop;
+	this->clickReturn = clickReturn;
+	this->setClickable(true);
+	this->setShape(isRound);
+	this->roundBtnRadius = radius;
+	this->btnText = btnText;
+	this->align = alignText;
+	this->backgroundColor = btnC;
+	this->borderColor = borderC;
+	this->clickBorderColor = clickBorderC;
 	this->textColor = textC;
 }
 
@@ -90,6 +111,30 @@ void UserInterfaceClass::setClickable(uint8_t isClickable)
 	}
 }
 
+void UserInterfaceClass::setBgColor(uint16_t color)
+{
+	this->backgroundColor = color;
+
+}
+
+void UserInterfaceClass::setBorderColor(uint16_t color)
+{
+	this->borderColor = color;
+
+}
+
+void UserInterfaceClass::setClickBorderColor(uint16_t color)
+{
+	this->clickBorderColor = color;
+
+}
+
+void UserInterfaceClass::setTextColor(uint16_t color)
+{
+	this->textColor = color;
+
+}
+
 uint16_t UserInterfaceClass::getXStart()
 {
 	return this->xStart;
@@ -110,9 +155,9 @@ uint16_t UserInterfaceClass::getYStop()
 	return this->yStop;
 }
 
-uint8_t UserInterfaceClass::getPage()
+uint8_t UserInterfaceClass::getClickReturn()
 {
-	return this->page;
+	return this->clickReturn;
 }
 
 bool UserInterfaceClass::getIsRound()
@@ -146,7 +191,12 @@ uint8_t UserInterfaceClass::getAlign()
 
 uint16_t UserInterfaceClass::getBtnColor()
 {
-	return this->bodyColor;
+	return this->backgroundColor;
+}
+
+uint16_t UserInterfaceClass::getClickBorderColor()
+{
+	return this->clickBorderColor;
 }
 
 uint16_t UserInterfaceClass::getBorderColor()

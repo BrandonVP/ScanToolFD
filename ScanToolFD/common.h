@@ -14,12 +14,15 @@
 #include "config.h"
 
 
-
+extern uint8_t CANBusOut;
+extern uint32_t messageNum;
 
 extern ILI9488_t3 display;
 
+extern UserInterfaceClass userInterfaceButton[APP_BUTTON_SIZE];
+extern UserInterfaceClass userInterfaceCaptureButton[CAPTURE_BUTTON_SIZE];
+extern UserInterfaceClass userInterfaceMenuButton[MENU_BUTTON_SIZE];
 
-extern UserInterfaceClass userInterfaceButtons[APP_BUTTON_SIZE];
 extern uint16_t buttonsOnPage;
 extern Adafruit_FT6206 ts;
 

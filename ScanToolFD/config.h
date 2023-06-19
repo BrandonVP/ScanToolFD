@@ -59,7 +59,7 @@
 
 #define PIDSAMPLES 5
 
-
+typedef bool error_t;
 
 // For the draw shape functions
 #define ALIGN_LEFT 1
@@ -92,6 +92,7 @@ typedef bool error_t;
 
 // Buttons
 #define MENU_BUTTON_SIZE 5
+#define CAPTURE_BUTTON_SIZE 15
 #define APP_BUTTON_SIZE 30
 
 
