@@ -140,10 +140,15 @@ void CAPTURE_captureConfig()
 	}
 	if (userInput == CAPTURE_START_POS)
 	{
+		if (CAPTURE_output_config == 9)
+		{
+			clearAppSpace();
+		}
 		messageNum = 0;
 		CANBusOut = CAPTURE_output_config;
 		userInterfaceCaptureButton[CAPTURE_START_POS].setClickable(false);
 		userInterfaceCaptureButton[CAPTURE_STOP_POS].setClickable(true);
+		
 	}
 	if (userInput == CAPTURE_STOP_POS)
 	{

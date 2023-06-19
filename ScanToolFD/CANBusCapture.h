@@ -23,7 +23,7 @@
 #include "userInterface.h"
 
 extern UserInterfaceClass userInterfaceButtons[APP_BUTTON_SIZE];
-
+extern void clearAppSpace();
 void CAPTURE_createMenuBtns();
 void CAPTURE_createCaptureBtns();
 void CAPTURE_captureConfig();

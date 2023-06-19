@@ -87,6 +87,7 @@ bool hasDrawn = false;
 
 uint8_t CANBusOut = 0;
 uint32_t messageNum = 0;
+uint16_t LCDPos = 60;
 
 // Use to load pages in pieces to prevent blocking while loading entire page
 uint8_t graphicLoaderState = 0;
@@ -214,11 +215,7 @@ void appManager()
 		{
 			if (graphicLoaderState == 0)
 			{
-				
 				clearAppSpace();
-
-		
-
 				graphicLoaderState++;
 				break;
 			}
@@ -235,6 +232,11 @@ void appManager()
 		// Release any variable locks if page changed
 		if (nextPage != page)
 		{
+			if (CANBusOut == 9)
+			{
+				CANBusOut = 0;
+			}
+			LCDPos = 60;
 			pageTransition();
 		}
 		break;
@@ -408,9 +410,12 @@ void canSniff1(const CAN_message_t& msg)
 	{
 		Serial.printf("%8d    %9d    %04X   %d   %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\r\n", ++messageNum, millis(), msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
 	}
-	else if (CANBusOut == 2)
+	else if (CANBusOut == 9)
 	{
-
+		char printString[40];
+		display.setTextColor(menuBtnColor);
+		sprintf(printString, "%03X  %d  %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X", msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
+		display.drawString(printString, 40, 100);
 	}
 }
 
@@ -421,9 +426,53 @@ void canSniff2(const CAN_message_t& msg)
 	{
 		Serial.printf("%8d    %9d    %04X   %d   %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\r\n", ++messageNum, millis(), msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
 	}
-	else if (CANBusOut == 2)
+	else if ((CANBusOut == 9) && (page == APP_CAPTURE))
 	{
+		if (LCDPos == 60)
+		{
+			display.fillRect(25, 300, 10, 10, themeBackground);
+			display.fillRect(25, LCDPos, 10, 10, 0x0000);
+			display.fillRect(40, LCDPos, 400, 15, themeBackground);
+		}
+		else
+		{
+			display.fillRect(25, LCDPos - 15, 10, 10, themeBackground);
+			display.fillRect(25, LCDPos, 10, 10, 0x0000);
+			display.fillRect(40, LCDPos, 400, 15, themeBackground);
+		}
 
+		char printString[40];
+		display.setTextColor(menuBtnText);
+		sprintf(printString, "%03X", msg.id);
+		display.drawString(printString, 40, LCDPos);
+		sprintf(printString, "%d", msg.len);
+		display.drawString(printString, 100, LCDPos);
+		sprintf(printString, "%02X ", msg.buf[0]);
+		display.drawString(printString, 130, LCDPos);
+		sprintf(printString, "%02X ", msg.buf[1]);
+		display.drawString(printString, 170, LCDPos);
+		sprintf(printString, "%02X ", msg.buf[2]);
+		display.drawString(printString, 210, LCDPos);
+		sprintf(printString, "%02X ", msg.buf[3]);
+		display.drawString(printString, 250, LCDPos);
+		sprintf(printString, "%02X ", msg.buf[4]);
+		display.drawString(printString, 290, LCDPos);
+		sprintf(printString, "%02X ", msg.buf[5]);
+		display.drawString(printString, 330, LCDPos);
+		sprintf(printString, "%02X ", msg.buf[6]);
+		display.drawString(printString, 370, LCDPos);
+		sprintf(printString, "%02X ", msg.buf[7]);
+		display.drawString(printString, 410, LCDPos);
+		//sprintf(printString, "%03X  %d  %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X", msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
+		
+		if (LCDPos < 300)
+		{
+			LCDPos += 15;
+		}
+		else
+		{
+			LCDPos = 60;
+		}
 	}
 }
 
