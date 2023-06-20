@@ -142,10 +142,12 @@ void CAPTURE_captureConfig()
 	{
 		if (CAPTURE_output_config == 9)
 		{
-			clearAppSpace();
+			nextPage = APP_CAPTURE_LCD;
 		}
-		messageNum = 0;
-		CANBusOut = CAPTURE_output_config;
+		else
+		{
+			CANBusOut = CAPTURE_output_config;
+		}
 		userInterfaceCaptureButton[CAPTURE_START_POS].setClickable(false);
 		userInterfaceCaptureButton[CAPTURE_STOP_POS].setClickable(true);
 		
@@ -156,4 +158,45 @@ void CAPTURE_captureConfig()
 		userInterfaceCaptureButton[CAPTURE_START_POS].setClickable(true);
 		userInterfaceCaptureButton[CAPTURE_STOP_POS].setClickable(false);
 	}
+}
+
+void CAPTURE_createLCDBtns()
+{
+	uint8_t btnPos = 0;
+	userInterfaceButton[btnPos].setButton(435, 50, 480, 320, 0, false, 0, F(""), ALIGN_CENTER, menuBackground, frameBorder, menuBackground, menuBackground);
+	userInterfaceButton[btnPos++].setClickable(false);
+	userInterfaceButton[btnPos++].setButton(409, 100, 479, 150, 1, false, 0, F("Start"), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(409, 160, 479, 210, 2, false, 0, F("Stop"), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(409, 220, 479, 270, 3, false, 0, F("Clear"), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+}
+
+void CAPTURE_createBaudBtns()
+{
+	uint8_t btnPos = 0;
+	userInterfaceButton[btnPos].setButton(10, 55, 170, 70, 0, true, 20, F("Baud"), ALIGN_CENTER, themeBackground, themeBackground, menuBackground, menuBtnTextColor);
+	userInterfaceButton[btnPos++].setClickable(false);
+	userInterfaceButton[btnPos].setButton(175, 55, 335, 70, 0, true, 20, F("Output"), ALIGN_CENTER, themeBackground, themeBackground, menuBackground, menuBtnTextColor);
+	userInterfaceButton[btnPos++].setClickable(false);
+	userInterfaceButton[btnPos++].setButton(10, 75, 170, 315, 0, false, 0, F(""), ALIGN_CENTER, menuBackground, frameBorder, menuBackground, menuBackground);
+	userInterfaceButton[btnPos++].setClickable(false);
+	userInterfaceButton[btnPos++].setButton(175, 75, 335, 315, 0, false, 0, F(""), ALIGN_CENTER, menuBackground, frameBorder, menuBackground, menuBackground);
+	userInterfaceButton[btnPos++].setClickable(false);
+	userInterfaceButton[btnPos++].setButton(10, 75, 170, 105, 4, false, 0, F("5M"), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(10, 105, 170, 135, 5, false, 0, F("2M"), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(10, 135, 170, 160, 6, false, 0, F("1M"), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(10, 160, 170, 185, 7, false, 0, F("800K"), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(10, 185, 170, 210, 8, false, 0, F("500K"), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(10, 235, 170, 260, 8, false, 0, F("250K"), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(10, 285, 170, 310, 8, false, 0, F("125K"), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(10, 310, 170, 320, 8, false, 0, F("100K"), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+
+
+	userInterfaceButton[btnPos++].setButton(175, 75, 335, 110, 9, false, 0, F("LCD"), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(175, 115, 335, 150, 10, false, 0, F("Serial"), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(175, 155, 335, 190, 11, false, 0, F("SD Card"), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(175, 195, 335, 230, 12, false, 0, F("Wireless"), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceButton[btnPos].setButton(340, 230, 475, 270, 13, true, 0, F("START"), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setClickable(false);
+	userInterfaceButton[btnPos].setButton(340, 275, 475, 315, 14, true, 0, F("STOP"), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setClickable(false);
 }

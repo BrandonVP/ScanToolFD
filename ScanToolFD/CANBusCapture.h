@@ -7,6 +7,7 @@
 #include "gui.h"
 #define APP_CANBUS_TOOLS 0
 #define APP_CAPTURE 1
+#define APP_CAPTURE_LCD 2
 
 #ifndef _CANBUSCAPTURE_h
 #define _CANBUSCAPTURE_h
@@ -29,9 +30,13 @@ void CAPTURE_createCaptureBtns();
 void CAPTURE_captureConfig();
 #else
 
+extern uint8_t CAPTURE_input_config;
+extern uint8_t CAPTURE_output_config;
+
 void CAPTURE_createMenuBtns();
 void CAPTURE_createCaptureBtns();
 void CAPTURE_captureConfig();
+void CAPTURE_createLCDBtns();
 
 #endif
 #endif

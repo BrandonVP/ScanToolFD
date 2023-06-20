@@ -232,38 +232,67 @@ void appManager()
 		// Release any variable locks if page changed
 		if (nextPage != page)
 		{
-			if (CANBusOut == 9)
-			{
-				CANBusOut = 0;
-			}
-			LCDPos = 60;
 			pageTransition();
 		}
 		break;
-	case 2: // 
+	case APP_CAPTURE_LCD: // 
 		// Draw page and lock variables
 		if (!hasDrawn)
 		{
 			if (graphicLoaderState == 0)
 			{
-				createCANBusBaudBtns();
+				CAPTURE_createLCDBtns();
 				clearAppSpace();
 				graphicLoaderState++;
 				break;
 			}
+			display.setFont(Michroma_10);
 			if (GUI_drawPage(userInterfaceButton, graphicLoaderState, 4))
 			{
 				break;
 			}
+			
+
+			messageNum = 0;
+			CANBusOut = CAPTURE_output_config;
+
 			hasDrawn = true;
+			display.setFont(Arial_12);
 		}
 
 		// Call buttons or page method
-		GUI_buttonMonitor(userInterfaceButton, 4);
+		results = GUI_subMenuButtonMonitor(userInterfaceButton, 4);
+		if (results == 1)
+		{
+			CANBusOut = 9;
+		}
+		else if (results == 2)
+		{
+			CANBusOut = 0;
+		}
+		else if (results == 3)
+		{
+			Can1.disableFIFO();
+			Can1.disableFIFOInterrupt();
+			Can0.disableFIFO();
+			Can0.disableFIFOInterrupt();
+			GUI_drawSquareBtn(0, 51, 408, 320, "", themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
+			LCDPos = 60;
+			Can1.enableFIFO();
+			Can1.enableFIFOInterrupt();
+			Can0.enableFIFO();
+			Can0.enableFIFOInterrupt();
+		}
 
 		// Release any variable locks if page changed
 		if (nextPage != page)
 		{
+			if (CANBusOut == 9)
+			{
+				CANBusOut = 0;
+			}
+			LCDPos = 60;
+			display.setFont(Michroma_11);
 			pageTransition();
 		}
 		break;
@@ -426,43 +455,43 @@ void canSniff2(const CAN_message_t& msg)
 	{
 		Serial.printf("%8d    %9d    %04X   %d   %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\r\n", ++messageNum, millis(), msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
 	}
-	else if ((CANBusOut == 9) && (page == APP_CAPTURE))
+	else if ((CANBusOut == 9) && (page == APP_CAPTURE_LCD))
 	{
 		if (LCDPos == 60)
 		{
-			display.fillRect(25, 300, 10, 10, themeBackground);
-			display.fillRect(25, LCDPos, 10, 10, 0x0000);
-			display.fillRect(40, LCDPos, 400, 15, themeBackground);
+			display.fillRect(5, 300, 10, 10, themeBackground);
+			display.fillRect(5, LCDPos, 10, 10, 0x0000);
+			display.fillRect(15, LCDPos, 385, 15, themeBackground);
 		}
 		else
 		{
-			display.fillRect(25, LCDPos - 15, 10, 10, themeBackground);
-			display.fillRect(25, LCDPos, 10, 10, 0x0000);
-			display.fillRect(40, LCDPos, 400, 15, themeBackground);
+			display.fillRect(5, LCDPos - 15, 10, 10, themeBackground);
+			display.fillRect(5, LCDPos, 10, 10, 0x0000);
+			display.fillRect(15, LCDPos, 385, 15, themeBackground);
 		}
 
 		char printString[40];
 		display.setTextColor(menuBtnText);
 		sprintf(printString, "%03X", msg.id);
-		display.drawString(printString, 40, LCDPos);
+		display.drawString(printString, 15, LCDPos);
 		sprintf(printString, "%d", msg.len);
-		display.drawString(printString, 100, LCDPos);
+		display.drawString(printString, 65, LCDPos);   
 		sprintf(printString, "%02X ", msg.buf[0]);
-		display.drawString(printString, 130, LCDPos);
+		display.drawString(printString, 90, LCDPos);
 		sprintf(printString, "%02X ", msg.buf[1]);
-		display.drawString(printString, 170, LCDPos);
+		display.drawString(printString, 130, LCDPos);
 		sprintf(printString, "%02X ", msg.buf[2]);
-		display.drawString(printString, 210, LCDPos);
+		display.drawString(printString, 170, LCDPos);
 		sprintf(printString, "%02X ", msg.buf[3]);
-		display.drawString(printString, 250, LCDPos);
+		display.drawString(printString, 210, LCDPos);
 		sprintf(printString, "%02X ", msg.buf[4]);
-		display.drawString(printString, 290, LCDPos);
+		display.drawString(printString, 250, LCDPos);
 		sprintf(printString, "%02X ", msg.buf[5]);
-		display.drawString(printString, 330, LCDPos);
+		display.drawString(printString, 290, LCDPos);
 		sprintf(printString, "%02X ", msg.buf[6]);
-		display.drawString(printString, 370, LCDPos);
+		display.drawString(printString, 330, LCDPos);
 		sprintf(printString, "%02X ", msg.buf[7]);
-		display.drawString(printString, 410, LCDPos);
+		display.drawString(printString, 370, LCDPos);
 		//sprintf(printString, "%03X  %d  %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X", msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
 		
 		if (LCDPos < 300)
