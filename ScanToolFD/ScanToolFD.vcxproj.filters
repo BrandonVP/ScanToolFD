@@ -69,10 +69,10 @@
     <ClInclude Include="ili9488_t3_font_ComicSansMS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\AppData\Local\arduino15\packages\teensy\hardware\avr\1.57.2\libraries\ILI9488_t3\src\font_AwesomeF180.h">
+    <ClInclude Include="..\..\..\..\AppData\Local\arduino15\packages\teensy\hardware\avr\1.58.1\libraries\ILI9488_t3\src\font_AwesomeF180.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\AppData\Local\arduino15\packages\teensy\hardware\avr\1.57.2\libraries\ILI9488_t3\src\font_Michroma.h">
+    <ClInclude Include="..\..\..\..\AppData\Local\arduino15\packages\teensy\hardware\avr\1.58.1\libraries\ILI9488_t3\src\font_Michroma.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -107,10 +107,10 @@
     <ClCompile Include="ili9488_t3_font_ComicSansMS.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\AppData\Local\arduino15\packages\teensy\hardware\avr\1.57.2\libraries\ILI9488_t3\src\font_AwesomeF180.c">
+    <ClCompile Include="..\..\..\..\AppData\Local\arduino15\packages\teensy\hardware\avr\1.58.1\libraries\ILI9488_t3\src\font_AwesomeF180.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\AppData\Local\arduino15\packages\teensy\hardware\avr\1.57.2\libraries\ILI9488_t3\src\font_Michroma.c">
+    <ClCompile Include="..\..\..\..\AppData\Local\arduino15\packages\teensy\hardware\avr\1.58.1\libraries\ILI9488_t3\src\font_Michroma.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

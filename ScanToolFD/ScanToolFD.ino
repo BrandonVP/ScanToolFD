@@ -86,6 +86,7 @@ int x, y;
 bool hasDrawn = false;
 
 uint8_t CANBusOut = 0;
+uint8_t CANBusIn = 0;
 uint32_t messageNum = 0;
 uint16_t LCDPos = 60;
 
@@ -171,7 +172,8 @@ void createSettingsBtns()
 
 void clearAppSpace()
 {
-	GUI_drawSquareBtn(0, 51, 480, 320, "", themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
+	//GUI_drawSquareBtn(0, 51, 480, 320, "", themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
+	display.fillRect(0, 51, 480, 269, themeBackground);
 }
 
 // Manages the loading and unloading of different user Apps
@@ -322,6 +324,33 @@ void appManager()
 			pageTransition();
 		}
 		break;
+	case 4: // CAN Bus Capture
+		// Draw page and lock variables
+		if (!hasDrawn)
+		{
+			if (graphicLoaderState == 0)
+			{
+				CAPTURE_createBaudBtns();
+				clearAppSpace();
+				graphicLoaderState++;
+				break;
+			}
+			if (GUI_drawPage(userInterfaceButton, graphicLoaderState, 20))
+			{
+				break;
+			}
+			hasDrawn = true;
+		}
+
+		// Call buttons or page method
+		GUI_subMenuButtonMonitor(userInterfaceButton, 20);
+
+		// Release any variable locks if page changed
+		if (nextPage != page)
+		{
+			pageTransition();
+		}
+		break;
 	case 9: // Tools
 		// Draw page and lock variables
 		if (!hasDrawn)
@@ -433,29 +462,70 @@ void createMenuBtns()
 }
 
 
+void canSniff0(const CAN_message_t& msg) 
+{
+	if (CANBusOut == 10)
+	{
+		Serial.printf("%8d    %9d    %04X   %d   %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\r\n", ++messageNum, millis(), msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
+	}
+	else if ((CANBusOut == 9) && (CANBusIn == 4) && (page == APP_CAPTURE_LCD))
+	{
+		if (LCDPos == 60)
+		{
+			display.fillRect(5, 300, 10, 10, themeBackground);
+			display.fillRect(5, LCDPos, 10, 10, 0x0000);
+			display.fillRect(15, LCDPos, 385, 15, themeBackground);
+		}
+		else
+		{
+			display.fillRect(5, LCDPos - 15, 10, 10, themeBackground);
+			display.fillRect(5, LCDPos, 10, 10, 0x0000);
+			display.fillRect(15, LCDPos, 385, 15, themeBackground);
+		}
+
+		char printString[40];
+		display.setTextColor(menuBtnText);
+		sprintf(printString, "%03X", msg.id);
+		display.drawString(printString, 15, LCDPos);
+		sprintf(printString, "%d", msg.len);
+		display.drawString(printString, 65, LCDPos);
+		sprintf(printString, "%02X ", msg.buf[0]);
+		display.drawString(printString, 90, LCDPos);
+		sprintf(printString, "%02X ", msg.buf[1]);
+		display.drawString(printString, 130, LCDPos);
+		sprintf(printString, "%02X ", msg.buf[2]);
+		display.drawString(printString, 170, LCDPos);
+		sprintf(printString, "%02X ", msg.buf[3]);
+		display.drawString(printString, 210, LCDPos);
+		sprintf(printString, "%02X ", msg.buf[4]);
+		display.drawString(printString, 250, LCDPos);
+		sprintf(printString, "%02X ", msg.buf[5]);
+		display.drawString(printString, 290, LCDPos);
+		sprintf(printString, "%02X ", msg.buf[6]);
+		display.drawString(printString, 330, LCDPos);
+		sprintf(printString, "%02X ", msg.buf[7]);
+		display.drawString(printString, 370, LCDPos);
+		//sprintf(printString, "%03X  %d  %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X", msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
+
+		if (LCDPos < 300)
+		{
+			LCDPos += 15;
+		}
+		else
+		{
+			LCDPos = 60;
+		}
+	}
+}
+
+
 void canSniff1(const CAN_message_t& msg) 
 {
 	if (CANBusOut == 10)
 	{
 		Serial.printf("%8d    %9d    %04X   %d   %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\r\n", ++messageNum, millis(), msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
 	}
-	else if (CANBusOut == 9)
-	{
-		char printString[40];
-		display.setTextColor(menuBtnColor);
-		sprintf(printString, "%03X  %d  %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X", msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
-		display.drawString(printString, 40, 100);
-	}
-}
-
-
-void canSniff2(const CAN_message_t& msg) 
-{
-	if (CANBusOut == 10)
-	{
-		Serial.printf("%8d    %9d    %04X   %d   %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\r\n", ++messageNum, millis(), msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
-	}
-	else if ((CANBusOut == 9) && (page == APP_CAPTURE_LCD))
+	else if ((CANBusOut == 9) && (CANBusIn == 5) && (page == APP_CAPTURE_LCD))
 	{
 		if (LCDPos == 60)
 		{
@@ -509,6 +579,7 @@ void canSniff2(const CAN_message_t& msg)
 void setup(void)
 {
 	Serial.begin(9600); // USB is always 12 or 480 Mbit/sec
+	//SPI.setMOSI(pin), SPI.setMISO(pin), and SPI.setSCK(pin)
 
 	pinMode(LED_R, OUTPUT);
 	pinMode(LED_G, OUTPUT);
@@ -561,7 +632,7 @@ void setup(void)
 	Can0.setMaxMB(16);
 	Can0.enableFIFO();
 	Can0.enableFIFOInterrupt();
-	Can0.onReceive(canSniff1);
+	Can0.onReceive(canSniff0);
 	Can0.mailboxStatus();
 
 	Can1.begin();
@@ -569,7 +640,7 @@ void setup(void)
 	Can1.setMaxMB(16);
 	Can1.enableFIFO();
 	Can1.enableFIFOInterrupt();
-	Can1.onReceive(canSniff2);
+	Can1.onReceive(canSniff1);
 	Can1.mailboxStatus();
 	Can1.disableFIFOInterrupt();
 

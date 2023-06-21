@@ -21,7 +21,8 @@
 #define menuBackground 0x5B0E // Dark top menu background
 #define menuBorder 0x39E8 // Dark top menu background
 #define frameBorder 0x8452 // Dark top menu background
-
+#define OrangeBtnColor 0xFC00 // Orange
+#define BlackBtnColor 0x0000 // Orange
 /*
 #define themeBackground 0xFFFF // White
 #define menuBtnText 0x0000 // White
@@ -58,8 +59,6 @@
 #define SD_CAPTURE_BLOCK_SIZE   (SD_CAPTURE_NUM_MSG * MSG_STRING_LENGTH) // SD_CAPTURE_NUM_MSG * MSG_STRING_LENGTH
 
 #define PIDSAMPLES 5
-
-typedef bool error_t;
 
 // For the draw shape functions
 #define ALIGN_LEFT 1

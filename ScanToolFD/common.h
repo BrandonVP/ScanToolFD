@@ -15,6 +15,7 @@
 
 
 extern uint8_t CANBusOut;
+extern uint8_t CANBusIn;
 extern uint32_t messageNum;
 
 extern ILI9488_t3 display;

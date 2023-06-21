@@ -25,6 +25,7 @@
 
 extern UserInterfaceClass userInterfaceButtons[APP_BUTTON_SIZE];
 extern void clearAppSpace();
+
 void CAPTURE_createMenuBtns();
 void CAPTURE_createCaptureBtns();
 void CAPTURE_captureConfig();
@@ -37,6 +38,7 @@ void CAPTURE_createMenuBtns();
 void CAPTURE_createCaptureBtns();
 void CAPTURE_captureConfig();
 void CAPTURE_createLCDBtns();
+void CAPTURE_createBaudBtns();
 
 #endif
 #endif
