@@ -25,6 +25,9 @@
 	3.) Call function to draw buttons in assigned page switch statement hasDrawn section
 	4.) Call function to monitor button press in assigned page switch statement loop section
 
+	Swap SD SPI port in SdSpiTeensy3.cpp
+	Change: m_spi = &SPI;
+	To: m_spi = &SPI2;
  ===========================================================
 	 End README
  =========================================================*/
@@ -111,8 +114,9 @@ UserInterfaceClass userInterfaceButton[APP_BUTTON_SIZE];
 UserInterfaceClass userInterfaceCaptureButton[CAPTURE_BUTTON_SIZE];
 UserInterfaceClass userInterfaceMenuButton[MENU_BUTTON_SIZE];
 
-FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> Can0;
-FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> Can1;
+FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> Can1;
+FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> Can2;
+FlexCAN_T4FD<CAN3, RX_SIZE_256, TX_SIZE_16> Can3; // FD
 
 // Simplifies getting x and y coords
 bool Touch_getXY()
@@ -211,7 +215,7 @@ void appManager()
 			pageTransition();
 		}
 		break;
-	case APP_CAPTURE : // CAN Bus Capture
+	case APP_CAPTURE_CONFIG: // CAN Bus Capture
 		// Draw page and lock variables
 		if (!hasDrawn)
 		{
@@ -248,8 +252,8 @@ void appManager()
 				graphicLoaderState++;
 				break;
 			}
-			display.setFont(Michroma_10);
-			if (GUI_drawPage(userInterfaceButton, graphicLoaderState, 4))
+			display.setFont(Michroma_9);
+			if (GUI_drawPage(userInterfaceButton, graphicLoaderState, 6))
 			{
 				break;
 			}
@@ -274,16 +278,16 @@ void appManager()
 		}
 		else if (results == 3)
 		{
+			Can2.disableFIFO();
+			Can2.disableFIFOInterrupt();
 			Can1.disableFIFO();
 			Can1.disableFIFOInterrupt();
-			Can0.disableFIFO();
-			Can0.disableFIFOInterrupt();
 			GUI_drawSquareBtn(0, 51, 408, 320, "", themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
 			LCDPos = 60;
+			Can2.enableFIFO();
+			Can2.enableFIFOInterrupt();
 			Can1.enableFIFO();
 			Can1.enableFIFOInterrupt();
-			Can0.enableFIFO();
-			Can0.enableFIFOInterrupt();
 		}
 
 		// Release any variable locks if page changed
@@ -298,7 +302,7 @@ void appManager()
 			pageTransition();
 		}
 		break;
-	case 3: // 
+	case APP_CAPTURE_FILES: // 
 		// Draw page and lock variables
 		if (!hasDrawn)
 		{
@@ -324,7 +328,7 @@ void appManager()
 			pageTransition();
 		}
 		break;
-	case 4: // CAN Bus Capture
+	case APP_CAPTURE_BAUD: // CAN Bus Capture
 		// Draw page and lock variables
 		if (!hasDrawn)
 		{
@@ -335,7 +339,61 @@ void appManager()
 				graphicLoaderState++;
 				break;
 			}
-			if (GUI_drawPage(userInterfaceButton, graphicLoaderState, 20))
+			if (GUI_drawPage(userInterfaceButton, graphicLoaderState, 23))
+			{
+				break;
+			}
+			hasDrawn = true;
+		}
+
+		// Call buttons or page method
+		GUI_subMenuButtonMonitor(userInterfaceButton, 20);
+
+		// Release any variable locks if page changed
+		if (nextPage != page)
+		{
+			pageTransition();
+		}
+		break;
+	case APP_CAPTAPP_CAPTURE_FILTERMASKURE_BAUD: // CAN Bus Capture
+		// Draw page and lock variables
+		if (!hasDrawn)
+		{
+			if (graphicLoaderState == 0)
+			{
+				CAPTURE_createBaudBtns();
+				clearAppSpace();
+				graphicLoaderState++;
+				break;
+			}
+			if (GUI_drawPage(userInterfaceButton, graphicLoaderState, 23))
+			{
+				break;
+			}
+			hasDrawn = true;
+		}
+
+		// Call buttons or page method
+		GUI_subMenuButtonMonitor(userInterfaceButton, 20);
+
+		// Release any variable locks if page changed
+		if (nextPage != page)
+		{
+			pageTransition();
+		}
+		break;
+	case APP_CAPTURE_AUTOBAUD: // CAN Bus Capture
+		// Draw page and lock variables
+		if (!hasDrawn)
+		{
+			if (graphicLoaderState == 0)
+			{
+				CAPTURE_createBaudBtns();
+				clearAppSpace();
+				graphicLoaderState++;
+				break;
+			}
+			if (GUI_drawPage(userInterfaceButton, graphicLoaderState, 23))
 			{
 				break;
 			}
@@ -462,7 +520,7 @@ void createMenuBtns()
 }
 
 
-void canSniff0(const CAN_message_t& msg) 
+void canSniff1(const CAN_message_t& msg) 
 {
 	if (CANBusOut == 10)
 	{
@@ -488,7 +546,7 @@ void canSniff0(const CAN_message_t& msg)
 		sprintf(printString, "%03X", msg.id);
 		display.drawString(printString, 15, LCDPos);
 		sprintf(printString, "%d", msg.len);
-		display.drawString(printString, 65, LCDPos);
+		display.drawString(printString, 60, LCDPos);
 		sprintf(printString, "%02X ", msg.buf[0]);
 		display.drawString(printString, 90, LCDPos);
 		sprintf(printString, "%02X ", msg.buf[1]);
@@ -519,7 +577,7 @@ void canSniff0(const CAN_message_t& msg)
 }
 
 
-void canSniff1(const CAN_message_t& msg) 
+void canSniff2(const CAN_message_t& msg) 
 {
 	if (CANBusOut == 10)
 	{
@@ -545,7 +603,7 @@ void canSniff1(const CAN_message_t& msg)
 		sprintf(printString, "%03X", msg.id);
 		display.drawString(printString, 15, LCDPos);
 		sprintf(printString, "%d", msg.len);
-		display.drawString(printString, 65, LCDPos);   
+		display.drawString(printString, 60, LCDPos);   
 		sprintf(printString, "%02X ", msg.buf[0]);
 		display.drawString(printString, 90, LCDPos);
 		sprintf(printString, "%02X ", msg.buf[1]);
@@ -575,11 +633,148 @@ void canSniff1(const CAN_message_t& msg)
 	}
 }
 
+
+void canSniff3()
+//void canSniff3(const CANFD_message_t& msg)
+{
+	if (!CANBusIn == 6)
+	{
+		return;
+	}
+
+	CANFD_message_t msg;
+	if (!Can3.read(msg))
+	{
+		return;
+	}
+	/*
+	if (Can3.read(msg)) 
+	{
+		Serial.print(msg.id, HEX);
+		Serial.print("   ");
+		for (int i = 0; i < msg.len; i++) 
+		{
+			Serial.print(msg.buf[i], HEX);
+			Serial.print("  ");
+		}
+		Serial.println();
+	}
+	else
+	{
+		return;
+	}
+		*/
+
+	if (CANBusOut == 8)
+	{
+		Serial.print(msg.id, HEX);
+		Serial.print("   ");
+		for (int i = 0; i < msg.len; i++)
+		{
+			Serial.print(msg.buf[i], HEX);
+			Serial.print("  ");
+		}
+		Serial.println();
+	}
+	else if ((CANBusOut == 9) && (page == APP_CAPTURE_LCD))
+	{
+		if (LCDPos == 60)
+		{
+			display.fillRect(5, 300, 10, 10, themeBackground);
+			display.fillRect(5, LCDPos, 10, 10, 0x0000);
+			display.fillRect(15, LCDPos, 385, 15, themeBackground);
+		}
+		else
+		{
+			display.fillRect(5, LCDPos - 15, 10, 10, themeBackground);
+			display.fillRect(5, LCDPos, 10, 10, 0x0000);
+			display.fillRect(15, LCDPos, 385, 15, themeBackground);
+		}
+
+		char printString[40];
+		display.setTextColor(menuBtnText);
+		sprintf(printString, "%03X", msg.id);
+		display.drawString(printString, 15, LCDPos);
+		sprintf(printString, "%d", msg.len);
+		display.drawString(printString, 60, LCDPos);
+		sprintf(printString, "%02X ", msg.buf[0]);
+		display.drawString(printString, 95, LCDPos);
+		sprintf(printString, "%02X ", msg.buf[1]);
+		display.drawString(printString, 135, LCDPos);
+		sprintf(printString, "%02X ", msg.buf[2]);
+		display.drawString(printString, 175, LCDPos);
+		sprintf(printString, "%02X ", msg.buf[3]);
+		display.drawString(printString, 215, LCDPos);
+		sprintf(printString, "%02X ", msg.buf[4]);
+		display.drawString(printString, 255, LCDPos);
+		sprintf(printString, "%02X ", msg.buf[5]);
+		display.drawString(printString, 295, LCDPos);
+		sprintf(printString, "%02X ", msg.buf[6]);
+		display.drawString(printString, 335, LCDPos);
+		sprintf(printString, "%02X ", msg.buf[7]);
+		display.drawString(printString, 375, LCDPos);
+
+		if (LCDPos < 300)
+		{
+			LCDPos += 15;
+		}
+		else
+		{
+			LCDPos = 60;
+		}
+	}
+}
+
+
 // -------------------------------------------------------------
 void setup(void)
 {
-	Serial.begin(9600); // USB is always 12 or 480 Mbit/sec
-	//SPI.setMOSI(pin), SPI.setMISO(pin), and SPI.setSCK(pin)
+	Serial.begin(115200); // USB is always 12 or 480 Mbit/sec
+	//Serial2.begin(115200); // ESP8266
+
+	//SPI2.begin();
+	//pinMode(2, OUTPUT);
+	//digitalWrite(2, 1);
+	//pinMode(3, OUTPUT);
+	//pinMode(4, OUTPUT);
+	//pinMode(5, OUTPUT);
+	//pinMode(6, OUTPUT);
+	//pinMode(7, OUTPUT);
+	//pinMode(8, OUTPUT);
+	//pinMode(16, OUTPUT);
+	//pinMode(17, OUTPUT);
+
+	// Unused pins on back
+	// 27 28 29 32 33
+	// 
+	// if removed LED
+	// 24, 25, 26
+
+	// SPI0 
+	// SCK0  13
+	// MISO0 12
+	// MOSI0 11
+	// CS0   10
+	 
+	// SPI1
+	// SCK1  27
+	// MISO1 1
+	// MOSI1 26
+	// CS1   0
+	
+	// SPI2  
+	// SCK2  37
+	// MISO2 34
+	// MOSI2 35
+	// CS2   36
+	/*
+	digitalWrite(6, 0);
+	delay(1);
+	SPI1.transfer(0x55);
+	delay(1);
+	digitalWrite(6, 1);
+	*/
+	
 
 	pinMode(LED_R, OUTPUT);
 	pinMode(LED_G, OUTPUT);
@@ -614,7 +809,7 @@ void setup(void)
 	//display.setFont(Crystal_18_Italic);
 	//display.setFont(Michroma_12);
 
-	// Clear LCD
+	// 
 	GUI_drawSquareBtn(0, 0, 479, 319, "", themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
 	GUI_drawSquareBtn(0, 0, 480, 45, "", menuBackground, menuBackground, menuBackground, ALIGN_CENTER);
 	GUI_drawSquareBtn(0, 45, 480, 50, "", menuBorder, menuBorder, menuBorder, ALIGN_CENTER);
@@ -627,14 +822,6 @@ void setup(void)
 	while (GUI_drawPage(userInterfaceMenuButton, graphicLoaderState, 3));
 	graphicLoaderState = 0;
 
-	Can0.begin();
-	Can0.setBaudRate(500000);
-	Can0.setMaxMB(16);
-	Can0.enableFIFO();
-	Can0.enableFIFOInterrupt();
-	Can0.onReceive(canSniff0);
-	Can0.mailboxStatus();
-
 	Can1.begin();
 	Can1.setBaudRate(500000);
 	Can1.setMaxMB(16);
@@ -642,8 +829,27 @@ void setup(void)
 	Can1.enableFIFOInterrupt();
 	Can1.onReceive(canSniff1);
 	Can1.mailboxStatus();
-	Can1.disableFIFOInterrupt();
 
+	Can2.begin();
+	Can2.setBaudRate(500000);
+	Can2.setMaxMB(16);
+	Can2.enableFIFO();
+	Can2.enableFIFOInterrupt();
+	Can2.onReceive(canSniff2);
+	Can2.mailboxStatus();
+	Can2.disableFIFOInterrupt();
+
+	Can3.begin();
+	CANFD_timings_t config;
+	config.clock = CLK_60MHz;
+	config.baudrate = 500000;
+	config.baudrateFD = 5000000;
+	config.propdelay = 190;
+	config.bus_length = 1;
+	config.sample = 70;
+	Can3.setBaudRate(config);
+	Can3.setRegions(64);
+	//Can3.onReceive(canSniff3);
 
 	CAPTURE_createCaptureBtns();
 }
@@ -660,28 +866,70 @@ void backgroundProcess()
 	//serialOut();
 	//SDCardOut();
 	//timedTXSend();
+	canSniff3();
 }
 
 /*=========================================================
 	Main loop
 ===========================================================*/
 // Main loop runs the user interface and calls for background processes
+int i = 0;
 void loop(void)
 {
 	appManager();
 	backgroundProcess();
 
+	//Can1.events();
+	//Can2.events();
+	//Can3.events();
 
-	Can0.events();
-	static uint32_t timeout = millis();
-	if (millis() - timeout > 200)
+	static uint32_t timeout123 = millis();
+	if (millis() - timeout123 > 1000)
+	{
+		CANFD_message_t msg;
+		msg.id = 0x4CA;
+		msg.len = 64;
+		for (uint8_t i = 0; i < 64; i++) msg.buf[i] = i + 0x25;
+		Can3.write(msg);
+		timeout123 = millis();
+	}
+
+	/*
+	if (millis() - timeout123 > 2000)
 	{
 		CAN_message_t msg;
 		msg.id = 1;
 		for (uint8_t i = 0; i < 8; i++) msg.buf[i] = i + 1;
-		Can0.write(msg);
-		msg.id = 2;
 		Can1.write(msg);
-		timeout = millis();
+		msg.id = 2;
+		Can2.write(msg);
+		timeout123 = millis();
 	}
+	*/
 }
+/*
+
+	Can1.events();
+	Can2.events();
+	//Can3.events();
+
+	static uint32_t timeout = millis();
+	if (millis() - timeout > 1000)
+	{
+
+		CAN_message_t msg;
+		msg.id = 1;
+		for (uint8_t i = 0; i < 8; i++) msg.buf[i] = i + 1;
+		Can1.write(msg);
+		msg.id = 2;
+		Can2.write(msg);
+		/*
+		CANFD_message_t msg;
+		msg.id = 0x4CA;
+		msg.len = 8;
+		for (uint8_t i = 0; i < 8; i++) msg.buf[i] = i + 1;
+		Can3.write(msg);
+		timeout = millis();
+		
+	}
+*/

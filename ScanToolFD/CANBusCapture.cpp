@@ -12,8 +12,8 @@
 #define CAPTURE_START_POS 13
 #define CAPTURE_STOP_POS 14
 
-extern FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> Can0;
-extern FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> Can1;
+extern FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> Can1;
+extern FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> Can2;
 
 uint8_t CAPTURE_input_config = 0;
 uint8_t CAPTURE_output_config = 0;
@@ -21,12 +21,12 @@ uint8_t CAPTURE_output_config = 0;
 void CAPTURE_createMenuBtns()
 {
 	uint8_t btnPos = 0;
-	userInterfaceButton[btnPos++].setButton(55, 80, 220, 120, 1, true, F("Capture"), ALIGN_CENTER);
-	userInterfaceButton[btnPos++].setButton(260, 80, 425, 120, 2, true, F("Send"), ALIGN_CENTER);
-	userInterfaceButton[btnPos++].setButton(55, 140, 220, 180, 3, true, F("Files"), ALIGN_CENTER);
-	userInterfaceButton[btnPos++].setButton(260, 140, 425, 180, 4, true, F("Baud"), ALIGN_CENTER);
-	userInterfaceButton[btnPos++].setButton(55, 200, 220, 240, 0, true, F("Filter Mask"), ALIGN_CENTER);
-	userInterfaceButton[btnPos++].setButton(260, 200, 425, 240, 0, true, F("Auto Baud"), ALIGN_CENTER);
+	userInterfaceButton[btnPos++].setButton(55, 80, 220, 120, APP_CAPTURE_CONFIG, true, 20, F("Capture"), ALIGN_CENTER, themeBackground, themeBackground, menuBackground, menuBtnTextColor);
+	userInterfaceButton[btnPos++].setButton(260, 80, 425, 120, APP_CAPTURE_SEND, true, F("Send"), ALIGN_CENTER);
+	userInterfaceButton[btnPos++].setButton(55, 140, 220, 180, APP_CAPTURE_FILES, true, F("Files"), ALIGN_CENTER);
+	userInterfaceButton[btnPos++].setButton(260, 140, 425, 180, APP_CAPTURE_BAUD, true, F("Baud"), ALIGN_CENTER);
+	userInterfaceButton[btnPos++].setButton(55, 200, 220, 240, APP_CAPTURE_FILTERMASK, true, F("Filter Mask"), ALIGN_CENTER);
+	userInterfaceButton[btnPos++].setButton(260, 200, 425, 240, APP_CAPTURE_AUTOBAUD, true, F("Auto Baud"), ALIGN_CENTER);
 	userInterfaceButton[btnPos++].setButton(55, 260, 220, 300, 0, true, F(""), ALIGN_CENTER);
 	userInterfaceButton[btnPos++].setButton(260, 260, 425, 300, 0, true, F(""), ALIGN_CENTER);
 }
@@ -41,9 +41,9 @@ void CAPTURE_createCaptureBtns()
 	userInterfaceCaptureButton[2]. setClickable(false);
 	userInterfaceCaptureButton[3]. setButton(175,  75, 335, 315,  0, false, 0, F(""),            ALIGN_CENTER, menuBackground, frameBorder, menuBackground, menuBackground);
 	userInterfaceCaptureButton[3]. setClickable(false);
-	userInterfaceCaptureButton[4]. setButton( 10,  75, 170, 110,  4, false, 0, F("CAN0 "),     ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
-	userInterfaceCaptureButton[5]. setButton( 10, 115, 170, 150,  5, false, 0, F("CAN1 "),        ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
-	userInterfaceCaptureButton[6]. setButton( 10, 155, 170, 190,  6, false, 0, F("CAN2 FD "),        ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceCaptureButton[4]. setButton( 10,  75, 170, 110,  4, false, 0, F("CAN1 "),     ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceCaptureButton[5]. setButton( 10, 115, 170, 150,  5, false, 0, F("CAN2 "),        ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceCaptureButton[6]. setButton( 10, 155, 170, 190,  6, false, 0, F("CAN3 FD "),        ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
 	userInterfaceCaptureButton[7]. setButton( 10, 195, 170, 230,  7, false, 0, F("Wireless"),    ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
 	userInterfaceCaptureButton[8]. setButton( 10, 235, 170, 270,  8, false, 0, F("C2 Out Only"), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
 	
@@ -170,11 +170,13 @@ void CAPTURE_captureConfig()
 void CAPTURE_createLCDBtns()
 {
 	uint8_t btnPos = 0;
-	userInterfaceButton[btnPos].setButton(435, 50, 480, 320, 0, false, 0, F(""), ALIGN_CENTER, menuBackground, frameBorder, menuBackground, menuBackground);
+	userInterfaceButton[btnPos].setButton(440, 50, 480, 320, 0, false, 0, F(""), ALIGN_CENTER, menuBackground, frameBorder, menuBackground, menuBackground);
 	userInterfaceButton[btnPos++].setClickable(false);
-	userInterfaceButton[btnPos++].setButton(409, 100, 479, 150, 1, false, 0, F("Start"), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
-	userInterfaceButton[btnPos++].setButton(409, 160, 479, 210, 2, false, 0, F("Stop"), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
-	userInterfaceButton[btnPos++].setButton(409, 220, 479, 270, 3, false, 0, F("Clear"), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(408, 60, 479, 105, 1, false, 0, F("Start"), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(408, 110, 479, 155, 2, false, 0, F("Stop"), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(408, 160, 479, 205, 3, false, 0, F("Clear"), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(408, 210, 479, 255, 3, false, 0, F("Config"), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(408, 260, 479, 305, 3, false, 0, F("Back"), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
 }
 
 void CAPTURE_createBaudBtns()
@@ -199,16 +201,20 @@ void CAPTURE_createBaudBtns()
 
 	userInterfaceButton[btnPos].  setButton(rStartX,  55, 380,  70, 0, true, 20, F("CAN Bus Port"), ALIGN_CENTER, themeBackground, themeBackground, menuBackground, menuBtnTextColor);
 	userInterfaceButton[btnPos++].setClickable(false);
-	userInterfaceButton[btnPos++].setButton(rStartX,  75, rEndX, 105, 9, false, 0, F("CAN0"), ALIGN_CENTER, menuBtnColor, frameBorder, menuBtnColor, menuBtnText);
-	userInterfaceButton[btnPos++].setButton(rStartX, 105, rEndX, 135, 9, false, 0, Can0.getBaudRate(), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
-	userInterfaceButton[btnPos++].setButton(rStartX, 155, rEndX, 185, 10, false, 0, F("CAN1"), ALIGN_CENTER, menuBtnColor, frameBorder, menuBtnColor, menuBtnText);
-	userInterfaceButton[btnPos++].setButton(rStartX, 185, rEndX, 215, 10, false, 0, Can0.getBaudRate(), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
-	userInterfaceButton[btnPos++].setButton(rStartX, 235, rEndX, 265, 11, false, 0, F("CAN2 FD"), ALIGN_CENTER, menuBtnColor, frameBorder, menuBtnColor, menuBtnText);
-	userInterfaceButton[btnPos++].setButton(rStartX, 265, rEndX, 295, 11, false, 0, F("1000000"), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(rStartX,  75, rEndX, 105, 9, false, 0, F("CAN1"), ALIGN_CENTER, menuBtnColor, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(rStartX, 105, rEndX, 135, 9, false, 0, Can1.getBaudRate(), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+
+	userInterfaceButton[btnPos++].setButton(rStartX, 135, rEndX, 165, 10, false, 0, F("CAN2"), ALIGN_CENTER, menuBtnColor, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(rStartX, 165, rEndX, 195, 10, false, 0, Can2.getBaudRate(), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+
+	userInterfaceButton[btnPos++].setButton(rStartX, 195, rEndX, 225, 11, false, 0, F("CAN3"), ALIGN_CENTER, menuBtnColor, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(rStartX, 225, rEndX, 255, 11, false, 0, "-", ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+
+	userInterfaceButton[btnPos++].setButton(rStartX, 255, rEndX, 285, 11, false, 0, F("CAN3 FD"), ALIGN_CENTER, menuBtnColor, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(rStartX, 285, rEndX, 315, 11, false, 0, "-", ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
 
 	userInterfaceButton[btnPos++].setButton(rEndX, 105, 470, 135, 12, false, 0, F("Set"), ALIGN_CENTER, OrangeBtnColor, frameBorder, BlackBtnColor, menuBtnText);
-	userInterfaceButton[btnPos++].setButton(rEndX, 185, 470, 215, 12, false, 0, F("Set"), ALIGN_CENTER, OrangeBtnColor, frameBorder, BlackBtnColor, menuBtnText);
-	userInterfaceButton[btnPos++].setButton(rEndX, 265, 470, 295, 12, false, 0, F("Set"), ALIGN_CENTER, OrangeBtnColor, frameBorder, BlackBtnColor, menuBtnText);
-
-	Serial.println(btnPos);
+	userInterfaceButton[btnPos++].setButton(rEndX, 165, 470, 195, 12, false, 0, F("Set"), ALIGN_CENTER, OrangeBtnColor, frameBorder, BlackBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(rEndX, 225, 470, 255, 12, false, 0, F("Set"), ALIGN_CENTER, OrangeBtnColor, frameBorder, BlackBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(rEndX, 285, 470, 315, 12, false, 0, F("Set"), ALIGN_CENTER, OrangeBtnColor, frameBorder, BlackBtnColor, menuBtnText);
 }

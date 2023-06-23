@@ -5,9 +5,15 @@
 */
 
 #include "gui.h"
+
 #define APP_CANBUS_TOOLS 0
-#define APP_CAPTURE 1
+#define APP_CAPTURE_CONFIG 1
 #define APP_CAPTURE_LCD 2
+#define APP_CAPTURE_FILES 3
+#define APP_CAPTURE_BAUD 4
+#define APP_CAPTURE_SEND 5
+#define APP_CAPTURE_FILTERMASK 6
+#define APP_CAPTURE_AUTOBAUD 7
 
 #ifndef _CANBUSCAPTURE_h
 #define _CANBUSCAPTURE_h
