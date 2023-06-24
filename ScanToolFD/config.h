@@ -1,13 +1,12 @@
 #pragma once
 
-// For LCD
-#define LED_R 24
-#define LED_B 26
-#define LED_G 25
+
+
 #define LCD_BL 14
 #define LCD_RST 15
-#define ON LOW
-#define OFF HIGH
+
+
+
 #define TFT_CS 10
 #define TFT_DC 9
 

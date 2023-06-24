@@ -32,6 +32,7 @@
 	 End README
  =========================================================*/
 
+#include "RGB_LED.h"
 #include <FlexCAN_T4.h>
  //#include <kinetis_flexcan.h>
  //#include <isotp_server.h>
@@ -184,7 +185,7 @@ void clearAppSpace()
 void appManager()
 {
 	int8_t results = 0;
-	error_t e = 0;
+	//error_t e = 0;
 
 	switch (page)
 	{
@@ -355,7 +356,7 @@ void appManager()
 			pageTransition();
 		}
 		break;
-	case APP_CAPTAPP_CAPTURE_FILTERMASKURE_BAUD: // CAN Bus Capture
+	case APP_CAPTURE_FILTERMASK: // CAN Bus Capture
 		// Draw page and lock variables
 		if (!hasDrawn)
 		{
@@ -545,7 +546,7 @@ void canSniff1(const CAN_message_t& msg)
 		display.setTextColor(menuBtnText);
 		sprintf(printString, "%03X", msg.id);
 		display.drawString(printString, 15, LCDPos);
-		sprintf(printString, "%d", msg.len);
+		sprintf(printString, "%d", (uint8_t)msg.len);
 		display.drawString(printString, 60, LCDPos);
 		sprintf(printString, "%02X ", msg.buf[0]);
 		display.drawString(printString, 90, LCDPos);
@@ -602,7 +603,7 @@ void canSniff2(const CAN_message_t& msg)
 		display.setTextColor(menuBtnText);
 		sprintf(printString, "%03X", msg.id);
 		display.drawString(printString, 15, LCDPos);
-		sprintf(printString, "%d", msg.len);
+		sprintf(printString, "%d", (uint8_t)msg.len);
 		display.drawString(printString, 60, LCDPos);   
 		sprintf(printString, "%02X ", msg.buf[0]);
 		display.drawString(printString, 90, LCDPos);
@@ -637,7 +638,7 @@ void canSniff2(const CAN_message_t& msg)
 void canSniff3()
 //void canSniff3(const CANFD_message_t& msg)
 {
-	if (!CANBusIn == 6)
+	if (!(CANBusIn == 6))
 	{
 		return;
 	}
@@ -647,6 +648,9 @@ void canSniff3()
 	{
 		return;
 	}
+
+	LED_pulse((RGB)LED_GREEN);
+
 	/*
 	if (Can3.read(msg)) 
 	{
@@ -695,7 +699,7 @@ void canSniff3()
 		display.setTextColor(menuBtnText);
 		sprintf(printString, "%03X", msg.id);
 		display.drawString(printString, 15, LCDPos);
-		sprintf(printString, "%d", msg.len);
+		sprintf(printString, "%d", (uint8_t)msg.len);
 		display.drawString(printString, 60, LCDPos);
 		sprintf(printString, "%02X ", msg.buf[0]);
 		display.drawString(printString, 95, LCDPos);
@@ -767,40 +771,29 @@ void setup(void)
 	// MISO2 34
 	// MOSI2 35
 	// CS2   36
-	/*
-	digitalWrite(6, 0);
-	delay(1);
-	SPI1.transfer(0x55);
-	delay(1);
-	digitalWrite(6, 1);
-	*/
-	
 
-	pinMode(LED_R, OUTPUT);
-	pinMode(LED_G, OUTPUT);
-	pinMode(LED_B, OUTPUT);
+	LED_initialize();
+
+	LED_RGB((RGB)LED_RED);
+	delay(200);
+	LED_RGB((RGB)LED_OFF);
+
+	LED_RGB((RGB)LED_GREEN);
+	delay(200);
+	LED_RGB((RGB)LED_OFF);
+
+	LED_RGB((RGB)LED_BLUE);
+	delay(200);
+	LED_RGB((RGB)LED_OFF);
+
 	pinMode(LCD_BL, OUTPUT);
-
 	digitalWrite(LCD_BL, HIGH);
-	digitalWrite(LED_B, OFF);
-	digitalWrite(LED_G, OFF);
-	digitalWrite(LED_R, OFF);
-	digitalWrite(LED_R, ON);
-	delay(200);
-	digitalWrite(LED_R, OFF);
-
-	digitalWrite(LED_G, ON);
-	delay(200);
-	digitalWrite(LED_G, OFF);
-
-	digitalWrite(LED_B, ON);
-	delay(200);
-	digitalWrite(LED_B, OFF);
 
 	ts.begin(40);
 	display.begin();
 	display.fillScreen(ILI9488_BLACK);
 	display.setRotation(1);
+
 	//display.setFont(Arial_14);
 	//display.setFont(AwesomeF180_12);
 	display.setFont(Michroma_11);
@@ -867,6 +860,7 @@ void backgroundProcess()
 	//SDCardOut();
 	//timedTXSend();
 	canSniff3();
+	LED_strobe((RGB)LED_OFF);
 }
 
 /*=========================================================
@@ -878,7 +872,7 @@ void loop(void)
 {
 	appManager();
 	backgroundProcess();
-
+	
 	//Can1.events();
 	//Can2.events();
 	//Can3.events();
@@ -907,29 +901,3 @@ void loop(void)
 	}
 	*/
 }
-/*
-
-	Can1.events();
-	Can2.events();
-	//Can3.events();
-
-	static uint32_t timeout = millis();
-	if (millis() - timeout > 1000)
-	{
-
-		CAN_message_t msg;
-		msg.id = 1;
-		for (uint8_t i = 0; i < 8; i++) msg.buf[i] = i + 1;
-		Can1.write(msg);
-		msg.id = 2;
-		Can2.write(msg);
-		/*
-		CANFD_message_t msg;
-		msg.id = 0x4CA;
-		msg.len = 8;
-		for (uint8_t i = 0; i < 8; i++) msg.buf[i] = i + 1;
-		Can3.write(msg);
-		timeout = millis();
-		
-	}
-*/

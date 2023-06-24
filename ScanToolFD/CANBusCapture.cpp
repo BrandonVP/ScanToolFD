@@ -21,12 +21,12 @@ uint8_t CAPTURE_output_config = 0;
 void CAPTURE_createMenuBtns()
 {
 	uint8_t btnPos = 0;
-	userInterfaceButton[btnPos++].setButton(55, 80, 220, 120, APP_CAPTURE_CONFIG, true, 20, F("Capture"), ALIGN_CENTER, themeBackground, themeBackground, menuBackground, menuBtnTextColor);
-	userInterfaceButton[btnPos++].setButton(260, 80, 425, 120, APP_CAPTURE_SEND, true, F("Send"), ALIGN_CENTER);
-	userInterfaceButton[btnPos++].setButton(55, 140, 220, 180, APP_CAPTURE_FILES, true, F("Files"), ALIGN_CENTER);
-	userInterfaceButton[btnPos++].setButton(260, 140, 425, 180, APP_CAPTURE_BAUD, true, F("Baud"), ALIGN_CENTER);
-	userInterfaceButton[btnPos++].setButton(55, 200, 220, 240, APP_CAPTURE_FILTERMASK, true, F("Filter Mask"), ALIGN_CENTER);
-	userInterfaceButton[btnPos++].setButton(260, 200, 425, 240, APP_CAPTURE_AUTOBAUD, true, F("Auto Baud"), ALIGN_CENTER);
+	userInterfaceButton[btnPos++].setButton(55, 80, 220, 120, APP_CAPTURE_CONFIG, true, 20, F("Capture"), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(260, 80, 425, 120, APP_CAPTURE_SEND, true, 20, F("Send"), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(55, 140, 220, 180, APP_CAPTURE_FILES, true, 20, F("Files"), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(260, 140, 425, 180, APP_CAPTURE_BAUD, true, 20, F("Baud"), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(55, 200, 220, 240, APP_CAPTURE_FILTERMASK, true, 20, F("Filter Mask"), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(260, 200, 425, 240, APP_CAPTURE_AUTOBAUD, true, 20, F("Auto Baud"), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
 	userInterfaceButton[btnPos++].setButton(55, 260, 220, 300, 0, true, F(""), ALIGN_CENTER);
 	userInterfaceButton[btnPos++].setButton(260, 260, 425, 300, 0, true, F(""), ALIGN_CENTER);
 }
