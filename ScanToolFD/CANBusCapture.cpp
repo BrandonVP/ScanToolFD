@@ -1,22 +1,14 @@
 /*
- Name:    CANBusCapture.cpp
- Created: 11/15/2020 8:54:18 AM
- Author:  Brandon Van Pelt
-*/
+ ===========================================================================
+ Name        : CANBusCapture.cpp
+ Author      : Brandon Van Pelt
+ Created	 : 11/15/2020 8:54:18 AM
+ Description : CAN Bus functions
+ ===========================================================================
+ */
 
 #define _CANBUSCAPTURE_C
 #include "CANBusCapture.h"
-#include "common.h"
-#include <FlexCAN_T4.h>
-
-#define CAPTURE_START_POS 13
-#define CAPTURE_STOP_POS 14
-
-extern FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> Can1;
-extern FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> Can2;
-
-uint8_t CAPTURE_input_config = 0;
-uint8_t CAPTURE_output_config = 0;
 
 void CAPTURE_createMenuBtns()
 {

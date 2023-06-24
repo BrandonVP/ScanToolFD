@@ -1,10 +1,11 @@
 /*
- Name:    CANBusCapture.h
- Created: 11/15/2020 8:54:18 AM
- Author:  Brandon Van Pelt
-*/
-
-#include "gui.h"
+ ===========================================================================
+ Name        : CANBusCapture.h
+ Author      : Brandon Van Pelt
+ Created	 : 11/15/2020 8:54:18 AM
+ Description : CAN Bus functions
+ ===========================================================================
+ */
 
 #define APP_CANBUS_TOOLS 0
 #define APP_CAPTURE_CONFIG 1
@@ -25,16 +26,19 @@
 #endif
 
 #ifdef _CANBUSCAPTURE_C
-#include "config.h"
-#include "common.h"
-#include "userInterface.h"
 
-extern UserInterfaceClass userInterfaceButtons[APP_BUTTON_SIZE];
-extern void clearAppSpace();
+#include "common.h"
+
+#define CAPTURE_START_POS 13
+#define CAPTURE_STOP_POS 14
+
+uint8_t CAPTURE_input_config = 0;
+uint8_t CAPTURE_output_config = 0;
 
 void CAPTURE_createMenuBtns();
 void CAPTURE_createCaptureBtns();
 void CAPTURE_captureConfig();
+
 #else
 
 extern uint8_t CAPTURE_input_config;
@@ -46,6 +50,6 @@ void CAPTURE_captureConfig();
 void CAPTURE_createLCDBtns();
 void CAPTURE_createBaudBtns();
 
-#endif
-#endif
+#endif // _CANBUSCAPTURE_C
+#endif // _CANBUSCAPTURE_h
 

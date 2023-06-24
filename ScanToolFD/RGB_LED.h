@@ -10,12 +10,6 @@
 #ifndef _RGB_LED_H
 #define _RGB_LED_H
 
-#if defined(ARDUINO) && ARDUINO >= 100
-#include "arduino.h"
-#else
-#include "WProgram.h"
-#endif
-
 enum RGB
 {
 	LED_RED = 1,
@@ -35,12 +29,11 @@ enum RGB
 
 #ifdef _RGB_LED_CPP
 
-#define LED_STROBE_INTERVAL        (50)
+#include "common.h"
+#define LED_STROBE_INTERVAL        (20)
 #define COLOR_BUFFER_SIZE		   (0x1F)
-
 bool cycleLED = false;
 uint32_t LEDTimer = 0;
-
 void LED_RGB(RGB color);
 
 #else 

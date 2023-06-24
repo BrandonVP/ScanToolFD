@@ -34,13 +34,7 @@
 
 #include "RGB_LED.h"
 #include <FlexCAN_T4.h>
- //#include <kinetis_flexcan.h>
- //#include <isotp_server.h>
- //#include <isotp.h>
- //#include <imxrt_flexcan.h>
- //#include <circular_buffer.h>
 
- //#include <Adafruit_GFX.h>
 #include "KeyInput.h"
 #include "serialTransfer.h"
 #include <SPI.h>
@@ -71,7 +65,6 @@
 #include "font_Crystal.h"
 #include "font_ChanceryItalic.h"
 
-#include "Fonts/FreeSansOblique12pt7b.h"
 */
 
 ILI9488_t3 display = ILI9488_t3(&SPI, TFT_CS, TFT_DC);

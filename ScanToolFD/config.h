@@ -1,5 +1,5 @@
 #pragma once
-
+#include <cstdint>
 
 
 #define LCD_BL 14
