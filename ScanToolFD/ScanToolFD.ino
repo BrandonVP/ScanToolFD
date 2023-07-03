@@ -38,6 +38,7 @@
 #include "KeyInput.h"
 #include "serialTransfer.h"
 #include <SPI.h>
+#include <SD.h>
 #include <Wire.h>
 #include <Adafruit_FT6206.h> // Touch
 #include <ILI9488_t3.h>      // Display
@@ -112,6 +113,10 @@ FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> Can1;
 FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> Can2;
 FlexCAN_T4FD<CAN3, RX_SIZE_256, TX_SIZE_16> Can3; // FD
 
+const int chipSelect = 2;
+File myFile;
+
+
 // Simplifies getting x and y coords
 bool Touch_getXY()
 {
@@ -177,7 +182,7 @@ void clearAppSpace()
 // Manages the loading and unloading of different user Apps
 void appManager()
 {
-	int8_t results = 0;
+	int results = 0;
 	//error_t e = 0;
 
 	switch (page)
@@ -310,11 +315,26 @@ void appManager()
 			{
 				break;
 			}
+			Serial.println("hasDrawn");
 			hasDrawn = true;
 		}
 
 		// Call buttons or page method
-		GUI_subMenuButtonMonitor(userKeyButtons, 42);
+		results = GUI_subMenuButtonMonitor(userKeyButtons, 42);
+
+		if (results == 0xcc)
+		{
+			createUpperCaseButtons();
+			graphicLoaderState = 3;
+			while(GUI_drawPage(userKeyButtons, graphicLoaderState, 36));
+		}
+
+		if (results == 0xaa)
+		{
+			createKeyboardButtons();
+			graphicLoaderState = 3;
+			while (GUI_drawPage(userKeyButtons, graphicLoaderState, 36));
+		}
 
 		// Release any variable locks if page changed
 		if (nextPage != page)
@@ -514,6 +534,7 @@ void createMenuBtns()
 }
 
 
+
 void canSniff1(const CAN_message_t& msg) 
 {
 	if (CANBusOut == 10)
@@ -688,6 +709,7 @@ void canSniff3()
 			display.fillRect(15, LCDPos, 385, 15, themeBackground);
 		}
 
+		
 		char printString[40];
 		display.setTextColor(menuBtnText);
 		sprintf(printString, "%03X", msg.id);
@@ -764,6 +786,11 @@ void setup(void)
 	// MISO2 34
 	// MOSI2 35
 	// CS2   36
+	
+	// Blue   - MISO
+	// White  - MOSI
+	// Orange - SCK
+	// Brown  - CS
 
 	LED_initialize();
 
@@ -838,6 +865,8 @@ void setup(void)
 	//Can3.onReceive(canSniff3);
 
 	CAPTURE_createCaptureBtns();
+
+	//SD.begin(chipSelect);
 }
 
 
@@ -856,6 +885,17 @@ void backgroundProcess()
 	LED_strobe((RGB)LED_OFF);
 }
 
+/*
+void ILI9488_t3::scrollTextArea(uint8_t scrollSize) {
+	uint16_t awColors[scroll_width];
+	for (int y = scroll_y + scrollSize; y < (scroll_y + scroll_height); y++) {
+		readRect(scroll_x, y, scroll_width, 1, awColors);
+		writeRect(scroll_x, y - scrollSize, scroll_width, 1, awColors);
+	}
+	fillRect(scroll_x, (scroll_y + scroll_height) - scrollSize, scroll_width, scrollSize, scrollbgcolor);
+}
+*/
+
 /*=========================================================
 	Main loop
 ===========================================================*/
@@ -863,8 +903,45 @@ void backgroundProcess()
 int i = 0;
 void loop(void)
 {
-	appManager();
-	backgroundProcess();
+	for (uint8_t i = 0; i < 50; i++)
+	{
+		appManager();
+		backgroundProcess();
+	}
+
+	
+
+	/* // Scroll testing
+	delay(500);
+	display.enableScroll();
+	display.setScrollBackgroundColor(themeBackground);
+	display.setScrollTextArea(55, 200, 220-55, 10);
+	delay(500);
+	display.scrollTextArea(-1);
+	delay(500); 
+	display.scrollTextArea(-1);
+	delay(500);
+	display.scrollTextArea(-1);
+	delay(500); 
+	display.scrollTextArea(-1);
+	delay(500);
+	display.scrollTextArea(-1);
+	delay(500); 
+	display.scrollTextArea(-1);
+	delay(500);
+	display.scrollTextArea(-1);
+	delay(500); 
+	display.scrollTextArea(-1);
+	delay(500);
+	display.scrollTextArea(-1);
+	delay(500); 
+	display.scrollTextArea(-1);
+	delay(500);
+	display.scrollTextArea(-1);
+	delay(2000);
+	display.disableScroll();
+	*/
+	// 
 	
 	//Can1.events();
 	//Can2.events();

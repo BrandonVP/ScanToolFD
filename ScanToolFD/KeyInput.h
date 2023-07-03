@@ -26,6 +26,7 @@ uint8_t keyboardController(uint8_t&);
 
 extern UserInterfaceClass userKeyButtons[43];
 void createKeyboardButtons();
+void createUpperCaseButtons();
 uint8_t keyboardController(uint8_t&);
 
 #endif // _KEYINPUT_C

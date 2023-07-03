@@ -174,6 +174,8 @@ int GUI_subMenuButtonMonitor(UserInterfaceClass* buttons, uint8_t size)
                     {
                         GUI_waitForItRect(buttons[i].getXStart(), buttons[i].getYStart(), buttons[i].getXStop(), buttons[i].getYStop(), buttons[i].getRadius(), buttons[i].getBorderColor(), buttons[i].getClickBorderColor());
                     }
+                    Serial.println((char)buttons[i].getClickReturn());
+                    Serial.println(" ");
                     return buttons[i].getClickReturn();
                 }
             }
