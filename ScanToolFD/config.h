@@ -21,7 +21,7 @@
 #define menuBorder 0x39E8 // Dark top menu background
 #define frameBorder 0x8452 // Dark top menu background
 #define OrangeBtnColor 0xFC00 // Orange
-#define BlackBtnColor 0x0000 // Orange
+#define BlackBtnColor 0x0000 // 
 /*
 #define themeBackground 0xFFFF // White
 #define menuBtnText 0x0000 // White

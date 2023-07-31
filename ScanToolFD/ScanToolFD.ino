@@ -361,7 +361,34 @@ void appManager()
 		}
 
 		// Call buttons or page method
-		GUI_subMenuButtonMonitor(userInterfaceButton, 20);
+		GUI_subMenuButtonMonitor(userInterfaceButton, 21);
+
+		// Release any variable locks if page changed
+		if (nextPage != page)
+		{
+			pageTransition();
+		}
+		break;
+	case APP_CAPTURE_SEND: // CAN Bus Capture
+		// Draw page and lock variables
+		if (!hasDrawn)
+		{
+			if (graphicLoaderState == 0)
+			{
+				createNumPadButtons();
+				clearAppSpace();
+				graphicLoaderState++;
+				break;
+			}
+			if (GUI_drawPage(userKeyButtons, graphicLoaderState, 21))
+			{
+				break;
+			}
+			hasDrawn = true;
+		}
+
+		// Call buttons or page method
+		GUI_subMenuButtonMonitor(userKeyButtons, 21);
 
 		// Release any variable locks if page changed
 		if (nextPage != page)
@@ -658,6 +685,7 @@ void canSniff3()
 	}
 
 	CANFD_message_t msg;
+	
 	if (!Can3.read(msg))
 	{
 		return;
@@ -770,10 +798,10 @@ void setup(void)
 	// 24, 25, 26
 
 	// SPI0 
-	// SCK0  13
-	// MISO0 12
-	// MOSI0 11
-	// CS0   10
+	// SCK0  13 // Orange
+	// MISO0 12 // Blue
+	// MOSI0 11 // White/Pink
+	// CS0   10 // Brown
 	 
 	// SPI1
 	// SCK1  27
@@ -866,7 +894,7 @@ void setup(void)
 
 	CAPTURE_createCaptureBtns();
 
-	//SD.begin(chipSelect);
+	SD.begin(chipSelect);
 }
 
 
@@ -911,37 +939,6 @@ void loop(void)
 
 	
 
-	/* // Scroll testing
-	delay(500);
-	display.enableScroll();
-	display.setScrollBackgroundColor(themeBackground);
-	display.setScrollTextArea(55, 200, 220-55, 10);
-	delay(500);
-	display.scrollTextArea(-1);
-	delay(500); 
-	display.scrollTextArea(-1);
-	delay(500);
-	display.scrollTextArea(-1);
-	delay(500); 
-	display.scrollTextArea(-1);
-	delay(500);
-	display.scrollTextArea(-1);
-	delay(500); 
-	display.scrollTextArea(-1);
-	delay(500);
-	display.scrollTextArea(-1);
-	delay(500); 
-	display.scrollTextArea(-1);
-	delay(500);
-	display.scrollTextArea(-1);
-	delay(500); 
-	display.scrollTextArea(-1);
-	delay(500);
-	display.scrollTextArea(-1);
-	delay(2000);
-	display.disableScroll();
-	*/
-	// 
 	
 	//Can1.events();
 	//Can2.events();
