@@ -3,23 +3,18 @@
  Name        : userInterface.h
  Author      : Brandon Van Pelt
  Created	 : 4/6/2023
- Description :
+ Description : Button objects
  ===========================================================================
  */
 
 #include "gui.h"
+#include "common.h"
 
 #ifndef _USERINTERFACE_h
 #define _USERINTERFACE_h
 
 #define IS_ROUND_POSITION 7
 #define IS_CLICKABLE_POSITION 6
-
-#if defined(ARDUINO) && ARDUINO >= 100
-	#include "arduino.h"
-#else
-	#include "WProgram.h"
-#endif
 
 class UserInterfaceClass
 {
@@ -73,7 +68,5 @@ class UserInterfaceClass
 	uint16_t getClickBorderColor();
 	uint16_t getTextColor();
 };
-
-
 #endif
 

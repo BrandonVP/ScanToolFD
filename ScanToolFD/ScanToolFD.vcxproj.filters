@@ -15,7 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ScanToolFD.ino" />
     <None Include="src\arduino folders read me.txt">
       <Filter>Misc Files</Filter>
     </None>
@@ -69,9 +68,6 @@
     <ClInclude Include="ili9488_t3_font_ComicSansMS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\AppData\Local\arduino15\packages\teensy\hardware\avr\1.58.1\libraries\ILI9488_t3\src\font_AwesomeF180.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\AppData\Local\arduino15\packages\teensy\hardware\avr\1.58.1\libraries\ILI9488_t3\src\font_Michroma.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -110,14 +106,12 @@
     <ClCompile Include="ili9488_t3_font_ComicSansMS.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\AppData\Local\arduino15\packages\teensy\hardware\avr\1.58.1\libraries\ILI9488_t3\src\font_AwesomeF180.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\AppData\Local\arduino15\packages\teensy\hardware\avr\1.58.1\libraries\ILI9488_t3\src\font_Michroma.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RGB_LED.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ScanToolFD.ino" />
   </ItemGroup>
 </Project>

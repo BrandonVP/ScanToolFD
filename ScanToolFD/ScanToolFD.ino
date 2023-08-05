@@ -32,6 +32,7 @@
 	 End README
  =========================================================*/
 
+#include <TimeLib.h>
 #include "RGB_LED.h"
 #include <FlexCAN_T4.h>
 
@@ -49,11 +50,12 @@
 #include "config.h"
 #include "gui.h"
 #include "KeyInput.h"
+#include "batteryMonitor.h"
 
 #include "ili9488_t3_font_Arial.h"
 #include "ili9488_t3_font_ComicSansMS.h"
 #include "ili9488_t3_font_ArialBold.h"
-#include "font_AwesomeF180.h"
+//#include "font_AwesomeF180.h"
 #include "font_Michroma.h"
 
 /*
@@ -74,12 +76,6 @@ Adafruit_FT6206 ts = Adafruit_FT6206();
 #define SCREEN_WIDTH 480
 #define SCREEN_HEIGHT 320
 
-int oldTouchX = 0;
-int oldTouchY = 0;
-
-// For touch controls
-int x, y;
-
 // Used for page control
 bool hasDrawn = false;
 
@@ -90,6 +86,7 @@ uint16_t LCDPos = 60;
 
 // Use to load pages in pieces to prevent blocking while loading entire page
 uint8_t graphicLoaderState = 0;
+uint8_t buttonsOnPage = 0;
 
 // *Used by background process*
 //uint8_t selectedChannelOut = 0;
@@ -116,26 +113,18 @@ FlexCAN_T4FD<CAN3, RX_SIZE_256, TX_SIZE_16> Can3; // FD
 const int chipSelect = 2;
 File myFile;
 
-
-// Simplifies getting x and y coords
-bool Touch_getXY()
+// Arduino library time update
+time_t getTeensy3Time()
 {
-	if (ts.touched())
-	{
-		TS_Point p = ts.getPoint();
-		x = p.y;
-		y = SCREEN_HEIGHT - p.x;
-		return true;
-	}
-	return false;
+	return Teensy3Clock.get();
 }
 
 // Resets variables for page change
-void pageTransition()
+void appTransition()
 {
 	hasDrawn = false;
 	graphicLoaderState = 0;
-	page = nextPage;
+	app = nextApp;
 }
 
 void createCANBusBaudBtns()
@@ -173,19 +162,13 @@ void createSettingsBtns()
 	userInterfaceButton[btnPos++].setButton(260, 260, 425, 300, 0, true, F("Reset"), ALIGN_CENTER);
 }
 
-void clearAppSpace()
-{
-	//GUI_drawSquareBtn(0, 51, 480, 320, "", themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
-	display.fillRect(0, 51, 480, 269, themeBackground);
-}
-
 // Manages the loading and unloading of different user Apps
 void appManager()
 {
 	int results = 0;
 	//error_t e = 0;
 
-	switch (page)
+	switch (app)
 	{
 	case APP_CANBUS_TOOLS: /*========== CANBUS ==========*/
 		// Draw page and lock variables
@@ -194,7 +177,7 @@ void appManager()
 			if (graphicLoaderState == 0)
 			{
 				CAPTURE_createMenuBtns();
-				clearAppSpace();
+				GUI_clearAppSpace();
 				graphicLoaderState++;
 				break;
 			}
@@ -209,9 +192,9 @@ void appManager()
 		GUI_buttonMonitor(userInterfaceButton, 6);
 
 		// Release any variable locks if page changed
-		if (nextPage != page)
+		if (nextApp != app)
 		{
-			pageTransition();
+			appTransition();
 		}
 		break;
 	case APP_CAPTURE_CONFIG: // CAN Bus Capture
@@ -220,7 +203,7 @@ void appManager()
 		{
 			if (graphicLoaderState == 0)
 			{
-				clearAppSpace();
+				GUI_clearAppSpace();
 				graphicLoaderState++;
 				break;
 			}
@@ -235,9 +218,9 @@ void appManager()
 		CAPTURE_captureConfig();
 
 		// Release any variable locks if page changed
-		if (nextPage != page)
+		if (nextApp != app)
 		{
-			pageTransition();
+			appTransition();
 		}
 		break;
 	case APP_CAPTURE_LCD: // 
@@ -247,7 +230,7 @@ void appManager()
 			if (graphicLoaderState == 0)
 			{
 				CAPTURE_createLCDBtns();
-				clearAppSpace();
+				GUI_clearAppSpace();
 				graphicLoaderState++;
 				break;
 			}
@@ -290,7 +273,7 @@ void appManager()
 		}
 
 		// Release any variable locks if page changed
-		if (nextPage != page)
+		if (nextApp != app)
 		{
 			if (CANBusOut == 9)
 			{
@@ -298,7 +281,7 @@ void appManager()
 			}
 			LCDPos = 60;
 			display.setFont(Michroma_11);
-			pageTransition();
+			appTransition();
 		}
 		break;
 	case APP_CAPTURE_FILES: // 
@@ -337,9 +320,9 @@ void appManager()
 		}
 
 		// Release any variable locks if page changed
-		if (nextPage != page)
+		if (nextApp != app)
 		{
-			pageTransition();
+			appTransition();
 		}
 		break;
 	case APP_CAPTURE_BAUD: // CAN Bus Capture
@@ -349,7 +332,7 @@ void appManager()
 			if (graphicLoaderState == 0)
 			{
 				CAPTURE_createBaudBtns();
-				clearAppSpace();
+				GUI_clearAppSpace();
 				graphicLoaderState++;
 				break;
 			}
@@ -364,9 +347,9 @@ void appManager()
 		GUI_subMenuButtonMonitor(userInterfaceButton, 21);
 
 		// Release any variable locks if page changed
-		if (nextPage != page)
+		if (nextApp != app)
 		{
-			pageTransition();
+			appTransition();
 		}
 		break;
 	case APP_CAPTURE_SEND: // CAN Bus Capture
@@ -376,7 +359,7 @@ void appManager()
 			if (graphicLoaderState == 0)
 			{
 				createNumPadButtons();
-				clearAppSpace();
+				GUI_clearAppSpace();
 				graphicLoaderState++;
 				break;
 			}
@@ -391,9 +374,9 @@ void appManager()
 		GUI_subMenuButtonMonitor(userKeyButtons, 21);
 
 		// Release any variable locks if page changed
-		if (nextPage != page)
+		if (nextApp != app)
 		{
-			pageTransition();
+			appTransition();
 		}
 		break;
 	case APP_CAPTURE_FILTERMASK: // CAN Bus Capture
@@ -403,7 +386,7 @@ void appManager()
 			if (graphicLoaderState == 0)
 			{
 				CAPTURE_createBaudBtns();
-				clearAppSpace();
+				GUI_clearAppSpace();
 				graphicLoaderState++;
 				break;
 			}
@@ -418,19 +401,23 @@ void appManager()
 		GUI_subMenuButtonMonitor(userInterfaceButton, 20);
 
 		// Release any variable locks if page changed
-		if (nextPage != page)
+		if (nextApp != app)
 		{
-			pageTransition();
+			appTransition();
 		}
 		break;
 	case APP_CAPTURE_AUTOBAUD: // CAN Bus Capture
 		// Draw page and lock variables
+#define CPU_RESTART_ADDR (uint32_t *)0xE000ED0C
+#define CPU_RESTART_VAL 0x5FA0004
+#define CPU_RESTART (*CPU_RESTART_ADDR = CPU_RESTART_VAL);
+		CPU_RESTART;
 		if (!hasDrawn)
 		{
 			if (graphicLoaderState == 0)
 			{
 				CAPTURE_createBaudBtns();
-				clearAppSpace();
+				GUI_clearAppSpace();
 				graphicLoaderState++;
 				break;
 			}
@@ -445,9 +432,9 @@ void appManager()
 		GUI_subMenuButtonMonitor(userInterfaceButton, 20);
 
 		// Release any variable locks if page changed
-		if (nextPage != page)
+		if (nextApp != app)
 		{
-			pageTransition();
+			appTransition();
 		}
 		break;
 	case 9: // Tools
@@ -457,7 +444,7 @@ void appManager()
 			if (graphicLoaderState == 0)
 			{
 				createToolBtns();
-				clearAppSpace();
+				GUI_clearAppSpace();
 				graphicLoaderState++;
 				break;
 			}
@@ -472,9 +459,9 @@ void appManager()
 
 
 		// Release any variable locks if page changed
-		if (nextPage != page)
+		if (nextApp != app)
 		{
-			pageTransition();
+			appTransition();
 		}
 		break;
 	case 36: // Settings
@@ -484,7 +471,7 @@ void appManager()
 			if (graphicLoaderState == 0)
 			{
 				createSettingsBtns();
-				clearAppSpace();
+				GUI_clearAppSpace();
 				graphicLoaderState++;
 				break;
 			}
@@ -541,9 +528,9 @@ void appManager()
 
 
 		// Release any variable locks if page changed
-		if (nextPage != page)
+		if (nextApp != app)
 		{
-			pageTransition();
+			appTransition();
 		}
 		break;
 	}
@@ -561,14 +548,13 @@ void createMenuBtns()
 }
 
 
-
 void canSniff1(const CAN_message_t& msg) 
 {
 	if (CANBusOut == 10)
 	{
 		Serial.printf("%8d    %9d    %04X   %d   %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\r\n", ++messageNum, millis(), msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
 	}
-	else if ((CANBusOut == 9) && (CANBusIn == 4) && (page == APP_CAPTURE_LCD))
+	else if ((CANBusOut == 9) && (CANBusIn == 4) && (app == APP_CAPTURE_LCD))
 	{
 		if (LCDPos == 60)
 		{
@@ -585,26 +571,26 @@ void canSniff1(const CAN_message_t& msg)
 
 		char printString[40];
 		display.setTextColor(menuBtnText);
-		sprintf(printString, "%03X", msg.id);
+		sprintf(printString, "%03X", (unsigned int)msg.id);
 		display.drawString(printString, 15, LCDPos);
-		sprintf(printString, "%d", (uint8_t)msg.len);
+		sprintf(printString, "%d", (int)msg.len);
 		display.drawString(printString, 60, LCDPos);
-		sprintf(printString, "%02X ", msg.buf[0]);
+		sprintf(printString, "%02X ", (uint8_t)msg.buf[0]);
 		display.drawString(printString, 90, LCDPos);
-		sprintf(printString, "%02X ", msg.buf[1]);
+		sprintf(printString, "%02X ", (uint8_t)msg.buf[1]);
 		display.drawString(printString, 130, LCDPos);
-		sprintf(printString, "%02X ", msg.buf[2]);
+		sprintf(printString, "%02X ", (uint8_t)msg.buf[2]);
 		display.drawString(printString, 170, LCDPos);
-		sprintf(printString, "%02X ", msg.buf[3]);
+		sprintf(printString, "%02X ", (uint8_t)msg.buf[3]);
 		display.drawString(printString, 210, LCDPos);
-		sprintf(printString, "%02X ", msg.buf[4]);
+		sprintf(printString, "%02X ", (uint8_t)msg.buf[4]);
 		display.drawString(printString, 250, LCDPos);
-		sprintf(printString, "%02X ", msg.buf[5]);
+		sprintf(printString, "%02X ", (uint8_t)msg.buf[5]);
 		display.drawString(printString, 290, LCDPos);
-		sprintf(printString, "%02X ", msg.buf[6]);
+		sprintf(printString, "%02X ", (uint8_t)msg.buf[6]);
 		display.drawString(printString, 330, LCDPos);
-		sprintf(printString, "%02X ", msg.buf[7]);
-		display.drawString(printString, 370, LCDPos);
+		sprintf(printString, "%02X ", (uint8_t)msg.buf[7]);
+		display.drawString(printString, 370, (uint8_t)LCDPos);
 		//sprintf(printString, "%03X  %d  %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X", msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
 
 		if (LCDPos < 300)
@@ -625,7 +611,7 @@ void canSniff2(const CAN_message_t& msg)
 	{
 		Serial.printf("%8d    %9d    %04X   %d   %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\r\n", ++messageNum, millis(), msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
 	}
-	else if ((CANBusOut == 9) && (CANBusIn == 5) && (page == APP_CAPTURE_LCD))
+	else if ((CANBusOut == 9) && (CANBusIn == 5) && (app == APP_CAPTURE_LCD))
 	{
 		if (LCDPos == 60)
 		{
@@ -642,25 +628,25 @@ void canSniff2(const CAN_message_t& msg)
 
 		char printString[40];
 		display.setTextColor(menuBtnText);
-		sprintf(printString, "%03X", msg.id);
+		sprintf(printString, "%03X", (unsigned int)msg.id);
 		display.drawString(printString, 15, LCDPos);
-		sprintf(printString, "%d", (uint8_t)msg.len);
+		sprintf(printString, "%d", (int)msg.len);
 		display.drawString(printString, 60, LCDPos);   
-		sprintf(printString, "%02X ", msg.buf[0]);
+		sprintf(printString, "%02X ", (uint8_t)msg.buf[0]);
 		display.drawString(printString, 90, LCDPos);
-		sprintf(printString, "%02X ", msg.buf[1]);
+		sprintf(printString, "%02X ", (uint8_t)msg.buf[1]);
 		display.drawString(printString, 130, LCDPos);
-		sprintf(printString, "%02X ", msg.buf[2]);
+		sprintf(printString, "%02X ", (uint8_t)msg.buf[2]);
 		display.drawString(printString, 170, LCDPos);
-		sprintf(printString, "%02X ", msg.buf[3]);
+		sprintf(printString, "%02X ", (uint8_t)msg.buf[3]);
 		display.drawString(printString, 210, LCDPos);
-		sprintf(printString, "%02X ", msg.buf[4]);
+		sprintf(printString, "%02X ", (uint8_t)msg.buf[4]);
 		display.drawString(printString, 250, LCDPos);
-		sprintf(printString, "%02X ", msg.buf[5]);
+		sprintf(printString, "%02X ", (uint8_t)msg.buf[5]);
 		display.drawString(printString, 290, LCDPos);
-		sprintf(printString, "%02X ", msg.buf[6]);
+		sprintf(printString, "%02X ", (uint8_t)msg.buf[6]);
 		display.drawString(printString, 330, LCDPos);
-		sprintf(printString, "%02X ", msg.buf[7]);
+		sprintf(printString, "%02X ", (uint8_t)msg.buf[7]);
 		display.drawString(printString, 370, LCDPos);
 		//sprintf(printString, "%03X  %d  %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X", msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
 		
@@ -722,7 +708,7 @@ void canSniff3()
 		}
 		Serial.println();
 	}
-	else if ((CANBusOut == 9) && (page == APP_CAPTURE_LCD))
+	else if ((CANBusOut == 9) && (app == APP_CAPTURE_LCD))
 	{
 		if (LCDPos == 60)
 		{
@@ -740,25 +726,25 @@ void canSniff3()
 		
 		char printString[40];
 		display.setTextColor(menuBtnText);
-		sprintf(printString, "%03X", msg.id);
+		sprintf(printString, "%03X", (unsigned int)msg.id);
 		display.drawString(printString, 15, LCDPos);
-		sprintf(printString, "%d", (uint8_t)msg.len);
+		sprintf(printString, "%d", (int)msg.len);
 		display.drawString(printString, 60, LCDPos);
-		sprintf(printString, "%02X ", msg.buf[0]);
+		sprintf(printString, "%02X ", (uint8_t)msg.buf[0]);
 		display.drawString(printString, 95, LCDPos);
-		sprintf(printString, "%02X ", msg.buf[1]);
+		sprintf(printString, "%02X ", (uint8_t)msg.buf[1]);
 		display.drawString(printString, 135, LCDPos);
-		sprintf(printString, "%02X ", msg.buf[2]);
+		sprintf(printString, "%02X ", (uint8_t)msg.buf[2]);
 		display.drawString(printString, 175, LCDPos);
-		sprintf(printString, "%02X ", msg.buf[3]);
+		sprintf(printString, "%02X ", (uint8_t)msg.buf[3]);
 		display.drawString(printString, 215, LCDPos);
-		sprintf(printString, "%02X ", msg.buf[4]);
+		sprintf(printString, "%02X ", (uint8_t)msg.buf[4]);
 		display.drawString(printString, 255, LCDPos);
-		sprintf(printString, "%02X ", msg.buf[5]);
+		sprintf(printString, "%02X ", (uint8_t)msg.buf[5]);
 		display.drawString(printString, 295, LCDPos);
-		sprintf(printString, "%02X ", msg.buf[6]);
+		sprintf(printString, "%02X ", (uint8_t)msg.buf[6]);
 		display.drawString(printString, 335, LCDPos);
-		sprintf(printString, "%02X ", msg.buf[7]);
+		sprintf(printString, "%02X ", (uint8_t)msg.buf[7]);
 		display.drawString(printString, 375, LCDPos);
 
 		if (LCDPos < 300)
@@ -778,6 +764,9 @@ void setup(void)
 {
 	Serial.begin(115200); // USB is always 12 or 480 Mbit/sec
 	//Serial2.begin(115200); // ESP8266
+
+	// Update time
+	setSyncProvider(getTeensy3Time);
 
 	//SPI2.begin();
 	//pinMode(2, OUTPUT);
@@ -894,7 +883,43 @@ void setup(void)
 
 	CAPTURE_createCaptureBtns();
 
+
+	// open the file. note that only one file can be open at a time,
+	// so you have to close this one before opening another.
 	SD.begin(chipSelect);
+	myFile = SD.open("a.txt", FILE_WRITE);
+
+	// if the file opened okay, write to it:
+	if (myFile) {
+		Serial.print("Writing to test.txt...");
+		myFile.println("testing 1, 2, 3.");
+		// close the file:
+		myFile.close();
+		Serial.println("done.");
+	}
+	else {
+		// if the file didn't open, print an error:
+		Serial.println("error opening a.txt");
+	}
+
+	// re-open the file for reading:
+	myFile = SD.open("a.txt");
+	if (myFile) {
+		Serial.println("a.txt:");
+
+		// read from the file until there's nothing else in it:
+		while (myFile.available()) {
+			Serial.write(myFile.read());
+		}
+		// close the file:
+		myFile.close();
+	}
+	else {
+		// if the file didn't open, print an error:
+		Serial.println("error opening a.txt");
+	}
+	pinMode(6, OUTPUT);
+	digitalWrite(6, LOW);
 }
 
 
@@ -909,8 +934,32 @@ void backgroundProcess()
 	//serialOut();
 	//SDCardOut();
 	//timedTXSend();
+	updateTime();
 	canSniff3();
 	LED_strobe((RGB)LED_OFF);
+}
+
+// Displays time in menu
+void updateTime()
+{
+	static uint32_t updateClock = 0;
+	if (millis() - updateClock > 1000)
+	{
+		char printString[64];
+
+		display.setFont(Michroma_8);
+
+		display.fillRect(4, 8, 88, 27, menuBackground); // menuBackground
+
+		sprintf(printString, "%2d:%2d:%2d", hour(), minute(), second());
+		display.drawString(printString, 5, 10);
+
+		sprintf(printString, "%2d/%2d/%2d", month(), day(), year());
+		display.drawString(printString, 5, 25);
+
+		display.setFont(Michroma_11);
+		updateClock = millis();
+	}
 }
 
 /*
@@ -936,9 +985,6 @@ void loop(void)
 		appManager();
 		backgroundProcess();
 	}
-
-	
-
 	
 	//Can1.events();
 	//Can2.events();
@@ -947,6 +993,15 @@ void loop(void)
 	static uint32_t timeout123 = millis();
 	if (millis() - timeout123 > 1000)
 	{
+		int temp1 = analogRead(A1);
+		Serial.printf("Battery: %3d\n", temp1);
+
+		display.setTextColor(menuBtnText);
+		display.fillRect(99, 17, 42, 14, menuBackground); //menuBackground
+		display.setFont(Michroma_8);
+		display.drawString(batteryLevel(temp1), 100, 20);
+		display.setFont(Michroma_11);
+
 		CANFD_message_t msg;
 		msg.id = 0x4CA;
 		msg.len = 64;

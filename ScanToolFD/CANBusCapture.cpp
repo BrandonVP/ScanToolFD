@@ -140,7 +140,7 @@ void CAPTURE_captureConfig()
 	{
 		if (CAPTURE_output_config == 9)
 		{
-			nextPage = APP_CAPTURE_LCD;
+			nextApp = APP_CAPTURE_LCD;
 		}
 		else
 		{

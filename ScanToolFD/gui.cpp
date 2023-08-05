@@ -3,20 +3,31 @@
  Name        : gui.cpp
  Author      : Brandon Van Pelt
  Created	 : 4/6/2023
- Description :
+ Description : GUI framework
  ===========================================================================
  */
 
 #define _GUI_C
 #include "gui.h"
-#include "userInterface.h"
-#include "config.h"
 
- //
+ // Monitor screen touch
+bool GUI_Touch_getXY()
+{
+    if (ts.touched())
+    {
+        TS_Point p = ts.getPoint();
+        x = p.y;
+        y = SCREEN_HEIGHT - p.x;
+        return true;
+    }
+    return false;
+}
+
+//
 void GUI_drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int alignText, int radius)
 {
-    const uint8_t LETTER_WIDTH = 11;
-    const uint8_t SIDE_OFFSET = 2;
+    const uint8_t LETTER_WIDTH = 10;
+    //const uint8_t SIDE_OFFSET = 2;
     const uint8_t yMagicOffset = 6;
     int stringLength, buttonWidth, offset;
 
@@ -25,7 +36,6 @@ void GUI_drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String b
     display.drawRoundRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), radius, btnBorderColor);
     display.drawRoundRect(x_start + 1, y_start + 1, (x_stop - x_start) - 2, (y_stop - y_start) - 2, radius, btnBorderColor);
     display.setTextColor(btnTxtColor);
-
     // Print String with desired alignment
     switch (alignText)
     {
@@ -35,9 +45,11 @@ void GUI_drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String b
     case 2: // Center
         // Calculate center
         stringLength = buttonText.length() * LETTER_WIDTH;
+        //Serial.print("stringLength: ");
+        //Serial.println(buttonText.length());
         buttonWidth = (x_stop)-(x_start);
         //buttonWidth = (x_stop - SIDE_OFFSET) - (x_start + SIDE_OFFSET);
-        offset = (x_start - SIDE_OFFSET) + (buttonWidth / 2) - (stringLength / 2);
+        offset = x_start + (buttonWidth / 2) - ((stringLength / 2));
         //offset = (x_start + SIDE_OFFSET) + (buttonWidth / 2) - (stringLength / 2);
         //display.setCursor(offset, y_start + ((y_stop - y_start) / 2) - yMagicOffset, false);
         //display.println(button);
@@ -63,6 +75,7 @@ void GUI_drawSquareBtn(int x_start, int y_start, int x_stop, int y_stop, String 
     // Print button
     display.fillRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), btnBgColor);
     display.drawRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), btnBorderColor);
+    display.setTextColor(btnTxtColor);
 
     // Print String with desired alignment
     switch (align)
@@ -76,7 +89,6 @@ void GUI_drawSquareBtn(int x_start, int y_start, int x_stop, int y_stop, String 
         buttonWidth = (x_stop - SIDE_OFFSET) - (x_start + SIDE_OFFSET);
         offset = (x_start + SIDE_OFFSET) + (buttonWidth / 2) - (stringLength / 2);
 
-        display.setTextColor(btnTxtColor);
         //display.setCursor(offset, y_start + ((y_stop - y_start) / 2) - yMagicOffset, false);
         //display.println(button);
         display.drawString(buttonText, offset, y_start + ((y_stop - y_start) / 2) - yMagicOffset);
@@ -132,7 +144,7 @@ void GUI_waitForItRect(int x_start, int y_start, int x_stop, int y_stop, int rad
 //
 void GUI_buttonMonitor(UserInterfaceClass* buttons, uint8_t size)
 {
-    if (Touch_getXY())
+    if (GUI_Touch_getXY())
     {
         for (uint8_t i = 0; i < size; i++)
         {
@@ -148,7 +160,7 @@ void GUI_buttonMonitor(UserInterfaceClass* buttons, uint8_t size)
                     {
                         GUI_waitForItRect(buttons[i].getXStart(), buttons[i].getYStart(), buttons[i].getXStop(), buttons[i].getYStop(), buttons[i].getRadius(), buttons[i].getBorderColor(), buttons[i].getClickBorderColor());
                     }
-                    nextPage = buttons[i].getClickReturn();
+                    nextApp = buttons[i].getClickReturn();
                 }
             }
         }
@@ -158,7 +170,7 @@ void GUI_buttonMonitor(UserInterfaceClass* buttons, uint8_t size)
 // Returns button clickReturn value - No press returns -1
 int GUI_subMenuButtonMonitor(UserInterfaceClass* buttons, uint8_t size)
 {
-    if (Touch_getXY())
+    if (GUI_Touch_getXY())
     {
         for (uint8_t i = 0; i < size; i++)
         {
@@ -174,8 +186,6 @@ int GUI_subMenuButtonMonitor(UserInterfaceClass* buttons, uint8_t size)
                     {
                         GUI_waitForItRect(buttons[i].getXStart(), buttons[i].getYStart(), buttons[i].getXStop(), buttons[i].getYStop(), buttons[i].getRadius(), buttons[i].getBorderColor(), buttons[i].getClickBorderColor());
                     }
-                    Serial.println((char)buttons[i].getClickReturn());
-                    Serial.println(" ");
                     return buttons[i].getClickReturn();
                 }
             }
@@ -211,7 +221,7 @@ bool GUI_drawPage(UserInterfaceClass* buttons, uint8_t& pos, uint8_t buttonsToPr
 }
 
 //
-void GUI_drawButton(UserInterfaceClass* button, uint16_t buttonColor, uint16_t buttonBorderColor, uint16_t buttonTextColor)
+void GUI_clearAppSpace()
 {
-    GUI_drawRoundBtn(button->getXStart(), button->getYStart(), button->getXStop(), button->getYStop(), button->getBtnText(), button->getBtnColor(), button->getBorderColor(), button->getTextColor(), button->getAlign(), button->getRadius());
+    display.fillRect(0, 51, 480, 269, themeBackground);
 }
