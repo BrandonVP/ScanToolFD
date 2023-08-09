@@ -74,6 +74,9 @@
     <ClInclude Include="RGB_LED.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\TPMS_Tool\TPMS_Tool\batteryMonitor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="userInterface.cpp">
@@ -113,5 +116,8 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ScanToolFD.ino" />
+    <ClCompile Include="..\..\TPMS_Tool\TPMS_Tool\batteryMonitor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

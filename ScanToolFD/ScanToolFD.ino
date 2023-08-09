@@ -32,6 +32,7 @@
 	 End README
  =========================================================*/
 
+#include <MTP_Teensy.h>
 #include <TimeLib.h>
 #include "RGB_LED.h"
 #include <FlexCAN_T4.h>
@@ -53,8 +54,8 @@
 #include "batteryMonitor.h"
 
 #include "ili9488_t3_font_Arial.h"
-#include "ili9488_t3_font_ComicSansMS.h"
-#include "ili9488_t3_font_ArialBold.h"
+//#include "ili9488_t3_font_ComicSansMS.h"
+//#include "ili9488_t3_font_ArialBold.h"
 //#include "font_AwesomeF180.h"
 #include "font_Michroma.h"
 
@@ -314,7 +315,7 @@ void appManager()
 
 		if (results == 0xaa)
 		{
-			createKeyboardButtons();
+			KEYINPUT_createKeyboardButtons();
 			graphicLoaderState = 3;
 			while (GUI_drawPage(userKeyButtons, graphicLoaderState, 36));
 		}
@@ -883,10 +884,13 @@ void setup(void)
 
 	CAPTURE_createCaptureBtns();
 
+	// mandatory to begin the MTP session.
+	MTP.begin();
 
 	// open the file. note that only one file can be open at a time,
 	// so you have to close this one before opening another.
 	SD.begin(chipSelect);
+	MTP.addFilesystem(SD, "SD Card");
 	myFile = SD.open("a.txt", FILE_WRITE);
 
 	// if the file opened okay, write to it:
@@ -937,6 +941,7 @@ void backgroundProcess()
 	updateTime();
 	canSniff3();
 	LED_strobe((RGB)LED_OFF);
+	MTP.loop();
 }
 
 // Displays time in menu
@@ -999,7 +1004,7 @@ void loop(void)
 		display.setTextColor(menuBtnText);
 		display.fillRect(99, 17, 42, 14, menuBackground); //menuBackground
 		display.setFont(Michroma_8);
-		display.drawString(batteryLevel(temp1), 100, 20);
+		display.drawString(BATTERY_batteryLevel(temp1), 100, 20);
 		display.setFont(Michroma_11);
 
 		CANFD_message_t msg;

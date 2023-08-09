@@ -57,73 +57,16 @@ uint8_t keypadController(uint8_t& index, uint16_t& total)
 		(index > 0) ? --index : 0;
 		return KEY_NO_CHANGE;
 	}
-	
+
 	return input;
 }
 */
 
-uint16_t plus5(uint16_t &value)
-{
-	value += 5;
-	return value;
-}
-
-uint16_t plus50(uint16_t &value)
-{
-	value += 50;
-	return value;
-}
-
-uint16_t plus55(uint16_t& value)
-{
-	value += 52;
-	return value;
-}
-
-void createNumPadButtons()
-{
-	uint8_t index = 0;
-	uint16_t row = 80;
-	uint16_t column = 55;
-
-	//userKeyButtons[index].setButton(0, 105, 479, 319, 1, true, 6, F(""), ALIGN_CENTER, themeBackground, themeBackground, themeBackground);
-	//userKeyButtons[index++].setClickable(false);
-	//userKeyButtons[index].setButton(0, 90, 480, 95, 1, false, 6, F(""), ALIGN_CENTER, menuBorder, menuBorder, menuBorder);
-	//userKeyButtons[index++].setClickable(false);
-
-	userKeyButtons[index++].setButton(row, column, plus50(row), column+50, 0, true, 6, F("0"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setButton(plus5(row), column, plus50(row), column+50, 1, true, 6, F("1"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setButton(plus5(row), column, plus50(row), column+50, 2, true, 6, F("2"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setButton(plus5(row), column, plus50(row), column+50, 3, true, 6, F("3"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setButton(plus5(row), column, plus50(row), column+50, 4, true, 6, F("4"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setButton(plus5(row), column, plus50(row), column+50, 5, true, 6, F("5"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	row = 80;
-	userKeyButtons[index++].setButton(row, plus55(column), plus50(row), column+50, 6, true, 6, F("6"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setButton(plus5(row), column, plus50(row), column+50, 7, true, 6, F("7"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setButton(plus5(row), column, plus50(row), column + 50, 8, true, 6, F("8"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setButton(plus5(row), column, plus50(row), column + 50, 9, true, 6, F("9"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setButton(plus5(row), column, plus50(row), column + 50, 0xA, true, 6, F("A"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setButton(plus5(row), column, plus50(row), column + 50, 0xB, true, 6, F("B"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	row = 80;
-	userKeyButtons[index++].setButton(row, plus55(column), plus50(row), column + 50, 0xC, true, 6, F("C"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setButton(plus5(row), column, plus50(row), column + 50, 0xD, true, 6, F("D"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setButton(plus5(row), column, plus50(row), column + 50, 0xE, true, 6, F("E"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setButton(plus5(row), column, plus50(row), column + 50, 0xF, true, 6, F("F"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setButton(plus5(row), column, plus50(row)+55, column + 50, 0xF2, true, 6, F("<---"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	row = 80;
-	userKeyButtons[index].setButton(row, plus55(column), plus50(row)+55, column + 50, 0, true, 6, F("Input:"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setClickable(false);
-	userKeyButtons[index].setButton(plus5(row)+55, column, plus50(row)+220, column + 50, 0, true, 6, F(" "), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setClickable(false);
-	row = 80;
-	userKeyButtons[index++].setButton(80, plus55(column), 240, column + 50, 0xF1, true, 6, F("Accept"), ALIGN_CENTER, menuBtnColor, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setButton(245, column, 405, column + 50, 0xF0, true, 6, F("Cancel"), ALIGN_CENTER, menuBtnColor, menuBackground, menuBtnColor, menuBtnTextColor);
-}
 
 /*============== Keyboard ==============*/
-// User input keypad  
+// User input keypad
 
-void createKeyboardButtons()
+uint8_t KEYINPUT_createKeyboardButtons(void)
 {
 	uint8_t index = 0;
 	userKeyButtons[index].setButton(0, 165, 479, 319, 1, true, 6, F(""), ALIGN_CENTER, themeBackground, themeBackground, themeBackground);
@@ -174,11 +117,17 @@ void createKeyboardButtons()
 	userKeyButtons[index++].setButton(128, 281, 352, 317, 1, true, 6, F(" "), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
 	userKeyButtons[index++].setButton(354, 281, 414, 317, 1, true, 6, F(">"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
 	userKeyButtons[index++].setButton(416, 281, 476, 317, 1, true, 6, F("_/"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	return index;
 }
 
-void createUpperCaseButtons()
+uint8_t KEYINPUT_createUpperCaseButtons()
 {
-	uint8_t index = 3;
+	uint8_t index = 0;
+	userKeyButtons[index].setButton(0, 165, 479, 319, 1, true, 6, F(""), ALIGN_CENTER, themeBackground, themeBackground, themeBackground);
+	userKeyButtons[index++].setClickable(false);
+	userKeyButtons[index].setButton(0, 160, 480, 165, 1, true, 6, F(""), ALIGN_CENTER, menuBorder, menuBorder, menuBorder);
+	userKeyButtons[index++].setClickable(false);
+
 	userKeyButtons[index++].setButton(47, 167, 81, 203, 'Q', true, 6, F("Q"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
 	userKeyButtons[index++].setButton(83, 167, 117, 203, 'W', true, 6, F("W"), ALIGN_LEFT, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
 	userKeyButtons[index++].setButton(119, 167, 153, 203, 'E', true, 6, F("E"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
@@ -211,9 +160,148 @@ void createUpperCaseButtons()
 	userKeyButtons[index++].setButton(202, 243, 240, 279, 'V', true, 6, F("V"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
 	userKeyButtons[index++].setButton(242, 243, 280, 279, 'B', true, 6, F("B"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
 	userKeyButtons[index++].setButton(282, 243, 320, 279, 'N', true, 6, F("N"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setButton(322, 243, 360, 279, 'M', true, 6, F("M"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor); 
-
+	userKeyButtons[index++].setButton(322, 243, 360, 279, 'M', true, 6, F("M"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	return index;
 }
+
+/*============== Hex/Dec Numpad ==============*/
+uint16_t plus5(uint16_t& value)
+{
+	value += 5;
+	return value;
+}
+
+uint16_t plus50(uint16_t& value)
+{
+	value += 50;
+	return value;
+}
+
+uint16_t plus55(uint16_t& value)
+{
+	value += 52;
+	return value;
+}
+
+uint8_t KEYINPUT_createHexpadButtons(void)
+{
+	uint8_t index = 0;
+	uint16_t row = 80;
+	uint16_t column = 55;
+
+	//userKeyButtons[index].setButton(0, 105, 479, 319, 1, true, 6, F(""), ALIGN_CENTER, themeBackground, themeBackground, themeBackground);
+	//userKeyButtons[index++].setClickable(false);
+	//userKeyButtons[index].setButton(0, 90, 480, 95, 1, false, 6, F(""), ALIGN_CENTER, menuBorder, menuBorder, menuBorder);
+	//userKeyButtons[index++].setClickable(false);
+
+	userKeyButtons[index++].setButton(row, column, plus50(row), column + 50, 0, true, 6, F("0"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(plus5(row), column, plus50(row), column + 50, 1, true, 6, F("1"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(plus5(row), column, plus50(row), column + 50, 2, true, 6, F("2"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(plus5(row), column, plus50(row), column + 50, 3, true, 6, F("3"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(plus5(row), column, plus50(row), column + 50, 4, true, 6, F("4"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(plus5(row), column, plus50(row), column + 50, 5, true, 6, F("5"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	row = 80;
+	userKeyButtons[index++].setButton(row, plus55(column), plus50(row), column + 50, 6, true, 6, F("6"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(plus5(row), column, plus50(row), column + 50, 7, true, 6, F("7"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(plus5(row), column, plus50(row), column + 50, 8, true, 6, F("8"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(plus5(row), column, plus50(row), column + 50, 9, true, 6, F("9"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(plus5(row), column, plus50(row), column + 50, 0xA, true, 6, F("A"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(plus5(row), column, plus50(row), column + 50, 0xB, true, 6, F("B"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	row = 80;
+	userKeyButtons[index++].setButton(row, plus55(column), plus50(row), column + 50, 0xC, true, 6, F("C"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(plus5(row), column, plus50(row), column + 50, 0xD, true, 6, F("D"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(plus5(row), column, plus50(row), column + 50, 0xE, true, 6, F("E"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(plus5(row), column, plus50(row), column + 50, 0xF, true, 6, F("F"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(plus5(row), column, plus50(row) + 55, column + 50, 0xF2, true, 6, F("<---"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	row = 80;
+	userKeyButtons[index].setButton(row, plus55(column), plus50(row) + 55, column + 50, 0, true, 6, F("Input:"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setClickable(false);
+
+	userKeyButtons[index].setButton(plus5(row) + 55, column, plus50(row) + 220, column + 50, 0, true, 6, F(" "), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+
+	userKeyButtons[index++].setClickable(false);
+	row = 80;
+	userKeyButtons[index++].setButton(80, plus55(column), 240, column + 50, 0xF1, true, 6, F("Accept"), ALIGN_CENTER, menuBtnColor, menuBackground, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(245, column, 405, column + 50, 0xF0, true, 6, F("Cancel"), ALIGN_CENTER, menuBtnColor, menuBackground, menuBtnColor, menuBtnTextColor);
+	return index;
+}
+
+uint8_t KEYINPUT_createNumpadButtons(void)
+{
+	uint8_t index = 0;
+	userKeyButtons[index++].setButton(145, 54, 205, 104, 7, true, 6, F("7"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(210, 54, 270, 104, 8, true, 6, F("8"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(275, 54, 335, 104, 9, true, 6, F("9"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+
+	userKeyButtons[index++].setButton(145, 108, 205, 158, 4, true, 6, F("4"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(210, 108, 270, 158, 5, true, 6, F("5"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(275, 108, 335, 158, 6, true, 6, F("6"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+
+	userKeyButtons[index++].setButton(145, 162, 205, 212, 1, true, 6, F("1"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(210, 162, 270, 212, 2, true, 6, F("2"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(275, 162, 335, 212, 3, true, 6, F("3"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+
+	userKeyButtons[index].setButton(145, 216, 270, 266, 0, true, 6, F(" "), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setClickable(false);
+	userKeyButtons[index++].setButton(275, 216, 335, 266, 88, true, 6, F("<---"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+
+	userKeyButtons[index++].setButton(145, 270, 235, 316, 0xF1, true, 6, F(" Accept"), ALIGN_LEFT, menuBtnColor, menuBackground, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(240, 270, 335, 316, 0xF0, true, 6, F("  Cancel"), ALIGN_LEFT, menuBtnColor, menuBackground, menuBtnColor, menuBtnTextColor);
+	return index;
+}
+
+/*
+* No change returns 0xFF
+* Accept returns 0xF1
+* Cancel returns 0xF0
+* Value contained in total
+*
+* index: Number place
+* total: Current total added value selected
+*/
+uint8_t numIndex = 0;
+uint8_t keypadInput[4] = { 0, 0, 0, 0 };
+uint8_t keypadController(uint8_t& total, uint8_t buttonsOnPage)
+{
+	uint8_t input = GUI_subMenuButtonMonitor(userKeyButtons, buttonsOnPage);
+
+	if (input >= 0x00 && input < 0x10 && numIndex < 4)
+	{
+		keypadInput[2] = keypadInput[1];
+		keypadInput[1] = keypadInput[0];
+		keypadInput[0] = input;
+		total = keypadInput[0] * hexTable[0] + keypadInput[1] * hexTable[1] + keypadInput[2] * hexTable[2];
+		//GUI_drawRoundBtn(240,  211,  405,  261, total, buttons[btn].getBtnColor(), buttons[btn].getBorderColor(), buttons[btn].getTextColor(), buttons[btn].getAlign(), buttons[btn].getRadius());
+
+		++numIndex;
+		return KEY_NO_CHANGE;
+	}
+	else if (input == 0x10)
+	{
+		switch (numIndex)
+		{
+		case 1:
+			keypadInput[0] = 0;
+			break;
+		case 2:
+			keypadInput[0] = keypadInput[1];
+			keypadInput[1] = 0;
+			break;
+		case 3:
+			keypadInput[0] = keypadInput[1];
+			keypadInput[1] = keypadInput[2];
+			keypadInput[2] = 0;
+			break;
+		}
+		total = 0;// keypadInput[0] * hexTable[0] + keypadInput[1] * hexTable[1] + keypadInput[2] * hexTable[2];
+		//drawRoundBtn(255, 220, 470, 260, String(total, 16), menuBtnColor, menuBtnBorder, menuBtnText, CENTER);
+		(numIndex > 0) ? --numIndex : 0;
+		return KEY_NO_CHANGE;
+	}
+
+	return 1;
+}
+
 /*
 * No change returns 0xFF
 * Accept returns 0xF1

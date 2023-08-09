@@ -21,7 +21,7 @@
 #define ARDUINO 108010
 #define ARDUINO_TEENSY40 1
 #define F_CPU 600000000
-#define USB_SERIAL 1
+#define USB_MTPDISK_SERIAL 1
 #define LAYOUT_US_ENGLISH 1
 #define __cplusplus 201103L
 #undef __cplusplus
