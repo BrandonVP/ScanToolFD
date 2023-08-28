@@ -35,8 +35,8 @@
 uint8_t CAPTURE_input_config = 0;
 uint8_t CAPTURE_output_config = 0;
 
-void CAPTURE_createMenuBtns();
-void CAPTURE_createCaptureBtns();
+uint8_t CAPTURE_createMenuBtns();
+uint8_t CAPTURE_createCaptureBtns();
 void CAPTURE_captureConfig();
 
 #else
@@ -44,8 +44,8 @@ void CAPTURE_captureConfig();
 extern uint8_t CAPTURE_input_config;
 extern uint8_t CAPTURE_output_config;
 
-void CAPTURE_createMenuBtns();
-void CAPTURE_createCaptureBtns();
+uint8_t CAPTURE_createMenuBtns();
+uint8_t CAPTURE_createCaptureBtns();
 void CAPTURE_captureConfig();
 void CAPTURE_createLCDBtns();
 void CAPTURE_createBaudBtns();

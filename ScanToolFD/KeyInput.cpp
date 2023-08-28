@@ -120,7 +120,7 @@ uint8_t KEYINPUT_createKeyboardButtons(void)
 	return index;
 }
 
-uint8_t KEYINPUT_createUpperCaseButtons()
+uint8_t KEYINPUT_createUpperCaseButtons(void)
 {
 	uint8_t index = 0;
 	userKeyButtons[index].setButton(0, 165, 479, 319, 1, true, 6, F(""), ALIGN_CENTER, themeBackground, themeBackground, themeBackground);
@@ -226,6 +226,7 @@ uint8_t KEYINPUT_createHexpadButtons(void)
 	return index;
 }
 
+//
 uint8_t KEYINPUT_createNumpadButtons(void)
 {
 	uint8_t index = 0;

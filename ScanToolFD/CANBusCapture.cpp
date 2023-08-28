@@ -10,7 +10,7 @@
 #define _CANBUSCAPTURE_C
 #include "CANBusCapture.h"
 
-void CAPTURE_createMenuBtns()
+uint8_t CAPTURE_createMenuBtns()
 {
 	uint8_t btnPos = 0;
 	userInterfaceButton[btnPos++].setButton(55, 80, 220, 120, APP_CAPTURE_CONFIG, true, 20, F("Capture"), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
@@ -21,32 +21,35 @@ void CAPTURE_createMenuBtns()
 	userInterfaceButton[btnPos++].setButton(260, 200, 425, 240, APP_CAPTURE_AUTOBAUD, true, 20, F("Auto Baud"), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
 	userInterfaceButton[btnPos++].setButton(55, 260, 220, 300, 0, true, F(""), ALIGN_CENTER);
 	userInterfaceButton[btnPos++].setButton(260, 260, 425, 300, 0, true, F(""), ALIGN_CENTER);
+	return btnPos;
 }
 
-void CAPTURE_createCaptureBtns()
+uint8_t CAPTURE_createCaptureBtns()
 {
-	userInterfaceCaptureButton[0]. setButton( 10,  55, 170,  70,  0, true, 20, F("Input"),      ALIGN_CENTER, themeBackground, themeBackground, menuBackground, menuBtnTextColor);
-	userInterfaceCaptureButton[0]. setClickable(false);
-	userInterfaceCaptureButton[1]. setButton(175,  55, 335,  70,  0, true, 20, F("Output"),      ALIGN_CENTER, themeBackground, themeBackground, menuBackground, menuBtnTextColor);
-	userInterfaceCaptureButton[1]. setClickable(false);
-	userInterfaceCaptureButton[2]. setButton( 10,  75, 170, 315,  0, false, 0, F(""),            ALIGN_CENTER, menuBackground, frameBorder, menuBackground, menuBackground);
-	userInterfaceCaptureButton[2]. setClickable(false);
-	userInterfaceCaptureButton[3]. setButton(175,  75, 335, 315,  0, false, 0, F(""),            ALIGN_CENTER, menuBackground, frameBorder, menuBackground, menuBackground);
-	userInterfaceCaptureButton[3]. setClickable(false);
-	userInterfaceCaptureButton[4]. setButton( 10,  75, 170, 110,  4, false, 0, F("CAN1 "),     ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
-	userInterfaceCaptureButton[5]. setButton( 10, 115, 170, 150,  5, false, 0, F("CAN2 "),        ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
-	userInterfaceCaptureButton[6]. setButton( 10, 155, 170, 190,  6, false, 0, F("CAN3 FD "),        ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
-	userInterfaceCaptureButton[7]. setButton( 10, 195, 170, 230,  7, false, 0, F("Wireless"),    ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
-	userInterfaceCaptureButton[8]. setButton( 10, 235, 170, 270,  8, false, 0, F("C2 Out Only"), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	uint8_t btnPos = 0;
+	userInterfaceCaptureButton[btnPos]. setButton( 10,  55, 170,  70,  0, true, 20, F("Input"),      ALIGN_CENTER, themeBackground, themeBackground, menuBackground, menuBtnTextColor);
+	userInterfaceCaptureButton[btnPos++]. setClickable(false);
+	userInterfaceCaptureButton[btnPos]. setButton(175,  55, 335,  70,  0, true, 20, F("Output"),      ALIGN_CENTER, themeBackground, themeBackground, menuBackground, menuBtnTextColor);
+	userInterfaceCaptureButton[btnPos++]. setClickable(false);
+	userInterfaceCaptureButton[btnPos]. setButton( 10,  75, 170, 315,  0, false, 0, F(""),            ALIGN_CENTER, menuBackground, frameBorder, menuBackground, menuBackground);
+	userInterfaceCaptureButton[btnPos++]. setClickable(false);
+	userInterfaceCaptureButton[btnPos]. setButton(175,  75, 335, 315,  0, false, 0, F(""),            ALIGN_CENTER, menuBackground, frameBorder, menuBackground, menuBackground);
+	userInterfaceCaptureButton[btnPos++]. setClickable(false);
+	userInterfaceCaptureButton[btnPos++]. setButton( 10,  75, 170, 110,  4, false, 0, F("CAN1 "),     ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceCaptureButton[btnPos++]. setButton( 10, 115, 170, 150,  5, false, 0, F("CAN2 "),        ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceCaptureButton[btnPos++]. setButton( 10, 155, 170, 190,  6, false, 0, F("CAN3 FD "),        ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceCaptureButton[btnPos++]. setButton( 10, 195, 170, 230,  7, false, 0, F("Wireless"),    ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceCaptureButton[btnPos++]. setButton( 10, 235, 170, 270,  8, false, 0, F("C2 Out Only"), ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
 	
-	userInterfaceCaptureButton[9]. setButton(175,  75, 335, 110,  9, false, 0, F("LCD"),         ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
-	userInterfaceCaptureButton[10].setButton(175, 115, 335, 150, 10, false, 0, F("Serial"),      ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
-	userInterfaceCaptureButton[11].setButton(175, 155, 335, 190, 11, false, 0, F("SD Card"),     ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
-	userInterfaceCaptureButton[12].setButton(175, 195, 335, 230, 12, false, 0, F("Wireless"),    ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
-	userInterfaceCaptureButton[13].setButton(340, 230, 475, 270, 13, true, 0, F("START "),        ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
-	userInterfaceCaptureButton[13].setClickable(false);
-	userInterfaceCaptureButton[14].setButton(340, 275, 475, 315, 14, true, 0, F("STOP "),         ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
-	userInterfaceCaptureButton[14].setClickable(false);
+	userInterfaceCaptureButton[btnPos++]. setButton(175,  75, 335, 110,  9, false, 0, F("LCD"),         ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceCaptureButton[btnPos++].setButton(175, 115, 335, 150, 10, false, 0, F("Serial"),      ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceCaptureButton[btnPos++].setButton(175, 155, 335, 190, 11, false, 0, F("SD Card"),     ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceCaptureButton[btnPos++].setButton(175, 195, 335, 230, 12, false, 0, F("Wireless"),    ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceCaptureButton[btnPos].setButton(340, 230, 475, 270, 13, true, 0, F("START "),        ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceCaptureButton[btnPos++].setClickable(false);
+	userInterfaceCaptureButton[btnPos].setButton(340, 275, 475, 315, 14, true, 0, F("STOP "),         ALIGN_CENTER, themeBackground, frameBorder, menuBtnColor, menuBtnText);
+	userInterfaceCaptureButton[btnPos++].setClickable(false);
+	return btnPos;
 }
 
 void CAPTURE_captureConfig()

@@ -19,16 +19,16 @@
 #ifdef _KEYINPUT_C
 
 UserInterfaceClass userKeyButtons[43];
-void KEYINPUT_createKeyboardButtons();
-uint8_t keyboardController(uint8_t&);
+//uint8_t keyboardController(uint8_t&);
 
 #else
 
 extern UserInterfaceClass userKeyButtons[43];
-void KEYINPUT_createKeyboardButtons();
-void KEYINPUT_createUpperCaseButtons();
-void KEYINPUT_createNumPadButtons();
-uint8_t keyboardController(uint8_t&);
+uint8_t KEYINPUT_createKeyboardButtons(void);
+uint8_t KEYINPUT_createUpperCaseButtons(void);
+uint8_t KEYINPUT_createHexpadButtons(void);
+uint8_t KEYINPUT_createNumpadButtons(void);
+uint8_t keypadController(uint8_t& total, uint8_t buttonsOnPage);
 
 #endif // _KEYINPUT_C
 #endif // _KEYINPUT_H

@@ -10,6 +10,11 @@
 #define _GUI_C
 #include "gui.h"
 
+ // Local load bar variables
+static uint16_t loadBarIndex = 471; // ends at 470
+static uint32_t loadBarTimer = 0;
+static uint16_t loarBarRunTime = 8000;
+
  // Monitor screen touch
 bool GUI_Touch_getXY()
 {
@@ -224,4 +229,80 @@ bool GUI_drawPage(UserInterfaceClass* buttons, uint8_t& pos, uint8_t buttonsToPr
 void GUI_clearAppSpace()
 {
     display.fillRect(0, 51, 480, 269, themeBackground);
+}
+
+//
+void GUI_setLoadBarRuntime(uint16_t time)
+{
+    loarBarRunTime = time;
+}
+
+//
+void GUI_startLoadBar(void)
+{
+    loadBarIndex = 250;
+    loadBarTimer = millis();
+}
+
+//
+void GUI_stopLoadBarTimed(void)
+{
+    loadBarIndex = 471;
+}
+
+// Load bar
+void GUI_sideLoadBarTimed(void)
+{
+    if (loadBarIndex > 470)
+    {
+        return;
+    }
+
+    uint32_t temp = ceil(loarBarRunTime / 270);
+
+    if (millis() - loadBarTimer > temp)
+    {
+        display.fillRect(loadBarIndex++, 151, 1, 38, OrangeBtnColor);
+        loadBarTimer = millis();
+    }
+}
+
+//
+void GUI_loadBarPrintFrame(void)
+{
+    GUI_drawSquareBtn(244, 146, 476, 195, "", menuBackground, BlackBtnColor, menuBtnColor, ALIGN_CENTER);
+    GUI_drawSquareBtn(248, 150, 472, 191, F(""), themeBackground, BlackBtnColor, themeBackground, ALIGN_CENTER);
+}
+
+//
+void GUI_LoadBarPrintStart(void)
+{
+    display.fillRect(241, 51, 480, 269, themeBackground);
+    display.setFont(Michroma_10);
+    GUI_drawSquareBtn(245, 127, 480, 142, F("Place tool next to TPMS"), themeBackground, themeBackground, menuBtnTextColor, ALIGN_LEFT);
+    display.setFont(Michroma_11);
+}
+
+//
+void GUI_loadBarPrintFailed(void)
+{
+    display.setFont(Michroma_10);
+    GUI_drawSquareBtn(242, 200, 480, 220, F("TPMS not detected"), themeBackground, themeBackground, menuBtnTextColor, ALIGN_CENTER);
+    display.setFont(Michroma_11);
+}
+
+//
+void GUI_loadBarPrintProgPass(void)
+{
+    display.setFont(Michroma_10);
+    GUI_drawSquareBtn(242, 200, 480, 220, F("Programming successful"), themeBackground, themeBackground, menuBtnTextColor, ALIGN_LEFT);
+    display.setFont(Michroma_11);
+}
+
+//
+void GUI_loadBarPrintReadPass(void)
+{
+    display.setFont(Michroma_10);
+    GUI_drawSquareBtn(280, 200, 480, 220, F("Read successful"), themeBackground, themeBackground, menuBtnTextColor, ALIGN_LEFT);
+    display.setFont(Michroma_11);
 }

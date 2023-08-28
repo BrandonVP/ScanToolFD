@@ -101,7 +101,6 @@ uint8_t buttonsOnPage = 0;
 //uint8_t state = 0;
 
 
-//uint16_t buttonsOnPage = 0;
 
 UserInterfaceClass userInterfaceButton[APP_BUTTON_SIZE];
 UserInterfaceClass userInterfaceCaptureButton[CAPTURE_BUTTON_SIZE];
@@ -109,10 +108,64 @@ UserInterfaceClass userInterfaceMenuButton[MENU_BUTTON_SIZE];
 
 FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> Can1;
 FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> Can2;
-FlexCAN_T4FD<CAN3, RX_SIZE_256, TX_SIZE_16> Can3; // FD
+//FlexCAN_T4FD<CAN3, RX_SIZE_256, TX_SIZE_16> Can3; // FD
 
 const int chipSelect = 2;
 File myFile;
+
+const uint8_t battery_bits[] = {
+  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+  0x00,0x00,0x00,0x00,0xFE,0xFF,0xFF,0x07,0xFE,0xFF,0xFF,0x07,
+  0x8E,0xE3,0x18,0x07,0x8E,0xE3,0x18,0x07,0x8E,0xE3,0x18,0x7F,
+  0x8E,0xE3,0x18,0x7F,0x8E,0xE3,0x18,0x7F,0x8E,0xE3,0x18,0x7F,
+  0x8E,0xE3,0x18,0x7F,0x8E,0xE3,0x18,0x7F,0x8E,0xE3,0x18,0x7F,
+  0x8E,0xE3,0x18,0x7F,0x8E,0xE3,0x18,0x7F,0x8E,0xE3,0x18,0x7F,
+  0x8E,0xE3,0x18,0x07,0x8E,0xE3,0x18,0x07,0xFE,0xFF,0xFF,0x07,
+  0xFE,0xFF,0xFF,0x07,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
+};
+
+
+unsigned int reverseBits(uint8_t num)
+{
+	unsigned int NO_OF_BITS = sizeof(num) * 2;
+	unsigned int reverse_num = 0, i, temp;
+
+	for (i = 0; i < NO_OF_BITS; i++)
+	{
+		temp = (num & (1 << i));
+		if (temp) reverse_num |= (1 << ((NO_OF_BITS - 1) - i));
+	}
+	return reverse_num;
+}
+
+// Then wrote this function to print the bits (located in icons.h)
+void print_icon(uint16_t x, uint16_t y, const uint8_t icon[], uint8_t maxRow, uint8_t maxColumn, uint16_t color1, uint16_t color2)
+{
+	int16_t i = 0, row, column, bit, temp;
+	for (row = 0; row < maxRow; row++) //64
+	{
+		for (column = 0; column < maxColumn; column++) // 8
+		{
+			temp = icon[i];
+			for (bit = 7; bit >= 0; bit--)
+			{
+				if (temp & 1)
+				{
+					display.drawPixel(x + (column * 8) + (8 - bit), y + row, color1);
+				}
+				else
+				{
+					//display.drawPixel(x + (column * 8) + (8 - bit), y + row, menuBtnColor);
+				}
+				temp >>= 1;
+			}
+			i++;
+		}
+	}
+}
 
 // Arduino library time update
 time_t getTeensy3Time()
@@ -163,6 +216,177 @@ void createSettingsBtns()
 	userInterfaceButton[btnPos++].setButton(260, 260, 425, 300, 0, true, F("Reset"), ALIGN_CENTER);
 }
 
+// -------------------------------------------------------------
+void setup(void)
+{
+	Serial.begin(115200); // USB is always 12 or 480 Mbit/sec
+	//Serial2.begin(115200); // ESP8266
+
+	// Update time
+	setSyncProvider(getTeensy3Time);
+
+	//SPI2.begin();
+	//pinMode(2, OUTPUT);
+	//digitalWrite(2, 1);
+	//pinMode(3, OUTPUT);
+	//pinMode(4, OUTPUT);
+	//pinMode(5, OUTPUT);
+	//pinMode(6, OUTPUT);
+	//pinMode(7, OUTPUT);
+	//pinMode(8, OUTPUT);
+	//pinMode(16, OUTPUT);
+	//pinMode(17, OUTPUT);
+
+	// Unused pins on back
+	// 27 28 29 32 33
+	// 
+	// if removed LED
+	// 24, 25, 26
+
+	// SPI0 
+	// SCK0  13 // Orange
+	// MISO0 12 // Blue
+	// MOSI0 11 // White/Pink
+	// CS0   10 // Brown
+
+	// SPI1
+	// SCK1  27
+	// MISO1 1
+	// MOSI1 26
+	// CS1   0
+
+	// SPI2  
+	// SCK2  37
+	// MISO2 34
+	// MOSI2 35
+	// CS2   36
+
+	// Blue   - MISO
+	// White  - MOSI
+	// Orange - SCK
+	// Brown  - CS
+
+	LED_initialize();
+
+	LED_RGB((RGB)LED_RED);
+	delay(200);
+	LED_RGB((RGB)LED_OFF);
+
+	LED_RGB((RGB)LED_GREEN);
+	delay(200);
+	LED_RGB((RGB)LED_OFF);
+
+	LED_RGB((RGB)LED_BLUE);
+	delay(200);
+	LED_RGB((RGB)LED_OFF);
+
+	pinMode(LCD_BL, OUTPUT);
+	digitalWrite(LCD_BL, HIGH);
+
+	ts.begin(40);
+	display.begin();
+	display.fillScreen(ILI9488_BLACK);
+	display.setRotation(1);
+
+	//display.setFont(Arial_14);
+	//display.setFont(AwesomeF180_12);
+	display.setFont(Michroma_11);
+	//display.setFont(ComicSansMS_12);
+	//display.setFont(OpenSans12);
+	//display.setFont(Crystal_18_Italic);
+	//display.setFont(Michroma_12);
+
+	// 
+	GUI_drawSquareBtn(0, 0, 479, 319, "", themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
+	GUI_drawSquareBtn(0, 0, 480, 45, "", menuBackground, menuBackground, menuBackground, ALIGN_CENTER);
+	GUI_drawSquareBtn(0, 45, 480, 50, "", menuBorder, menuBorder, menuBorder, ALIGN_CENTER);
+	GUI_drawSquareBtn(160, 45, 260, 50, "", menuBtnColor, menuBtnColor, menuBtnColor, ALIGN_CENTER);
+
+	// Create button objects
+	createMenuBtns();
+
+	// Draw Menu
+	while (GUI_drawPage(userInterfaceMenuButton, graphicLoaderState, 3));
+	graphicLoaderState = 0;
+
+	Can1.begin();
+	Can1.setBaudRate(500000);
+	Can1.setMaxMB(16);
+	Can1.enableFIFO();
+	Can1.enableFIFOInterrupt();
+	Can1.onReceive(canSniff1);
+	Can1.mailboxStatus();
+
+	Can2.begin();
+	Can2.setBaudRate(500000);
+	Can2.setMaxMB(16);
+	Can2.enableFIFO();
+	Can2.enableFIFOInterrupt();
+	Can2.onReceive(canSniff2);
+	Can2.mailboxStatus();
+	Can2.disableFIFOInterrupt();
+
+	/*
+	Can3.begin();
+	CANFD_timings_t config;
+	config.clock = CLK_60MHz;
+	config.baudrate = 500000;
+	config.baudrateFD = 5000000;
+	config.propdelay = 190;
+	config.bus_length = 1;
+	config.sample = 70;
+	Can3.setBaudRate(config);
+	Can3.setRegions(64);
+	//Can3.onReceive(canSniff3);
+	*/
+
+	CAPTURE_createCaptureBtns();
+
+	// mandatory to begin the MTP session.
+	MTP.begin();
+
+	// open the file. note that only one file can be open at a time,
+	// so you have to close this one before opening another.
+	SD.begin(chipSelect);
+	MTP.addFilesystem(SD, "SD Card");
+	myFile = SD.open("a.txt", FILE_WRITE);
+
+	// if the file opened okay, write to it:
+	if (myFile) {
+		Serial.print("Writing to test.txt...");
+		myFile.println("testing 1, 2, 3.");
+		// close the file:
+		myFile.close();
+		Serial.println("done.");
+	}
+	else {
+		// if the file didn't open, print an error:
+		Serial.println("error opening a.txt");
+	}
+
+	// re-open the file for reading:
+	myFile = SD.open("a.txt");
+	if (myFile) {
+		Serial.println("a.txt:");
+
+		// read from the file until there's nothing else in it:
+		while (myFile.available()) {
+			Serial.write(myFile.read());
+		}
+		// close the file:
+		myFile.close();
+	}
+	else {
+		// if the file didn't open, print an error:
+		Serial.println("error opening a.txt");
+	}
+	pinMode(6, OUTPUT);
+	digitalWrite(6, LOW);
+
+	print_icon(5, 5, battery_bits, 32, 4, menuBtnTextColor, 1);
+}
+
+
 // Manages the loading and unloading of different user Apps
 void appManager()
 {
@@ -177,12 +401,12 @@ void appManager()
 		{
 			if (graphicLoaderState == 0)
 			{
-				CAPTURE_createMenuBtns();
+				buttonsOnPage = CAPTURE_createMenuBtns();
 				GUI_clearAppSpace();
 				graphicLoaderState++;
 				break;
 			}
-			if (GUI_drawPage(userInterfaceButton, graphicLoaderState, 6))
+			if (GUI_drawPage(userInterfaceButton, graphicLoaderState, buttonsOnPage))
 			{
 				break;
 			}
@@ -204,11 +428,12 @@ void appManager()
 		{
 			if (graphicLoaderState == 0)
 			{
+				buttonsOnPage = CAPTURE_createCaptureBtns();
 				GUI_clearAppSpace();
 				graphicLoaderState++;
 				break;
 			}
-			if (GUI_drawPage(userInterfaceCaptureButton, graphicLoaderState, 15))
+			if (GUI_drawPage(userInterfaceCaptureButton, graphicLoaderState, buttonsOnPage))
 			{
 				break;
 			}
@@ -291,7 +516,7 @@ void appManager()
 		{
 			if (graphicLoaderState == 0)
 			{
-				createKeyboardButtons();
+				KEYINPUT_createKeyboardButtons();
 				graphicLoaderState++;
 				break;
 			}
@@ -308,7 +533,7 @@ void appManager()
 
 		if (results == 0xcc)
 		{
-			createUpperCaseButtons();
+			KEYINPUT_createUpperCaseButtons();
 			graphicLoaderState = 3;
 			while(GUI_drawPage(userKeyButtons, graphicLoaderState, 36));
 		}
@@ -359,7 +584,7 @@ void appManager()
 		{
 			if (graphicLoaderState == 0)
 			{
-				createNumPadButtons();
+				KEYINPUT_createNumpadButtons();
 				GUI_clearAppSpace();
 				graphicLoaderState++;
 				break;
@@ -673,11 +898,12 @@ void canSniff3()
 
 	CANFD_message_t msg;
 	
+	/*
 	if (!Can3.read(msg))
 	{
 		return;
 	}
-
+	*/
 	LED_pulse((RGB)LED_GREEN);
 
 	/*
@@ -760,171 +986,6 @@ void canSniff3()
 }
 
 
-// -------------------------------------------------------------
-void setup(void)
-{
-	Serial.begin(115200); // USB is always 12 or 480 Mbit/sec
-	//Serial2.begin(115200); // ESP8266
-
-	// Update time
-	setSyncProvider(getTeensy3Time);
-
-	//SPI2.begin();
-	//pinMode(2, OUTPUT);
-	//digitalWrite(2, 1);
-	//pinMode(3, OUTPUT);
-	//pinMode(4, OUTPUT);
-	//pinMode(5, OUTPUT);
-	//pinMode(6, OUTPUT);
-	//pinMode(7, OUTPUT);
-	//pinMode(8, OUTPUT);
-	//pinMode(16, OUTPUT);
-	//pinMode(17, OUTPUT);
-
-	// Unused pins on back
-	// 27 28 29 32 33
-	// 
-	// if removed LED
-	// 24, 25, 26
-
-	// SPI0 
-	// SCK0  13 // Orange
-	// MISO0 12 // Blue
-	// MOSI0 11 // White/Pink
-	// CS0   10 // Brown
-	 
-	// SPI1
-	// SCK1  27
-	// MISO1 1
-	// MOSI1 26
-	// CS1   0
-	
-	// SPI2  
-	// SCK2  37
-	// MISO2 34
-	// MOSI2 35
-	// CS2   36
-	
-	// Blue   - MISO
-	// White  - MOSI
-	// Orange - SCK
-	// Brown  - CS
-
-	LED_initialize();
-
-	LED_RGB((RGB)LED_RED);
-	delay(200);
-	LED_RGB((RGB)LED_OFF);
-
-	LED_RGB((RGB)LED_GREEN);
-	delay(200);
-	LED_RGB((RGB)LED_OFF);
-
-	LED_RGB((RGB)LED_BLUE);
-	delay(200);
-	LED_RGB((RGB)LED_OFF);
-
-	pinMode(LCD_BL, OUTPUT);
-	digitalWrite(LCD_BL, HIGH);
-
-	ts.begin(40);
-	display.begin();
-	display.fillScreen(ILI9488_BLACK);
-	display.setRotation(1);
-
-	//display.setFont(Arial_14);
-	//display.setFont(AwesomeF180_12);
-	display.setFont(Michroma_11);
-	//display.setFont(ComicSansMS_12);
-	//display.setFont(OpenSans12);
-	//display.setFont(Crystal_18_Italic);
-	//display.setFont(Michroma_12);
-
-	// 
-	GUI_drawSquareBtn(0, 0, 479, 319, "", themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
-	GUI_drawSquareBtn(0, 0, 480, 45, "", menuBackground, menuBackground, menuBackground, ALIGN_CENTER);
-	GUI_drawSquareBtn(0, 45, 480, 50, "", menuBorder, menuBorder, menuBorder, ALIGN_CENTER);
-	GUI_drawSquareBtn(160, 45, 260, 50, "", menuBtnColor, menuBtnColor, menuBtnColor, ALIGN_CENTER);
-
-	// Create button objects
-	createMenuBtns();
-
-	// Draw Menu
-	while (GUI_drawPage(userInterfaceMenuButton, graphicLoaderState, 3));
-	graphicLoaderState = 0;
-
-	Can1.begin();
-	Can1.setBaudRate(500000);
-	Can1.setMaxMB(16);
-	Can1.enableFIFO();
-	Can1.enableFIFOInterrupt();
-	Can1.onReceive(canSniff1);
-	Can1.mailboxStatus();
-
-	Can2.begin();
-	Can2.setBaudRate(500000);
-	Can2.setMaxMB(16);
-	Can2.enableFIFO();
-	Can2.enableFIFOInterrupt();
-	Can2.onReceive(canSniff2);
-	Can2.mailboxStatus();
-	Can2.disableFIFOInterrupt();
-
-	Can3.begin();
-	CANFD_timings_t config;
-	config.clock = CLK_60MHz;
-	config.baudrate = 500000;
-	config.baudrateFD = 5000000;
-	config.propdelay = 190;
-	config.bus_length = 1;
-	config.sample = 70;
-	Can3.setBaudRate(config);
-	Can3.setRegions(64);
-	//Can3.onReceive(canSniff3);
-
-	CAPTURE_createCaptureBtns();
-
-	// mandatory to begin the MTP session.
-	MTP.begin();
-
-	// open the file. note that only one file can be open at a time,
-	// so you have to close this one before opening another.
-	SD.begin(chipSelect);
-	MTP.addFilesystem(SD, "SD Card");
-	myFile = SD.open("a.txt", FILE_WRITE);
-
-	// if the file opened okay, write to it:
-	if (myFile) {
-		Serial.print("Writing to test.txt...");
-		myFile.println("testing 1, 2, 3.");
-		// close the file:
-		myFile.close();
-		Serial.println("done.");
-	}
-	else {
-		// if the file didn't open, print an error:
-		Serial.println("error opening a.txt");
-	}
-
-	// re-open the file for reading:
-	myFile = SD.open("a.txt");
-	if (myFile) {
-		Serial.println("a.txt:");
-
-		// read from the file until there's nothing else in it:
-		while (myFile.available()) {
-			Serial.write(myFile.read());
-		}
-		// close the file:
-		myFile.close();
-	}
-	else {
-		// if the file didn't open, print an error:
-		Serial.println("error opening a.txt");
-	}
-	pinMode(6, OUTPUT);
-	digitalWrite(6, LOW);
-}
 
 
 /*=========================================================
@@ -934,10 +995,10 @@ void setup(void)
 void backgroundProcess()
 {
 	GUI_buttonMonitor(userInterfaceMenuButton, MENU_BUTTON_SIZE);
-	//updateTime();
 	//serialOut();
 	//SDCardOut();
 	//timedTXSend();
+	BATTERY_printLevel();
 	updateTime();
 	canSniff3();
 	LED_strobe((RGB)LED_OFF);
@@ -948,19 +1009,20 @@ void backgroundProcess()
 void updateTime()
 {
 	static uint32_t updateClock = 0;
-	if (millis() - updateClock > 1000)
+	if (millis() - updateClock > 999)
 	{
+		display.setTextColor(menuBtnTextColor);
 		char printString[64];
 
 		display.setFont(Michroma_8);
 
-		display.fillRect(4, 8, 88, 27, menuBackground); // menuBackground
+		display.fillRect(59, 8, 88, 27, menuBackground); // menuBackground
 
 		sprintf(printString, "%2d:%2d:%2d", hour(), minute(), second());
-		display.drawString(printString, 5, 10);
+		display.drawString(printString, 60, 10);
 
 		sprintf(printString, "%2d/%2d/%2d", month(), day(), year());
-		display.drawString(printString, 5, 25);
+		display.drawString(printString, 60, 25);
 
 		display.setFont(Michroma_11);
 		updateClock = millis();
@@ -982,31 +1044,19 @@ void ILI9488_t3::scrollTextArea(uint8_t scrollSize) {
 	Main loop
 ===========================================================*/
 // Main loop runs the user interface and calls for background processes
-int i = 0;
 void loop(void)
 {
-	for (uint8_t i = 0; i < 50; i++)
-	{
-		appManager();
-		backgroundProcess();
-	}
-	
-	//Can1.events();
-	//Can2.events();
+	appManager();
+	backgroundProcess();
+
+	Can1.events();
+	Can2.events();
 	//Can3.events();
 
 	static uint32_t timeout123 = millis();
+	/*
 	if (millis() - timeout123 > 1000)
 	{
-		int temp1 = analogRead(A1);
-		Serial.printf("Battery: %3d\n", temp1);
-
-		display.setTextColor(menuBtnText);
-		display.fillRect(99, 17, 42, 14, menuBackground); //menuBackground
-		display.setFont(Michroma_8);
-		display.drawString(BATTERY_batteryLevel(temp1), 100, 20);
-		display.setFont(Michroma_11);
-
 		CANFD_message_t msg;
 		msg.id = 0x4CA;
 		msg.len = 64;
@@ -1014,17 +1064,25 @@ void loop(void)
 		Can3.write(msg);
 		timeout123 = millis();
 	}
-
-	/*
+	*/
+	
+	
 	if (millis() - timeout123 > 2000)
 	{
+		/*
 		CAN_message_t msg;
-		msg.id = 1;
-		for (uint8_t i = 0; i < 8; i++) msg.buf[i] = i + 1;
+		msg.id = 0x654;
+		msg.len = 8;
+		for (uint8_t i = 0; i < 8; i++) msg.buf[i] = i + 0x25;
 		Can1.write(msg);
-		msg.id = 2;
-		Can2.write(msg);
+		delay(10);
+		*/
+		CAN_message_t msg2;
+		msg2.id = 0x654;
+		msg2.len = 8;
+		for (uint8_t i = 0; i < 8; i++) msg2.buf[i] = i + 0x25;
+		Can2.write(msg2);
 		timeout123 = millis();
 	}
-	*/
+	
 }

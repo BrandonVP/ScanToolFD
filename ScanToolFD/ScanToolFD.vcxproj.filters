@@ -59,15 +59,6 @@
     <ClInclude Include="ILI9341_fonts.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ili9488_t3_font_Arial.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ili9488_t3_font_ArialBold.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ili9488_t3_font_ComicSansMS.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\..\AppData\Local\arduino15\packages\teensy\hardware\avr\1.58.1\libraries\ILI9488_t3\src\font_Michroma.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -75,6 +66,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\TPMS_Tool\TPMS_Tool\batteryMonitor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\AppData\Local\Arduino15\packages\teensy\hardware\avr\1.58.1\libraries\ILI9488_t3\src\ili9488_t3_font_Arial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -100,15 +94,6 @@
     <ClCompile Include="KeyInput.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ili9488_t3_font_Arial.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ili9488_t3_font_ArialBold.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ili9488_t3_font_ComicSansMS.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\AppData\Local\arduino15\packages\teensy\hardware\avr\1.58.1\libraries\ILI9488_t3\src\font_Michroma.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -117,6 +102,9 @@
     </ClCompile>
     <ClCompile Include="ScanToolFD.ino" />
     <ClCompile Include="..\..\TPMS_Tool\TPMS_Tool\batteryMonitor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\AppData\Local\Arduino15\packages\teensy\hardware\avr\1.58.1\libraries\ILI9488_t3\src\ili9488_t3_font_Arial.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
