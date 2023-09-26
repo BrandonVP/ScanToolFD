@@ -52,6 +52,7 @@
 #include "gui.h"
 #include "KeyInput.h"
 #include "batteryMonitor.h"
+#include "appManager.h"
 
 #include "ili9488_t3_font_Arial.h"
 //#include "ili9488_t3_font_ComicSansMS.h"
@@ -88,6 +89,8 @@ uint16_t LCDPos = 60;
 // Use to load pages in pieces to prevent blocking while loading entire page
 uint8_t graphicLoaderState = 0;
 uint8_t buttonsOnPage = 0;
+
+std::vector<appManager> myApps;
 
 // *Used by background process*
 //uint8_t selectedChannelOut = 0;
@@ -384,11 +387,13 @@ void setup(void)
 	digitalWrite(6, LOW);
 
 	print_icon(5, 5, battery_bits, 32, 4, menuBtnTextColor, 1);
+	appManager appObj1(&CAPTURE_createCaptureBtns, &CAPTURE_captureConfig);
+	myApps.push_back(appObj1);
 }
 
 
 // Manages the loading and unloading of different user Apps
-void appManager()
+void appManager1()
 {
 	int results = 0;
 	//error_t e = 0;
@@ -441,7 +446,8 @@ void appManager()
 		}
 
 		// Call buttons or page method
-		CAPTURE_captureConfig();
+		//CAPTURE_captureConfig();
+		myApps[0].runApp();
 
 		// Release any variable locks if page changed
 		if (nextApp != app)
@@ -1046,7 +1052,7 @@ void ILI9488_t3::scrollTextArea(uint8_t scrollSize) {
 // Main loop runs the user interface and calls for background processes
 void loop(void)
 {
-	appManager();
+	appManager1();
 	backgroundProcess();
 
 	Can1.events();

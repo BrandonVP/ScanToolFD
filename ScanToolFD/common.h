@@ -14,7 +14,8 @@
 //#include "KeyInput.h"
 #include <FlexCAN_T4.h>
 #include "config.h"
-#include "font_Michroma.h";
+#include "font_Michroma.h"
+#include <vector>
 
 extern uint8_t CANBusOut;
 extern uint8_t CANBusIn;

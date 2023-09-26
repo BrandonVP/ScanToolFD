@@ -65,10 +65,13 @@
     <ClInclude Include="RGB_LED.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\TPMS_Tool\TPMS_Tool\batteryMonitor.h">
+    <ClInclude Include="..\..\..\..\AppData\Local\Arduino15\packages\teensy\hardware\avr\1.58.1\libraries\ILI9488_t3\src\ili9488_t3_font_Arial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\AppData\Local\Arduino15\packages\teensy\hardware\avr\1.58.1\libraries\ILI9488_t3\src\ili9488_t3_font_Arial.h">
+    <ClInclude Include="batteryMonitor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="appManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -101,10 +104,13 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ScanToolFD.ino" />
-    <ClCompile Include="..\..\TPMS_Tool\TPMS_Tool\batteryMonitor.cpp">
+    <ClCompile Include="..\..\..\..\AppData\Local\Arduino15\packages\teensy\hardware\avr\1.58.1\libraries\ILI9488_t3\src\ili9488_t3_font_Arial.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\AppData\Local\Arduino15\packages\teensy\hardware\avr\1.58.1\libraries\ILI9488_t3\src\ili9488_t3_font_Arial.c">
+    <ClCompile Include="batteryMonitor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="appManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

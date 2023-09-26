@@ -9,6 +9,7 @@
 
 #include "gui.h"
 #include "common.h"
+#include <vector>
 
 #ifndef _USERINTERFACE_h
 #define _USERINTERFACE_h
@@ -39,6 +40,19 @@ class UserInterfaceClass
 	 /* |      7      |      6      |   5   |   4   |   3   |   2   |   1   |   0   | */
 	 /* |   isRound   | isClickable |       |       |       |       |       |       | */
 	 uint8_t btnSettings = 0;
+	
+	 enum assignedBtnSettings {
+		 iSettings_unused0 = 0,
+		 iSettings_unused1,
+		 iSettings_unused2,
+		 iSettings_unused3,
+		 iSettings_unused4,
+		 iSettings_unused5,
+		 iSettings_isClickable,
+		 iSettings_isRound
+	 };
+	 std::vector<bool> btnSettings1 = { true, true, true, true, true, true, true, true };
+
 
  public:
 	void init();
