@@ -387,8 +387,12 @@ void setup(void)
 	digitalWrite(6, LOW);
 
 	print_icon(5, 5, battery_bits, 32, 4, menuBtnTextColor, 1);
-	appManager appObj1(&CAPTURE_createCaptureBtns, &CAPTURE_captureConfig);
-	myApps.push_back(appObj1);
+
+
+
+	appManager appObj1(CAPTURE_captureConfig, CAPTURE_createCaptureBtns);
+	//appManager appObj1(CAPTURE_createCaptureBtns, &CAPTURE_captureConfig);
+	//myApps.push_back(appObj1);
 }
 
 
@@ -447,7 +451,7 @@ void appManager1()
 
 		// Call buttons or page method
 		//CAPTURE_captureConfig();
-		myApps[0].runApp();
+		//myApps[0].runApp();
 
 		// Release any variable locks if page changed
 		if (nextApp != app)

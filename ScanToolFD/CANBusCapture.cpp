@@ -52,9 +52,9 @@ uint8_t CAPTURE_createCaptureBtns()
 	return btnPos;
 }
 
-void CAPTURE_captureConfig()
+void CAPTURE_captureConfig(int userInput)
 {
-	int userInput = GUI_subMenuButtonMonitor(userInterfaceCaptureButton, 15);
+	//int userInput = GUI_subMenuButtonMonitor(userInterfaceCaptureButton, 15);
 	if (userInput > -1 && (userInput < 9))
 	{
 		if (CAPTURE_input_config != userInput)

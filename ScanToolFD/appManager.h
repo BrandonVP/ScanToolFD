@@ -1,17 +1,18 @@
 #pragma once
+#include "common.h"
 class appManager
 {
 private:
-	void (*printBtnPtr)(void);
-	//void* (*f)(void*)
+	void (*runAppPtr)(int);
+	uint8_t(*printBtnPtr)(void);
 	void (*runAnimationsPtr)(void);
-	void (*runAppPtr)(void);
+	
 	void (*callBackPtr)(void);
 public:
 	appManager(void* printFunc, void* animationFunc, void* appFunc, void* cbFunc);
 	appManager(void* printFunc, void* appFunc, void* cbFunc);
-	appManager(void* printFunc, void* appFunc);
-	void printButtons();
-	void runApp();
+	appManager(void (*appFunc)(int), uint8_t(*printFunc)(void));
+	uint8_t printButtons();
+	void runApp(int userInput);
 };
 

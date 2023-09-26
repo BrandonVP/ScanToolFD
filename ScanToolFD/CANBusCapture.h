@@ -16,6 +16,9 @@
 #define APP_CAPTURE_FILTERMASK 6
 #define APP_CAPTURE_AUTOBAUD 7
 
+#define CAPTURE_START_POS 13
+#define CAPTURE_STOP_POS 14
+
 #ifndef _CANBUSCAPTURE_h
 #define _CANBUSCAPTURE_h
 
@@ -29,15 +32,14 @@
 
 #include "common.h"
 
-#define CAPTURE_START_POS 13
-#define CAPTURE_STOP_POS 14
+
 
 uint8_t CAPTURE_input_config = 0;
 uint8_t CAPTURE_output_config = 0;
 
 uint8_t CAPTURE_createMenuBtns();
 uint8_t CAPTURE_createCaptureBtns();
-void CAPTURE_captureConfig();
+void CAPTURE_captureConfig(int userInput);
 
 #else
 
@@ -46,7 +48,7 @@ extern uint8_t CAPTURE_output_config;
 
 uint8_t CAPTURE_createMenuBtns();
 uint8_t CAPTURE_createCaptureBtns();
-void CAPTURE_captureConfig();
+void CAPTURE_captureConfig(int userInput);
 void CAPTURE_createLCDBtns();
 void CAPTURE_createBaudBtns();
 
