@@ -25,8 +25,6 @@
 // For touch controls
 int x, y;
 
-uint8_t nextApp = 0;
-uint8_t app = 0;
 
 extern UserInterfaceClass userInterfaceButtons[40];
 extern uint8_t buttonsOnPage;
@@ -40,7 +38,7 @@ void GUI_drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String b
 void GUI_drawSquareBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int align);
 void GUI_waitForIt(int x_start, int y_start, int x_stop, int y_stop, int radius, int borderC, int clickBorderC);
 void GUI_waitForItRect(int x_start, int y_start, int x_stop, int y_stop, int radius, int borderC, int clickBorderC);
-void GUI_buttonMonitor(UserInterfaceClass* buttons, uint8_t size);
+void GUI_buttonMonitor(UserInterfaceClass* buttons, uint16_t size);
 int GUI_subMenuButtonMonitor(UserInterfaceClass* buttons, uint8_t size);
 bool GUI_drawPage(UserInterfaceClass* buttons, uint8_t& pos, uint8_t buttonsToPrint);
 void GUI_clearAppSpace();
@@ -52,15 +50,14 @@ void GUI_sideLoadBarTimed(void);
 #else
 
 extern int x, y;
-extern uint8_t nextApp;
-extern uint8_t app;
+
 
 bool GUI_Touch_getXY();
 void GUI_drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int align, int radius);
 void GUI_drawSquareBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int align);
 void GUI_waitForIt(int x_start, int y_start, int x_stop, int y_stop, int radius, int borderC, int clickBorderC);
 void GUI_waitForItRect(int x_start, int y_start, int x_stop, int y_stop, int radius, int borderC, int clickBorderC);
-void GUI_buttonMonitor(UserInterfaceClass* buttons, uint8_t size);
+void GUI_buttonMonitor(UserInterfaceClass* buttons, uint16_t size);
 int GUI_subMenuButtonMonitor(UserInterfaceClass* buttons, uint8_t size);
 bool GUI_drawPage(UserInterfaceClass* buttons, uint8_t& pos, uint8_t buttonsToPrint);
 void GUI_clearAppSpace(void);

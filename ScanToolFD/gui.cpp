@@ -10,6 +10,8 @@
 #define _GUI_C
 #include "gui.h"
 
+
+
  // Local load bar variables
 static uint16_t loadBarIndex = 471; // ends at 470
 static uint32_t loadBarTimer = 0;
@@ -147,7 +149,7 @@ void GUI_waitForItRect(int x_start, int y_start, int x_stop, int y_stop, int rad
 }
 
 //
-void GUI_buttonMonitor(UserInterfaceClass* buttons, uint8_t size)
+void GUI_buttonMonitor(UserInterfaceClass* buttons, uint16_t size)
 {
     if (GUI_Touch_getXY())
     {

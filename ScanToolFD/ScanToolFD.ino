@@ -10,7 +10,7 @@
  /*=========================================================
 	 Todo List
  ===========================================================
-	//userInterfaceMenuButton[menuPosition++].setButton(5, 88, 125, 140, false, VEHTOOL_MAIN, (void*)testf);
+
 
  ===========================================================
 	 End Todo List
@@ -34,25 +34,23 @@
 
 #include <MTP_Teensy.h>
 #include <TimeLib.h>
-#include "RGB_LED.h"
 #include <FlexCAN_T4.h>
-
-#include "KeyInput.h"
-#include "serialTransfer.h"
 #include <SPI.h>
 #include <SD.h>
 #include <Wire.h>
 #include <Adafruit_FT6206.h> // Touch
 #include <ILI9488_t3.h>      // Display
 
+#include "appManager.h"
+#include "batteryMonitor.h"
 #include "CANBusCapture.h"
 #include "CANBus.h"
-#include "variableLock.h"
 #include "config.h"
 #include "gui.h"
 #include "KeyInput.h"
-#include "batteryMonitor.h"
-#include "appManager.h"
+#include "RGB_LED.h"
+#include "serialTransfer.h"
+#include "variableLock.h"
 
 #include "ili9488_t3_font_Arial.h"
 //#include "ili9488_t3_font_ComicSansMS.h"
@@ -78,6 +76,9 @@ Adafruit_FT6206 ts = Adafruit_FT6206();
 #define SCREEN_WIDTH 480
 #define SCREEN_HEIGHT 320
 
+APP_labels nextApp = APP_CANBUS;
+APP_labels activeApp = APP_CANBUS;
+
 // Used for page control
 bool hasDrawn = false;
 
@@ -91,19 +92,6 @@ uint8_t graphicLoaderState = 0;
 uint8_t buttonsOnPage = 0;
 
 std::vector<appManager> myApps;
-
-// *Used by background process*
-//uint8_t selectedChannelOut = 0;
-//uint8_t selectedSourceOut = 0;
-//uint32_t updateClock = 0;
-//bool isSerialOut = false;
-//bool isSDOut = false;
-//bool isMSGSpam = false;
-
-// General use variables
-//uint8_t state = 0;
-
-
 
 UserInterfaceClass userInterfaceButton[APP_BUTTON_SIZE];
 UserInterfaceClass userInterfaceCaptureButton[CAPTURE_BUTTON_SIZE];
@@ -181,7 +169,9 @@ void appTransition()
 {
 	hasDrawn = false;
 	graphicLoaderState = 0;
-	app = nextApp;
+	activeApp = nextApp;
+	GUI_stopLoadBarTimed();
+	display.useFrameBuffer(true);
 }
 
 void createCANBusBaudBtns()
@@ -193,7 +183,7 @@ void createCANBusBaudBtns()
 	userInterfaceButton[btnPos++].setButton(305, 150, 475, 190, 0, true, F("CAN1"), ALIGN_CENTER);
 }
 
-void createToolBtns()
+uint8_t createToolBtns()
 {
 	uint8_t btnPos = 0;
 	userInterfaceButton[btnPos++].setButton(55, 80, 220, 120, 1, true, F("PID Scan"), ALIGN_CENTER);
@@ -204,9 +194,10 @@ void createToolBtns()
 	userInterfaceButton[btnPos++].setButton(260, 200, 425, 240, 0, true, F("Gauges"), ALIGN_CENTER);
 	userInterfaceButton[btnPos++].setButton(55, 260, 220, 300, 0, true, F("TX Spam"), ALIGN_CENTER);
 	userInterfaceButton[btnPos++].setButton(260, 260, 425, 300, 0, true, F(""), ALIGN_CENTER);
+	return btnPos;
 }
 
-void createSettingsBtns()
+uint8_t createSettingsBtns()
 {
 	uint8_t btnPos = 0;
 	userInterfaceButton[btnPos++].setButton(55, 80, 220, 120, 1, true, F("Memory"), ALIGN_CENTER);
@@ -217,6 +208,7 @@ void createSettingsBtns()
 	userInterfaceButton[btnPos++].setButton(260, 200, 425, 240, 0, true, F("Set Time"), ALIGN_CENTER);
 	userInterfaceButton[btnPos++].setButton(55, 260, 220, 300, 0, true, F("Dongle"), ALIGN_CENTER);
 	userInterfaceButton[btnPos++].setButton(260, 260, 425, 300, 0, true, F("Reset"), ALIGN_CENTER);
+	return btnPos;
 }
 
 // -------------------------------------------------------------
@@ -288,6 +280,7 @@ void setup(void)
 
 	ts.begin(40);
 	display.begin();
+	display.useFrameBuffer(true);
 	display.fillScreen(ILI9488_BLACK);
 	display.setRotation(1);
 
@@ -351,6 +344,7 @@ void setup(void)
 	// open the file. note that only one file can be open at a time,
 	// so you have to close this one before opening another.
 	SD.begin(chipSelect);
+	/*
 	MTP.addFilesystem(SD, "SD Card");
 	myFile = SD.open("a.txt", FILE_WRITE);
 
@@ -383,28 +377,83 @@ void setup(void)
 		// if the file didn't open, print an error:
 		Serial.println("error opening a.txt");
 	}
+	*/
 	pinMode(6, OUTPUT);
 	digitalWrite(6, LOW);
 
 	print_icon(5, 5, battery_bits, 32, 4, menuBtnTextColor, 1);
 
 
+	myApps.reserve(15);
+	appManager appObj0(MENU_canBus,   "CAN Bus",  APP_CANBUS,   CAPTURE_CANBus, CAPTURE_createMenuBtns);
+	myApps.push_back(appObj0);
+	appManager appObj1(MENU_tools,    "Tools",    APP_TOOLS,    someFn, createToolBtns);
+	myApps.push_back(appObj1);
+	appManager appObj2(MENU_settings, "Settings", APP_SETTINGS, someFn, createSettingsBtns);
+	myApps.push_back(appObj2);
+	appManager appObj3(MENU_canBus,   "Capture",  APP_CAPTURE, CAPTURE_captureConfig, CAPTURE_createCaptureBtns);
+	myApps.push_back(appObj3);
+	appManager appObj4(MENU_canBus,   "Files",    APP_FILES,    someFn, KEYINPUT_createKeyboardButtons);
+	myApps.push_back(appObj4);
+	myApps.insert((myApps.begin() + 3), appObj4);
 
-	appManager appObj1(CAPTURE_captureConfig, CAPTURE_createCaptureBtns);
-	//appManager appObj1(CAPTURE_createCaptureBtns, &CAPTURE_captureConfig);
-	//myApps.push_back(appObj1);
 }
 
+void someFn(int useless)
+{
 
+}
+
+void CAPTURE_CANBus(int userInput)
+{
+	if (userInput >= 0)
+	{
+		nextApp = (APP_labels)userInput;
+	}
+}
+
+void appLoader()
+{
+	// Draw page and lock variables
+	if (!hasDrawn)
+	{
+		if (graphicLoaderState == 0)
+		{
+			buttonsOnPage = myApps[(int)activeApp].printButtons();
+			GUI_clearAppSpace();
+			graphicLoaderState++;
+			return;
+		}
+		if (GUI_drawPage(userInterfaceButton, graphicLoaderState, buttonsOnPage))
+		{
+			return;
+		}
+		Serial.printf("App: %d\n", (int)activeApp);
+		Serial.println(myApps[(int)activeApp].getName());
+		hasDrawn = true;
+		display.updateScreen();
+	}
+
+	// Call buttons or page method
+	myApps[activeApp].runApp(GUI_subMenuButtonMonitor(userInterfaceButton, buttonsOnPage));
+
+	// Release any variable locks if page changed
+	if (nextApp != activeApp)
+	{
+		appTransition();
+	}
+}
+
+/*
 // Manages the loading and unloading of different user Apps
 void appManager1()
 {
 	int results = 0;
 	//error_t e = 0;
 
-	switch (app)
+	switch (activeApp)
 	{
-	case APP_CANBUS_TOOLS: /*========== CANBUS ==========*/
+	case APP_CANBUS_TOOLS: 
 		// Draw page and lock variables
 		if (!hasDrawn)
 		{
@@ -426,7 +475,7 @@ void appManager1()
 		GUI_buttonMonitor(userInterfaceButton, 6);
 
 		// Release any variable locks if page changed
-		if (nextApp != app)
+		if (nextApp != activeApp)
 		{
 			appTransition();
 		}
@@ -437,7 +486,7 @@ void appManager1()
 		{
 			if (graphicLoaderState == 0)
 			{
-				buttonsOnPage = CAPTURE_createCaptureBtns();
+				buttonsOnPage = myApps[0].printButtons();
 				GUI_clearAppSpace();
 				graphicLoaderState++;
 				break;
@@ -451,10 +500,10 @@ void appManager1()
 
 		// Call buttons or page method
 		//CAPTURE_captureConfig();
-		//myApps[0].runApp();
+		myApps[0].runApp(1);
 
 		// Release any variable locks if page changed
-		if (nextApp != app)
+		if (nextApp != activeApp)
 		{
 			appTransition();
 		}
@@ -509,7 +558,7 @@ void appManager1()
 		}
 
 		// Release any variable locks if page changed
-		if (nextApp != app)
+		if (nextApp != activeApp)
 		{
 			if (CANBusOut == 9)
 			{
@@ -556,7 +605,7 @@ void appManager1()
 		}
 
 		// Release any variable locks if page changed
-		if (nextApp != app)
+		if (nextApp != activeApp)
 		{
 			appTransition();
 		}
@@ -583,7 +632,7 @@ void appManager1()
 		GUI_subMenuButtonMonitor(userInterfaceButton, 21);
 
 		// Release any variable locks if page changed
-		if (nextApp != app)
+		if (nextApp != activeApp)
 		{
 			appTransition();
 		}
@@ -610,7 +659,7 @@ void appManager1()
 		GUI_subMenuButtonMonitor(userKeyButtons, 21);
 
 		// Release any variable locks if page changed
-		if (nextApp != app)
+		if (nextApp != activeApp)
 		{
 			appTransition();
 		}
@@ -637,7 +686,7 @@ void appManager1()
 		GUI_subMenuButtonMonitor(userInterfaceButton, 20);
 
 		// Release any variable locks if page changed
-		if (nextApp != app)
+		if (nextApp != activeApp)
 		{
 			appTransition();
 		}
@@ -668,7 +717,7 @@ void appManager1()
 		GUI_subMenuButtonMonitor(userInterfaceButton, 20);
 
 		// Release any variable locks if page changed
-		if (nextApp != app)
+		if (nextApp != activeApp)
 		{
 			appTransition();
 		}
@@ -695,7 +744,7 @@ void appManager1()
 
 
 		// Release any variable locks if page changed
-		if (nextApp != app)
+		if (nextApp != activeApp)
 		{
 			appTransition();
 		}
@@ -717,7 +766,7 @@ void appManager1()
 			}
 			hasDrawn = true;
 
-			/*
+			
 			display.fillScreen(ILI9488_BLACK);
 			display.setTextColor(ILI9488_WHITE);  display.setTextSize(4);
 			display.enableScroll();
@@ -755,7 +804,7 @@ void appManager1()
 			delay(4000);
 			nextPage = 0;
 
-			*/
+			
 
 
 		}
@@ -764,13 +813,14 @@ void appManager1()
 
 
 		// Release any variable locks if page changed
-		if (nextApp != app)
+		if (nextApp != activeApp)
 		{
 			appTransition();
 		}
 		break;
 	}
 }
+*/
 
 //
 void createMenuBtns()
@@ -778,9 +828,9 @@ void createMenuBtns()
 	// Create Menu Buttons
 	uint8_t menuPosition = 0;
 
-	userInterfaceMenuButton[menuPosition++].setButton(160, 0, 260, 40, CANBUS_MAIN, true, 0, F("CAN Bus"), ALIGN_CENTER, menuBackground, menuBackground, menuBtnTextColor);
-	userInterfaceMenuButton[menuPosition++].setButton(270, 0, 370, 40, VEHTOOL_MAIN, true, 0, F("Tools"), ALIGN_CENTER, menuBackground, menuBackground, menuBtnTextColor);
-	userInterfaceMenuButton[menuPosition++].setButton(375, 0, 475, 40, SETTING_MAIN, true, 0, F("Settings"), ALIGN_CENTER, menuBackground, menuBackground, menuBtnTextColor);
+	userInterfaceMenuButton[menuPosition++].setButton(160, 0, 260, 40, APP_CANBUS, true, 0, F("CAN Bus"), ALIGN_CENTER, menuBackground, menuBackground, menuBtnTextColor);
+	userInterfaceMenuButton[menuPosition++].setButton(270, 0, 370, 40, APP_TOOLS, true, 0, F("Tools"), ALIGN_CENTER, menuBackground, menuBackground, menuBtnTextColor);
+	userInterfaceMenuButton[menuPosition++].setButton(375, 0, 475, 40, APP_SETTINGS, true, 0, F("Settings"), ALIGN_CENTER, menuBackground, menuBackground, menuBtnTextColor);
 }
 
 
@@ -790,7 +840,7 @@ void canSniff1(const CAN_message_t& msg)
 	{
 		Serial.printf("%8d    %9d    %04X   %d   %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\r\n", ++messageNum, millis(), msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
 	}
-	else if ((CANBusOut == 9) && (CANBusIn == 4) && (app == APP_CAPTURE_LCD))
+	else if ((CANBusOut == 9) && (CANBusIn == 4) && (activeApp == APP_CAPTURE_LCD))
 	{
 		if (LCDPos == 60)
 		{
@@ -847,7 +897,7 @@ void canSniff2(const CAN_message_t& msg)
 	{
 		Serial.printf("%8d    %9d    %04X   %d   %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\r\n", ++messageNum, millis(), msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
 	}
-	else if ((CANBusOut == 9) && (CANBusIn == 5) && (app == APP_CAPTURE_LCD))
+	else if ((CANBusOut == 9) && (CANBusIn == 5) && (activeApp == APP_CAPTURE_LCD))
 	{
 		if (LCDPos == 60)
 		{
@@ -945,7 +995,7 @@ void canSniff3()
 		}
 		Serial.println();
 	}
-	else if ((CANBusOut == 9) && (app == APP_CAPTURE_LCD))
+	else if ((CANBusOut == 9) && (activeApp == APP_CAPTURE_LCD))
 	{
 		if (LCDPos == 60)
 		{
@@ -1056,7 +1106,8 @@ void ILI9488_t3::scrollTextArea(uint8_t scrollSize) {
 // Main loop runs the user interface and calls for background processes
 void loop(void)
 {
-	appManager1();
+	appLoader();
+	//appManager1();
 	backgroundProcess();
 
 	Can1.events();

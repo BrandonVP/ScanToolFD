@@ -1,6 +1,32 @@
 #pragma once
 #include <cstdint>
 
+enum APP_labels {
+	APP_CANBUS = 0,
+	APP_TOOLS,
+	APP_SETTINGS,
+	APP_CAPTURE,
+	APP_FILES,
+	APP_FILTER_MASK,
+	APP_SEND,
+	APP_BAUD_RATE,
+	APP_GET_VIN,
+	APP_OBD_SIM,
+	APP_TX_SPAM,
+	APP_PID_SCAN,
+	APP_PID_STREAM,
+	APP_DTC,
+	APP_GAUGES
+};
+
+extern APP_labels nextApp;
+extern APP_labels activeApp;
+
+enum menus {
+	MENU_canBus = 0,
+	MENU_tools,
+	MENU_settings
+};
 
 #define LCD_BL 14
 #define LCD_RST 15

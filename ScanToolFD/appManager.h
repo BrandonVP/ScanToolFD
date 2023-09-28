@@ -1,18 +1,41 @@
+/*
+ ===========================================================================
+ Name        : appManager.h
+ Author      : Brandon Van Pelt
+ Created	 : 9/26/2023
+ Description : Holds App objects for loading and unloading Apps
+ ===========================================================================
+ */
+
 #pragma once
 #include "common.h"
+#include "config.h"
+
 class appManager
 {
 private:
+	menus assignedMenu;
+	String descriptiveName;
+	APP_labels appLabel;
 	void (*runAppPtr)(int);
-	uint8_t(*printBtnPtr)(void);
+	uint8_t (*printBtnPtr)(void);
 	void (*runAnimationsPtr)(void);
-	
 	void (*callBackPtr)(void);
 public:
-	appManager(void* printFunc, void* animationFunc, void* appFunc, void* cbFunc);
-	appManager(void* printFunc, void* appFunc, void* cbFunc);
-	appManager(void (*appFunc)(int), uint8_t(*printFunc)(void));
+	appManager(menus menuLocation, String descriptiveTxt, APP_labels label, void (*appFunc)(int), uint8_t(*printFunc)(void), void (*animationFunc)(void), void (*CBFunc)(void));
+	appManager(menus menuLocation, String descriptiveTxt, APP_labels label, void (*appFunc)(int), uint8_t(*printFunc)(void), void (*animationFunc)(void));
+	appManager(menus menuLocation, String descriptiveTxt, APP_labels label, void (*appFunc)(int), uint8_t(*printFunc)(void));
 	uint8_t printButtons();
+	bool isPrintButtonsNULL();
 	void runApp(int userInput);
+	bool isAppNULL();
+	void runAnimations();
+	bool isAnimationsNULL();
+	void executeCB();
+	bool isExecuteCBNULL();
+	menus getAssignedMenu();
+	String getName();
+	APP_labels getAppLabel();
 };
+
 

@@ -10,12 +10,7 @@
 #include "userInterface.h"
 #include "config.h"
 
-void UserInterfaceClass::init()
-{
-
-}
-
-void UserInterfaceClass::setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint8_t clickReturn, bool isRound, String btnText)
+void UserInterfaceClass::setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint16_t clickReturn, bool isRound, String btnText)
 {
 	this->xStart = xStart;
 	this->xStop = xStop;
@@ -33,7 +28,7 @@ void UserInterfaceClass::setButton(uint16_t xStart, uint16_t yStart, uint16_t xS
 	this->textColor = menuBtnText;
 }
 
-void UserInterfaceClass::setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint8_t clickReturn, bool isRound, String btnText, uint8_t alignText)
+void UserInterfaceClass::setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint16_t clickReturn, bool isRound, String btnText, uint8_t alignText)
 {
 	this->xStart = xStart;
 	this->xStop = xStop;
@@ -51,7 +46,7 @@ void UserInterfaceClass::setButton(uint16_t xStart, uint16_t yStart, uint16_t xS
 	this->textColor = menuBtnText;
 }
 
-void UserInterfaceClass::setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint8_t clickReturn, bool isRound, uint8_t radius, String btnText, uint8_t alignText, uint16_t btnC, uint16_t borderC, uint16_t textC)
+void UserInterfaceClass::setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint16_t clickReturn, bool isRound, uint8_t radius, String btnText, uint8_t alignText, uint16_t btnC, uint16_t borderC, uint16_t textC)
 {
 	this->xStart = xStart;
 	this->xStop = xStop;
@@ -69,7 +64,7 @@ void UserInterfaceClass::setButton(uint16_t xStart, uint16_t yStart, uint16_t xS
 	this->textColor = textC;
 }
 
-void UserInterfaceClass::setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint8_t clickReturn, bool isRound, uint8_t radius, String btnText, uint8_t alignText, uint16_t btnC, uint16_t borderC, uint16_t clickBorderC, uint16_t textC)
+void UserInterfaceClass::setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint16_t clickReturn, bool isRound, uint8_t radius, String btnText, uint8_t alignText, uint16_t btnC, uint16_t borderC, uint16_t clickBorderC, uint16_t textC)
 {
 	this->xStart = xStart;
 	this->xStop = xStop;
@@ -91,11 +86,11 @@ void UserInterfaceClass::setShape(uint8_t isRound)
 {
 	if (isRound)
 	{
-		btnSettings |= (1 << IS_ROUND_POSITION);
+		btnSettings |= (1 << Settings_isRound);
 	}
 	else
 	{
-		btnSettings &= ~(1 << IS_ROUND_POSITION);
+		btnSettings &= ~(1 << Settings_isRound);
 	}
 }
 
@@ -103,11 +98,11 @@ void UserInterfaceClass::setClickable(uint8_t isClickable)
 {
 	if (isClickable)
 	{
-		btnSettings |= (1 << IS_CLICKABLE_POSITION);
+		btnSettings |= (1 << Settings_isClickable);
 	}
 	else
 	{
-		btnSettings &= ~(1 << IS_CLICKABLE_POSITION);
+		btnSettings &= ~(1 << Settings_isClickable);
 	}
 }
 
@@ -132,6 +127,12 @@ void UserInterfaceClass::setClickBorderColor(uint16_t color)
 void UserInterfaceClass::setTextColor(uint16_t color)
 {
 	this->textColor = color;
+
+}
+
+void UserInterfaceClass::setTextSize(uint8_t size)
+{
+	this->textSize = size;
 
 }
 
@@ -163,14 +164,14 @@ uint8_t UserInterfaceClass::getClickReturn()
 bool UserInterfaceClass::getIsRound()
 {
 	bool isRound;
-	(CHECK_BIT(this->btnSettings, IS_ROUND_POSITION)) ? isRound = true : isRound = false;
+	(CHECK_BIT(this->btnSettings, Settings_isRound)) ? isRound = true : isRound = false;
 	return isRound;
 }
 
 bool UserInterfaceClass::getIsClickable()
 {
 	bool isClickable;
-	(CHECK_BIT(this->btnSettings, IS_CLICKABLE_POSITION)) ? isClickable = true : isClickable = false;
+	(CHECK_BIT(this->btnSettings, Settings_isClickable)) ? isClickable = true : isClickable = false;
 	return isClickable;
 }
 
@@ -210,3 +211,8 @@ uint16_t UserInterfaceClass::getTextColor()
 }
 UserInterfaceClass UserInterface;
 
+uint8_t UserInterfaceClass::getTextSize()
+{
+	return this->textSize;
+
+}

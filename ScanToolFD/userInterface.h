@@ -14,12 +14,9 @@
 #ifndef _USERINTERFACE_h
 #define _USERINTERFACE_h
 
-#define IS_ROUND_POSITION 7
-#define IS_CLICKABLE_POSITION 6
-
 class UserInterfaceClass
 {
- protected:
+ private:
 	 // Coordinates
 	 uint16_t xStart = 0;
 	 uint16_t xStop = 0;
@@ -31,42 +28,39 @@ class UserInterfaceClass
 	 uint16_t borderColor = 0;
 	 uint16_t clickBorderColor = 0;
 	 uint16_t textColor = 0;
+	 uint8_t textSize = 11;
 
 	 String btnText;
 	 uint8_t roundBtnRadius = 20;
 	 uint8_t align = 1;
-	 uint8_t clickReturn = 0;
-	 // Boolean Button Settings
-	 /* |      7      |      6      |   5   |   4   |   3   |   2   |   1   |   0   | */
-	 /* |   isRound   | isClickable |       |       |       |       |       |       | */
+	 uint16_t clickReturn = 0;
+
 	 uint8_t btnSettings = 0;
-	
 	 enum assignedBtnSettings {
-		 iSettings_unused0 = 0,
-		 iSettings_unused1,
-		 iSettings_unused2,
-		 iSettings_unused3,
-		 iSettings_unused4,
-		 iSettings_unused5,
-		 iSettings_isClickable,
-		 iSettings_isRound
+		 Settings_isClickable = 0,
+		 Settings_isRound,
+		 Settings_unused1,
+		 Settings_unused2,
+		 Settings_unused3,
+		 Settings_unused4,
+		 Settings_unused5,
+		 Settings_unused6
 	 };
-	 std::vector<bool> btnSettings1 = { true, true, true, true, true, true, true, true };
 
 
  public:
-	void init();
-	void setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint8_t clickReturn, bool isRound, String btnText);
-	void setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint8_t clickReturn, bool isRound, String btnText, uint8_t alignText);
-	void setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint8_t clickReturn, bool isRound, uint8_t radius, String btnText, uint8_t alignText, uint16_t btnC, uint16_t borderC, uint16_t textC);
-	void setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint8_t clickReturn, bool isRound, uint8_t radius, String btnText, uint8_t alignText, uint16_t btnC, uint16_t borderC, uint16_t clickBorderC, uint16_t textC);
+	void setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint16_t clickReturn, bool isRound, String btnText);
+	void setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint16_t clickReturn, bool isRound, String btnText, uint8_t alignText);
+	void setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint16_t clickReturn, bool isRound, uint8_t radius, String btnText, uint8_t alignText, uint16_t btnC, uint16_t borderC, uint16_t textC);
+	void setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint16_t clickReturn, bool isRound, uint8_t radius, String btnText, uint8_t alignText, uint16_t btnC, uint16_t borderC, uint16_t clickBorderC, uint16_t textC);
 	void setShape(uint8_t isRound);
 	void setClickable(uint8_t isClickable);
 	void setBgColor(uint16_t color);
 	void setBorderColor(uint16_t color);
 	void setClickBorderColor(uint16_t color);
 	void setTextColor(uint16_t color);
-	
+	void setTextSize(uint8_t size);
+
 	uint16_t getXStart();
 	uint16_t getXStop();
 	uint16_t getYStart();
@@ -81,6 +75,7 @@ class UserInterfaceClass
 	uint16_t getBorderColor();
 	uint16_t getClickBorderColor();
 	uint16_t getTextColor();
+	uint8_t getTextSize();
 };
 #endif
 
