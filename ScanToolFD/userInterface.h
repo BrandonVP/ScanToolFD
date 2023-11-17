@@ -34,8 +34,8 @@ class UserInterfaceClass
 	 uint8_t roundBtnRadius = 20;
 	 uint8_t align = 1;
 	 uint16_t clickReturn = 0;
-
 	 uint8_t btnSettings = 0;
+
 	 enum assignedBtnSettings {
 		 Settings_isClickable = 0,
 		 Settings_isRound,

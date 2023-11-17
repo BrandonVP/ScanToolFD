@@ -40,6 +40,7 @@ void GUI_waitForIt(int x_start, int y_start, int x_stop, int y_stop, int radius,
 void GUI_waitForItRect(int x_start, int y_start, int x_stop, int y_stop, int radius, int borderC, int clickBorderC);
 void GUI_buttonMonitor(UserInterfaceClass* buttons, uint16_t size);
 int GUI_subMenuButtonMonitor(UserInterfaceClass* buttons, uint8_t size);
+void GUI_setTextSize(int textSize);
 bool GUI_drawPage(UserInterfaceClass* buttons, uint8_t& pos, uint8_t buttonsToPrint);
 void GUI_clearAppSpace();
 void GUI_setLoadBarRuntime(uint16_t time);
@@ -59,6 +60,7 @@ void GUI_waitForIt(int x_start, int y_start, int x_stop, int y_stop, int radius,
 void GUI_waitForItRect(int x_start, int y_start, int x_stop, int y_stop, int radius, int borderC, int clickBorderC);
 void GUI_buttonMonitor(UserInterfaceClass* buttons, uint16_t size);
 int GUI_subMenuButtonMonitor(UserInterfaceClass* buttons, uint8_t size);
+void GUI_setTextSize(int textSize);
 bool GUI_drawPage(UserInterfaceClass* buttons, uint8_t& pos, uint8_t buttonsToPrint);
 void GUI_clearAppSpace(void);
 void GUI_setLoadBarRuntime(uint16_t time);

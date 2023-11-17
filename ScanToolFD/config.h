@@ -6,10 +6,12 @@ enum APP_labels {
 	APP_TOOLS,
 	APP_SETTINGS,
 	APP_CAPTURE,
+	APP_CAPTURE_LCD,
 	APP_FILES,
 	APP_FILTER_MASK,
 	APP_SEND,
 	APP_BAUD_RATE,
+
 	APP_GET_VIN,
 	APP_OBD_SIM,
 	APP_TX_SPAM,
@@ -25,14 +27,12 @@ extern APP_labels activeApp;
 enum menus {
 	MENU_canBus = 0,
 	MENU_tools,
-	MENU_settings
+	MENU_settings,
+	MENU_sub
 };
 
 #define LCD_BL 14
 #define LCD_RST 15
-
-
-
 #define TFT_CS 10
 #define TFT_DC 9
 
@@ -44,8 +44,8 @@ enum menus {
 #define menuBtnBorder 0x869B // 
 #define menuBtnColor 0x0516// Button Blue
 #define menuBackground 0x5B0E // Dark top menu background
-#define menuBorder 0x39E8 // Dark top menu background
-#define frameBorder 0x8452 // Dark top menu background
+#define menuBorder 0x39E8 // 
+#define frameBorder 0x8452 // 
 #define OrangeBtnColor 0xFC00 // Orange
 #define BlackBtnColor 0x0000 // 
 /*

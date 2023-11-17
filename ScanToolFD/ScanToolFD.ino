@@ -32,6 +32,8 @@
 	 End README
  =========================================================*/
 
+#include "SDCard.h"
+#include "cbBuffer.h"
 #include <MTP_Teensy.h>
 #include <TimeLib.h>
 #include <FlexCAN_T4.h>
@@ -51,6 +53,7 @@
 #include "RGB_LED.h"
 #include "serialTransfer.h"
 #include "variableLock.h"
+#include "cbBuffer.h"
 
 #include "ili9488_t3_font_Arial.h"
 //#include "ili9488_t3_font_ComicSansMS.h"
@@ -82,11 +85,6 @@ APP_labels activeApp = APP_CANBUS;
 // Used for page control
 bool hasDrawn = false;
 
-uint8_t CANBusOut = 0;
-uint8_t CANBusIn = 0;
-uint32_t messageNum = 0;
-uint16_t LCDPos = 60;
-
 // Use to load pages in pieces to prevent blocking while loading entire page
 uint8_t graphicLoaderState = 0;
 uint8_t buttonsOnPage = 0;
@@ -99,7 +97,15 @@ UserInterfaceClass userInterfaceMenuButton[MENU_BUTTON_SIZE];
 
 FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> Can1;
 FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> Can2;
-//FlexCAN_T4FD<CAN3, RX_SIZE_256, TX_SIZE_16> Can3; // FD
+//FlexCAN_T4<CAN3, RX_SIZE_256, TX_SIZE_16> Can3;
+FlexCAN_T4FD<CAN3, RX_SIZE_256, TX_SIZE_16> Can3; // FD
+
+cbBuffer can1Buffer;
+cbBuffer can2Buffer;
+cbBuffer can3Buffer;
+bool enableCB1 = true;
+bool enableCB2 = true;
+bool enableCB3 = true;
 
 const int chipSelect = 2;
 File myFile;
@@ -174,14 +180,7 @@ void appTransition()
 	display.useFrameBuffer(true);
 }
 
-void createCANBusBaudBtns()
-{
-	uint8_t btnPos = 0;
-	userInterfaceButton[btnPos++].setButton(140, 275, 300, 315, 0, true, F("Set CAN0"), ALIGN_CENTER);
-	userInterfaceButton[btnPos++].setButton(305, 275, 475, 315, 0, true, F("Set CAN1"), ALIGN_CENTER);
-	userInterfaceButton[btnPos++].setButton(305, 60, 475, 100, 0, true, F("CAN0"), ALIGN_CENTER);
-	userInterfaceButton[btnPos++].setButton(305, 150, 475, 190, 0, true, F("CAN1"), ALIGN_CENTER);
-}
+
 
 uint8_t createToolBtns()
 {
@@ -211,26 +210,59 @@ uint8_t createSettingsBtns()
 	return btnPos;
 }
 
+void loadApps()
+{
+	myApps.reserve(15);
+	appManager appObj0(MENU_canBus, "CAN Bus", APP_CANBUS, CAPTURE_CANBus, CAPTURE_createMenuBtns);
+	myApps.push_back(appObj0);
+	appManager appObj1(MENU_tools, "Tools", APP_TOOLS, someFn, createToolBtns);
+	myApps.push_back(appObj1);
+	appManager appObj2(MENU_settings, "Settings", APP_SETTINGS, someFn, createSettingsBtns);
+	myApps.push_back(appObj2);
+	appManager appObj3(MENU_canBus, "Capture", APP_CAPTURE, CAPTURE_captureConfig, CAPTURE_createCaptureBtns);
+	myApps.push_back(appObj3);
+	appManager appObj4(MENU_sub, "CaptureLCD", APP_CAPTURE_LCD, CAPTURE_LCD_scan, CAPTURE_createLCDBtns);
+	myApps.push_back(appObj4);
+	appManager appObj5(MENU_canBus, "Files", APP_FILES, someFn, KEYINPUT_createKeyboardButtons);
+	myApps.push_back(appObj5);
+	appManager appObj6(MENU_canBus, "FilterMask", APP_FILTER_MASK, someFn, KEYINPUT_createKeyboardButtons);
+	myApps.push_back(appObj6);
+	appManager appObj7(MENU_canBus, "Send", APP_SEND, someFn, KEYINPUT_createKeyboardButtons);
+	myApps.push_back(appObj7);	
+	appManager appObj8(MENU_canBus, "BaudRate", APP_BAUD_RATE, someFn, CAPTURE_createBaudBtns);
+	myApps.push_back(appObj8);
+	
+	//myApps.insert((myApps.begin() + 3), appObj4);
+}
+
+void drawMenu()
+{
+	// 
+	GUI_drawSquareBtn(0, 0, 479, 319, "", themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
+	GUI_drawSquareBtn(0, 0, 480, 45, "", menuBackground, menuBackground, menuBackground, ALIGN_CENTER);
+	GUI_drawSquareBtn(0, 45, 480, 50, "", menuBorder, menuBorder, menuBorder, ALIGN_CENTER);
+	GUI_drawSquareBtn(160, 45, 260, 50, "", menuBtnColor, menuBtnColor, menuBtnColor, ALIGN_CENTER);
+
+	// Create button objects
+	createMenuBtns();
+
+	// Draw Menu
+	while (GUI_drawPage(userInterfaceMenuButton, graphicLoaderState, 3));
+	graphicLoaderState = 0;
+
+	print_icon(5, 5, battery_bits, 32, 4, menuBtnTextColor, 1);
+}
+
 // -------------------------------------------------------------
 void setup(void)
 {
 	Serial.begin(115200); // USB is always 12 or 480 Mbit/sec
 	//Serial2.begin(115200); // ESP8266
 
+	//while (!Serial);
+
 	// Update time
 	setSyncProvider(getTeensy3Time);
-
-	//SPI2.begin();
-	//pinMode(2, OUTPUT);
-	//digitalWrite(2, 1);
-	//pinMode(3, OUTPUT);
-	//pinMode(4, OUTPUT);
-	//pinMode(5, OUTPUT);
-	//pinMode(6, OUTPUT);
-	//pinMode(7, OUTPUT);
-	//pinMode(8, OUTPUT);
-	//pinMode(16, OUTPUT);
-	//pinMode(17, OUTPUT);
 
 	// Unused pins on back
 	// 27 28 29 32 33
@@ -292,25 +324,12 @@ void setup(void)
 	//display.setFont(Crystal_18_Italic);
 	//display.setFont(Michroma_12);
 
-	// 
-	GUI_drawSquareBtn(0, 0, 479, 319, "", themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
-	GUI_drawSquareBtn(0, 0, 480, 45, "", menuBackground, menuBackground, menuBackground, ALIGN_CENTER);
-	GUI_drawSquareBtn(0, 45, 480, 50, "", menuBorder, menuBorder, menuBorder, ALIGN_CENTER);
-	GUI_drawSquareBtn(160, 45, 260, 50, "", menuBtnColor, menuBtnColor, menuBtnColor, ALIGN_CENTER);
-
-	// Create button objects
-	createMenuBtns();
-
-	// Draw Menu
-	while (GUI_drawPage(userInterfaceMenuButton, graphicLoaderState, 3));
-	graphicLoaderState = 0;
-
 	Can1.begin();
 	Can1.setBaudRate(500000);
 	Can1.setMaxMB(16);
 	Can1.enableFIFO();
 	Can1.enableFIFOInterrupt();
-	Can1.onReceive(canSniff1);
+	Can1.onReceive(CANBus1_IRQHandler);
 	Can1.mailboxStatus();
 
 	Can2.begin();
@@ -318,11 +337,22 @@ void setup(void)
 	Can2.setMaxMB(16);
 	Can2.enableFIFO();
 	Can2.enableFIFOInterrupt();
-	Can2.onReceive(canSniff2);
+	Can2.onReceive(CANBus2_IRQHandler);
 	Can2.mailboxStatus();
 	Can2.disableFIFOInterrupt();
 
 	/*
+	Can3.begin();
+	Can3.setBaudRate(500000);
+	Can3.setMaxMB(16);
+	Can3.enableFIFO();
+	Can3.enableFIFOInterrupt();
+	Can3.onReceive(CANBus3_IRQHandler);
+	Can3.mailboxStatus();
+	Can3.disableFIFOInterrupt();
+	*/
+
+	
 	Can3.begin();
 	CANFD_timings_t config;
 	config.clock = CLK_60MHz;
@@ -333,8 +363,8 @@ void setup(void)
 	config.sample = 70;
 	Can3.setBaudRate(config);
 	Can3.setRegions(64);
-	//Can3.onReceive(canSniff3);
-	*/
+	//Can3.onReceive(CANBus3_IRQHandler);
+	
 
 	CAPTURE_createCaptureBtns();
 
@@ -344,7 +374,7 @@ void setup(void)
 	// open the file. note that only one file can be open at a time,
 	// so you have to close this one before opening another.
 	SD.begin(chipSelect);
-	/*
+	
 	MTP.addFilesystem(SD, "SD Card");
 	myFile = SD.open("a.txt", FILE_WRITE);
 
@@ -377,29 +407,17 @@ void setup(void)
 		// if the file didn't open, print an error:
 		Serial.println("error opening a.txt");
 	}
-	*/
+	
 	pinMode(6, OUTPUT);
 	digitalWrite(6, LOW);
 
-	print_icon(5, 5, battery_bits, 32, 4, menuBtnTextColor, 1);
 
+	loadApps();
 
-	myApps.reserve(15);
-	appManager appObj0(MENU_canBus,   "CAN Bus",  APP_CANBUS,   CAPTURE_CANBus, CAPTURE_createMenuBtns);
-	myApps.push_back(appObj0);
-	appManager appObj1(MENU_tools,    "Tools",    APP_TOOLS,    someFn, createToolBtns);
-	myApps.push_back(appObj1);
-	appManager appObj2(MENU_settings, "Settings", APP_SETTINGS, someFn, createSettingsBtns);
-	myApps.push_back(appObj2);
-	appManager appObj3(MENU_canBus,   "Capture",  APP_CAPTURE, CAPTURE_captureConfig, CAPTURE_createCaptureBtns);
-	myApps.push_back(appObj3);
-	appManager appObj4(MENU_canBus,   "Files",    APP_FILES,    someFn, KEYINPUT_createKeyboardButtons);
-	myApps.push_back(appObj4);
-	myApps.insert((myApps.begin() + 3), appObj4);
-
+	drawMenu();
 }
 
-void someFn(int useless)
+void someFn(int a)
 {
 
 }
@@ -409,6 +427,7 @@ void CAPTURE_CANBus(int userInput)
 	if (userInput >= 0)
 	{
 		nextApp = (APP_labels)userInput;
+		Serial.printf("nextApp: %d \n", nextApp);
 	}
 }
 
@@ -419,8 +438,8 @@ void appLoader()
 	{
 		if (graphicLoaderState == 0)
 		{
-			buttonsOnPage = myApps[(int)activeApp].printButtons();
 			GUI_clearAppSpace();
+			buttonsOnPage = myApps[(int)activeApp].printButtons();
 			graphicLoaderState++;
 			return;
 		}
@@ -833,142 +852,36 @@ void createMenuBtns()
 	userInterfaceMenuButton[menuPosition++].setButton(375, 0, 475, 40, APP_SETTINGS, true, 0, F("Settings"), ALIGN_CENTER, menuBackground, menuBackground, menuBtnTextColor);
 }
 
-
-void canSniff1(const CAN_message_t& msg) 
+//
+void CANBus1_IRQHandler(const CAN_message_t& msg)
 {
-	if (CANBusOut == 10)
-	{
-		Serial.printf("%8d    %9d    %04X   %d   %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\r\n", ++messageNum, millis(), msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
-	}
-	else if ((CANBusOut == 9) && (CANBusIn == 4) && (activeApp == APP_CAPTURE_LCD))
-	{
-		if (LCDPos == 60)
-		{
-			display.fillRect(5, 300, 10, 10, themeBackground);
-			display.fillRect(5, LCDPos, 10, 10, 0x0000);
-			display.fillRect(15, LCDPos, 385, 15, themeBackground);
-		}
-		else
-		{
-			display.fillRect(5, LCDPos - 15, 10, 10, themeBackground);
-			display.fillRect(5, LCDPos, 10, 10, 0x0000);
-			display.fillRect(15, LCDPos, 385, 15, themeBackground);
-		}
+	//Serial.printf("%03X  %d  %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\n", msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
+	can1Buffer.push_cb(msg.id, msg.len, msg.buf);
+}
 
-		char printString[40];
-		display.setTextColor(menuBtnText);
-		sprintf(printString, "%03X", (unsigned int)msg.id);
-		display.drawString(printString, 15, LCDPos);
-		sprintf(printString, "%d", (int)msg.len);
-		display.drawString(printString, 60, LCDPos);
-		sprintf(printString, "%02X ", (uint8_t)msg.buf[0]);
-		display.drawString(printString, 90, LCDPos);
-		sprintf(printString, "%02X ", (uint8_t)msg.buf[1]);
-		display.drawString(printString, 130, LCDPos);
-		sprintf(printString, "%02X ", (uint8_t)msg.buf[2]);
-		display.drawString(printString, 170, LCDPos);
-		sprintf(printString, "%02X ", (uint8_t)msg.buf[3]);
-		display.drawString(printString, 210, LCDPos);
-		sprintf(printString, "%02X ", (uint8_t)msg.buf[4]);
-		display.drawString(printString, 250, LCDPos);
-		sprintf(printString, "%02X ", (uint8_t)msg.buf[5]);
-		display.drawString(printString, 290, LCDPos);
-		sprintf(printString, "%02X ", (uint8_t)msg.buf[6]);
-		display.drawString(printString, 330, LCDPos);
-		sprintf(printString, "%02X ", (uint8_t)msg.buf[7]);
-		display.drawString(printString, 370, (uint8_t)LCDPos);
-		//sprintf(printString, "%03X  %d  %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X", msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
+//
+void CANBus2_IRQHandler(const CAN_message_t& msg)
+{
+	//Serial.printf("%03X  %d  %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\n", msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
 
-		if (LCDPos < 300)
-		{
-			LCDPos += 15;
-		}
-		else
-		{
-			LCDPos = 60;
-		}
-	}
+	can2Buffer.push_cb(msg.id, msg.len, msg.buf);
+}
+
+void CANBus3_IRQHandler(const CAN_message_t& msg)
+{
+	//Serial.printf("%03X  %d  %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\n", msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
+
+	can3Buffer.push_cb(msg.id, msg.len, msg.buf);
 }
 
 
-void canSniff2(const CAN_message_t& msg) 
+void CANBus3_IRQHandler()
+//void CANBus3_IRQHandler(const CANFD_message_t& msg)
 {
-	if (CANBusOut == 10)
-	{
-		Serial.printf("%8d    %9d    %04X   %d   %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\r\n", ++messageNum, millis(), msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
-	}
-	else if ((CANBusOut == 9) && (CANBusIn == 5) && (activeApp == APP_CAPTURE_LCD))
-	{
-		if (LCDPos == 60)
-		{
-			display.fillRect(5, 300, 10, 10, themeBackground);
-			display.fillRect(5, LCDPos, 10, 10, 0x0000);
-			display.fillRect(15, LCDPos, 385, 15, themeBackground);
-		}
-		else
-		{
-			display.fillRect(5, LCDPos - 15, 10, 10, themeBackground);
-			display.fillRect(5, LCDPos, 10, 10, 0x0000);
-			display.fillRect(15, LCDPos, 385, 15, themeBackground);
-		}
-
-		char printString[40];
-		display.setTextColor(menuBtnText);
-		sprintf(printString, "%03X", (unsigned int)msg.id);
-		display.drawString(printString, 15, LCDPos);
-		sprintf(printString, "%d", (int)msg.len);
-		display.drawString(printString, 60, LCDPos);   
-		sprintf(printString, "%02X ", (uint8_t)msg.buf[0]);
-		display.drawString(printString, 90, LCDPos);
-		sprintf(printString, "%02X ", (uint8_t)msg.buf[1]);
-		display.drawString(printString, 130, LCDPos);
-		sprintf(printString, "%02X ", (uint8_t)msg.buf[2]);
-		display.drawString(printString, 170, LCDPos);
-		sprintf(printString, "%02X ", (uint8_t)msg.buf[3]);
-		display.drawString(printString, 210, LCDPos);
-		sprintf(printString, "%02X ", (uint8_t)msg.buf[4]);
-		display.drawString(printString, 250, LCDPos);
-		sprintf(printString, "%02X ", (uint8_t)msg.buf[5]);
-		display.drawString(printString, 290, LCDPos);
-		sprintf(printString, "%02X ", (uint8_t)msg.buf[6]);
-		display.drawString(printString, 330, LCDPos);
-		sprintf(printString, "%02X ", (uint8_t)msg.buf[7]);
-		display.drawString(printString, 370, LCDPos);
-		//sprintf(printString, "%03X  %d  %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X", msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
-		
-		if (LCDPos < 300)
-		{
-			LCDPos += 15;
-		}
-		else
-		{
-			LCDPos = 60;
-		}
-	}
-}
-
-
-void canSniff3()
-//void canSniff3(const CANFD_message_t& msg)
-{
-	if (!(CANBusIn == 6))
-	{
-		return;
-	}
-
 	CANFD_message_t msg;
-	
-	/*
-	if (!Can3.read(msg))
-	{
-		return;
-	}
-	*/
-	LED_pulse((RGB)LED_GREEN);
-
-	/*
 	if (Can3.read(msg)) 
 	{
+		LED_pulse((RGB)LED_GREEN);
 		Serial.print(msg.id, HEX);
 		Serial.print("   ");
 		for (int i = 0; i < msg.len; i++) 
@@ -978,74 +891,7 @@ void canSniff3()
 		}
 		Serial.println();
 	}
-	else
-	{
-		return;
-	}
-		*/
-
-	if (CANBusOut == 8)
-	{
-		Serial.print(msg.id, HEX);
-		Serial.print("   ");
-		for (int i = 0; i < msg.len; i++)
-		{
-			Serial.print(msg.buf[i], HEX);
-			Serial.print("  ");
-		}
-		Serial.println();
-	}
-	else if ((CANBusOut == 9) && (activeApp == APP_CAPTURE_LCD))
-	{
-		if (LCDPos == 60)
-		{
-			display.fillRect(5, 300, 10, 10, themeBackground);
-			display.fillRect(5, LCDPos, 10, 10, 0x0000);
-			display.fillRect(15, LCDPos, 385, 15, themeBackground);
-		}
-		else
-		{
-			display.fillRect(5, LCDPos - 15, 10, 10, themeBackground);
-			display.fillRect(5, LCDPos, 10, 10, 0x0000);
-			display.fillRect(15, LCDPos, 385, 15, themeBackground);
-		}
-
-		
-		char printString[40];
-		display.setTextColor(menuBtnText);
-		sprintf(printString, "%03X", (unsigned int)msg.id);
-		display.drawString(printString, 15, LCDPos);
-		sprintf(printString, "%d", (int)msg.len);
-		display.drawString(printString, 60, LCDPos);
-		sprintf(printString, "%02X ", (uint8_t)msg.buf[0]);
-		display.drawString(printString, 95, LCDPos);
-		sprintf(printString, "%02X ", (uint8_t)msg.buf[1]);
-		display.drawString(printString, 135, LCDPos);
-		sprintf(printString, "%02X ", (uint8_t)msg.buf[2]);
-		display.drawString(printString, 175, LCDPos);
-		sprintf(printString, "%02X ", (uint8_t)msg.buf[3]);
-		display.drawString(printString, 215, LCDPos);
-		sprintf(printString, "%02X ", (uint8_t)msg.buf[4]);
-		display.drawString(printString, 255, LCDPos);
-		sprintf(printString, "%02X ", (uint8_t)msg.buf[5]);
-		display.drawString(printString, 295, LCDPos);
-		sprintf(printString, "%02X ", (uint8_t)msg.buf[6]);
-		display.drawString(printString, 335, LCDPos);
-		sprintf(printString, "%02X ", (uint8_t)msg.buf[7]);
-		display.drawString(printString, 375, LCDPos);
-
-		if (LCDPos < 300)
-		{
-			LCDPos += 15;
-		}
-		else
-		{
-			LCDPos = 60;
-		}
-	}
 }
-
-
 
 
 /*=========================================================
@@ -1060,7 +906,8 @@ void backgroundProcess()
 	//timedTXSend();
 	BATTERY_printLevel();
 	updateTime();
-	canSniff3();
+	CANBus3_IRQHandler();
+
 	LED_strobe((RGB)LED_OFF);
 	MTP.loop();
 }
@@ -1115,29 +962,40 @@ void loop(void)
 	//Can3.events();
 
 	static uint32_t timeout123 = millis();
-	/*
-	if (millis() - timeout123 > 1000)
+	static uint16_t rotatingID = 0;
+	if (millis() - timeout123 > 500)
 	{
 		CANFD_message_t msg;
 		msg.id = 0x4CA;
 		msg.len = 64;
 		for (uint8_t i = 0; i < 64; i++) msg.buf[i] = i + 0x25;
 		Can3.write(msg);
+	
+
+		//drawMenu();
+
+		
+		//CAN_message_t msg2;
+		//msg2.id = rotatingID++;
+		//msg2.len = 8;
+		//for (uint8_t i = 0; i < 8; i++) msg2.buf[i] = (uint8_t)millis() + (i * 0x3C);
+		//Can1.write(msg2);
+
 		timeout123 = millis();
 	}
-	*/
 	
 	
+	/*
 	if (millis() - timeout123 > 2000)
 	{
-		/*
+		
 		CAN_message_t msg;
 		msg.id = 0x654;
 		msg.len = 8;
 		for (uint8_t i = 0; i < 8; i++) msg.buf[i] = i + 0x25;
 		Can1.write(msg);
 		delay(10);
-		*/
+		
 		CAN_message_t msg2;
 		msg2.id = 0x654;
 		msg2.len = 8;
@@ -1145,5 +1003,46 @@ void loop(void)
 		Can2.write(msg2);
 		timeout123 = millis();
 	}
-	
+	*/
 }
+
+
+// works
+/*
+
+  tft.setTextColor(ILI9488_WHITE);  tft.setTextSize(4);
+  tft.enableScroll();
+  tft.setScrollTextArea(0,0,120,240);
+  tft.setScrollBackgroundColor(ILI9488_GREEN);
+
+  tft.setCursor(180, 100);
+
+  tft.setFont(ComicSansMS_12);
+  tft.print("Fixed text");
+
+  tft.setCursor(0, 0);
+
+  tft.setTextColor(ILI9488_BLACK);
+
+  for(int i=0;i<20;i++){
+	tft.print("  this is line ");
+	tft.println(i);
+	tft.updateScreen();
+	delay(100);
+  }
+
+  tft.fillScreen(ILI9488_BLACK);
+  tft.setScrollTextArea(40,50,120,120);
+  tft.setScrollBackgroundColor(ILI9488_GREEN);
+  tft.setFont(ComicSansMS_10);
+
+  tft.setTextSize(1);
+  tft.setCursor(40, 50);
+  tft.updateScreen();
+  for(int i=0;i<2000;i++){
+	tft.print("  this is line ");
+	tft.println(i);
+	  tft.updateScreen();
+	//delay(100);
+  }
+*/

@@ -17,10 +17,6 @@
 #include "font_Michroma.h"
 #include <vector>
 
-extern uint8_t CANBusOut;
-extern uint8_t CANBusIn;
-extern uint32_t messageNum;
-
 extern ILI9488_t3 display;
 
 extern UserInterfaceClass userInterfaceButton[APP_BUTTON_SIZE];
@@ -31,7 +27,8 @@ extern void GUI_clearAppSpace();
 
 extern FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> Can1;
 extern FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> Can2;
-extern FlexCAN_T4FD<CAN3, RX_SIZE_256, TX_SIZE_16> Can3;
+//extern FlexCAN_T4<CAN3, RX_SIZE_256, TX_SIZE_16> Can3;
+//extern FlexCAN_T4FD<CAN3, RX_SIZE_256, TX_SIZE_16> Can3;
 
 extern Adafruit_FT6206 ts;
 

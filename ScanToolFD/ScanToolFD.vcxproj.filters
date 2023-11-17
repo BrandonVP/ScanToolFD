@@ -74,6 +74,12 @@
     <ClInclude Include="appManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="cbBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDCard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="userInterface.cpp">
@@ -111,6 +117,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="appManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cbBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDCard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

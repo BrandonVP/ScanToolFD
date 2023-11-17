@@ -4,7 +4,7 @@
  Author      : Brandon Van Pelt
  Created	 : 9/26/2023
  Description : Holds App objects for loading and unloading Apps
- ===========================================================================
+ =========================================================================== 
  */
 
 #include "appManager.h"

@@ -112,20 +112,23 @@ void GUI_drawSquareBtn(int x_start, int y_start, int x_stop, int y_stop, String 
 // Holds round button down while pressed
 void GUI_waitForIt(int x_start, int y_start, int x_stop, int y_stop, int radius, int borderC, int clickBorderC)
 {
+    display.useFrameBuffer(false);
     if (y_stop > 50)
     {
         display.drawRoundRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), radius, clickBorderC);
     }
     else
     {
+        // < 50 indicates this is a menu button press
         GUI_drawSquareBtn(0, 45, 480, 50, "", menuBorder, menuBorder, menuBorder, ALIGN_CENTER);
     }
 
     while (ts.touched())
     {
-        // This is a blocking function so call backgroundProcess while looping
+        // This is a blocking function, call backgroundProcess while looping
         backgroundProcess();
     }
+
     if (y_stop > 50)
     {
         display.drawRoundRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), radius, borderC);
@@ -133,19 +136,24 @@ void GUI_waitForIt(int x_start, int y_start, int x_stop, int y_stop, int radius,
     else
     {
         GUI_drawSquareBtn(x_start, 45, x_stop, 50, "", menuBtnColor, menuBtnColor, borderC, ALIGN_CENTER);
+        display.useFrameBuffer(true);
+        GUI_drawSquareBtn(0, 45, 480, 50, "", menuBorder, menuBorder, menuBorder, ALIGN_CENTER);
+        GUI_drawSquareBtn(x_start, 45, x_stop, 50, "", menuBtnColor, menuBtnColor, borderC, ALIGN_CENTER);
     }
 }
 
 // Holds rectangle button down while pressed
 void GUI_waitForItRect(int x_start, int y_start, int x_stop, int y_stop, int radius, int borderC, int clickBorderC)
 {
+    display.useFrameBuffer(false);
     display.drawRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), clickBorderC);
     while (ts.touched())
     {
-        // This is a blocking function so call backgroundProcess while looping
+        // This is a blocking function, call backgroundProcess while looping
         backgroundProcess();
     }
     display.drawRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), borderC);
+    display.useFrameBuffer(true);
 }
 
 //
@@ -202,11 +210,86 @@ int GUI_subMenuButtonMonitor(UserInterfaceClass* buttons, uint8_t size)
 }
 
 //
+void GUI_setTextSize(int textSize)
+{
+    if (textSize < 10)
+    {
+        display.setFont(Michroma_9);
+    }
+    else if (textSize < 11)
+    {
+        display.setFont(Michroma_10);
+    }
+    else if (textSize < 12)
+    {
+        display.setFont(Michroma_11);
+    }
+    else if (textSize < 13)
+    {
+        display.setFont(Michroma_12);
+    }
+    else if (textSize < 14)
+    {
+        display.setFont(Michroma_13);
+    }
+    else if (textSize < 16)
+    {
+        display.setFont(Michroma_14);
+    }
+    else if (textSize < 18)
+    {
+        display.setFont(Michroma_16);
+    }
+    else if (textSize < 20)
+    {
+        display.setFont(Michroma_18);
+    }
+    else if (textSize < 24)
+    {
+        display.setFont(Michroma_20);
+    }
+    else if (textSize < 28)
+    {
+        display.setFont(Michroma_24);
+    }
+    else if (textSize < 32)
+    {
+        display.setFont(Michroma_28);
+    }
+    else if (textSize < 40)
+    {
+        display.setFont(Michroma_32);
+    }
+    else if (textSize < 48)
+    {
+        display.setFont(Michroma_40);
+    }
+    else if (textSize < 60)
+    {
+        display.setFont(Michroma_48);
+    }
+    else if (textSize < 72)
+    {
+        display.setFont(Michroma_60);
+    }
+    else if (textSize < 96)
+    {
+        display.setFont(Michroma_72);
+    }
+    else if (textSize > 95)
+    {
+        display.setFont(Michroma_96);
+    }
+}
+
+//
 bool GUI_drawPage(UserInterfaceClass* buttons, uint8_t& pos, uint8_t buttonsToPrint)
 {
     uint8_t btn = pos - 1;
     if (buttonsToPrint != 0)
     {
+        GUI_setTextSize(buttons[btn].getTextSize());
+        
         if (buttons[btn].getIsRound())
         {
             GUI_drawRoundBtn(buttons[btn].getXStart(), buttons[btn].getYStart(), buttons[btn].getXStop(), buttons[btn].getYStop(), buttons[btn].getBtnText(), buttons[btn].getBtnColor(), buttons[btn].getBorderColor(), buttons[btn].getTextColor(), buttons[btn].getAlign(), buttons[btn].getRadius());
