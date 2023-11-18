@@ -43,6 +43,12 @@ void GUI_drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String b
     display.drawRoundRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), radius, btnBorderColor);
     display.drawRoundRect(x_start + 1, y_start + 1, (x_stop - x_start) - 2, (y_stop - y_start) - 2, radius, btnBorderColor);
     display.setTextColor(btnTxtColor);
+
+    char c[0xFF];
+    buttonText.toCharArray(c, sizeof(buttonText));
+    stringLength = display.strPixelLen(c, 2);
+    //Serial.printf("buttonText: %s | stringLength: %d \n", c, stringLength);
+
     // Print String with desired alignment
     switch (alignText)
     {
@@ -51,20 +57,12 @@ void GUI_drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String b
         break;
     case 2: // Center
         // Calculate center
-        stringLength = buttonText.length() * LETTER_WIDTH;
-        //Serial.print("stringLength: ");
-        //Serial.println(buttonText.length());
         buttonWidth = (x_stop)-(x_start);
-        //buttonWidth = (x_stop - SIDE_OFFSET) - (x_start + SIDE_OFFSET);
-        offset = x_start + (buttonWidth / 2) - ((stringLength / 2));
-        //offset = (x_start + SIDE_OFFSET) + (buttonWidth / 2) - (stringLength / 2);
-        //display.setCursor(offset, y_start + ((y_stop - y_start) / 2) - yMagicOffset, false);
-        //display.println(button);
-        //display.drawString(buttonText, x_start + (x_stop - x_start), y_start + (y_stop - y_start));
-        display.drawString(buttonText, offset, y_start + ((y_stop - y_start) / 2) - yMagicOffset);
+        offset = (buttonWidth - stringLength) / 2;
+        display.drawString(buttonText, (x_start + offset), y_start + ((y_stop - y_start) / 2) - yMagicOffset);
         break;
     case 3: // Right
-        display.drawString(buttonText, x_start + 55, y_start + ((y_stop - y_start) / 2) - 8);
+        display.drawString(buttonText, x_stop - (stringLength + 5), y_start + ((y_stop - y_start) / 2) - 8);
         break;
     default:
         break;
@@ -72,7 +70,7 @@ void GUI_drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String b
 }
 
 //
-void GUI_drawSquareBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int align)
+void GUI_drawSquareBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int alignText)
 {
     const uint8_t LETTER_WIDTH = 11;
     const uint8_t SIDE_OFFSET = 2;
@@ -84,24 +82,25 @@ void GUI_drawSquareBtn(int x_start, int y_start, int x_stop, int y_stop, String 
     display.drawRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), btnBorderColor);
     display.setTextColor(btnTxtColor);
 
+
+    char c[0xFF];
+    buttonText.toCharArray(c, sizeof(buttonText));
+    stringLength = display.strPixelLen(c, 2);
+
     // Print String with desired alignment
-    switch (align)
+    switch (alignText)
     {
     case 1: // Left
         display.drawString(buttonText, x_start + 5, y_start + ((y_stop - y_start) / 2) - 8);
         break;
     case 2: // Center
         // Calculate center
-        stringLength = buttonText.length() * LETTER_WIDTH;
-        buttonWidth = (x_stop - SIDE_OFFSET) - (x_start + SIDE_OFFSET);
-        offset = (x_start + SIDE_OFFSET) + (buttonWidth / 2) - (stringLength / 2);
-
-        //display.setCursor(offset, y_start + ((y_stop - y_start) / 2) - yMagicOffset, false);
-        //display.println(button);
-        display.drawString(buttonText, offset, y_start + ((y_stop - y_start) / 2) - yMagicOffset);
+        buttonWidth = (x_stop)-(x_start);
+        offset = (buttonWidth - stringLength) / 2;
+        display.drawString(buttonText, (x_start + offset), y_start + ((y_stop - y_start) / 2) - yMagicOffset);
         break;
     case 3: // Right
-        display.drawString(buttonText, x_start + 55, y_start + ((y_stop - y_start) / 2) - 8);
+        display.drawString(buttonText, x_stop - (stringLength + 5), y_start + ((y_stop - y_start) / 2) - 8);
         break;
     default:
         break;

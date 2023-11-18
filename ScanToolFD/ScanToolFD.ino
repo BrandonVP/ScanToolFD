@@ -415,6 +415,31 @@ void setup(void)
 	loadApps();
 
 	drawMenu();
+
+
+
+
+	/*
+  display.setTextColor(ILI9488_WHITE);  
+  display.setTextSize(4);
+  display.enableScroll();
+  display.setScrollTextArea(0,0,120,240);
+ 
+  display.setScrollBackgroundColor(ILI9488_GREEN);
+  display.setCursor(180, 100);
+  display.print("Fixed text");
+  display.setCursor(0, 0);
+  display.setTextColor(ILI9488_BLACK);
+  display.fillRect(5, 5, 80, 100, menuBackground);
+
+  for(int i=0;i<20;i++){
+	display.print("  this is line ");
+	display.println(i);
+	display.updateScreen();
+	delay(100);
+  }
+  */
+
 }
 
 void someFn(int a)

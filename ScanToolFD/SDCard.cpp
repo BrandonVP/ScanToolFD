@@ -11,6 +11,7 @@
 #include "common.h"
 
  // Called at setup to initialize the SD Card
+/*
 bool SDCard::startSD()
 {
 	if (!SD.begin(SD_CARD_CS)) {
@@ -18,11 +19,12 @@ bool SDCard::startSD()
 	}
 	return true;
 }
-
+*/
 /*=========================================================
 	Write File Methods
 ===========================================================*/
 // Write string to SD Card
+/*
 void SDCard::writeFile(char* filename, String incoming)
 {
 	// File created and opened for writing
@@ -35,7 +37,9 @@ void SDCard::writeFile(char* filename, String incoming)
 		myFile.close();
 	}
 }
+*/
 
+/*
 // 
 void SDCard::setSDFilename(char* filename)
 {
@@ -48,7 +52,9 @@ void SDCard::setSDFilename(char* filename)
 	strcat(SDfilename, filename);
 	//SerialUSB.println(SDfilename);
 }
+*/
 
+/*
 // Write string to SD Card
 void SDCard::writeFileS(char* incoming, uint8_t size)
 {
@@ -62,7 +68,9 @@ void SDCard::writeFileS(char* incoming, uint8_t size)
 		myFile.close();
 	}
 }
+*/
 
+/*
 // Write string to SD Card
 void SDCard::saveSDCapture(char *filename, char* incoming, uint8_t size)
 {
@@ -76,7 +84,9 @@ void SDCard::saveSDCapture(char *filename, char* incoming, uint8_t size)
 		myFile.close();
 	}
 }
+*/
 
+/*
 // Write integer and base to SD Card
 void SDCard::writeFile(char* filename, int incoming, int base)
 {
@@ -90,7 +100,9 @@ void SDCard::writeFile(char* filename, int incoming, int base)
 		myFile.close();
 	}
 }
+*/
 
+/*
 // Write return to SD Card file
 void SDCard::writeFileln(char* filename)
 {
@@ -104,7 +116,9 @@ void SDCard::writeFileln(char* filename)
 		myFile.close();
 	}
 }
+*/
 
+/*
 // Saves users CAN Bus RX messages
 void SDCard::writeSendMsg(SchedulerRX msgStruct)
 {
@@ -141,6 +155,7 @@ void SDCard::writeSendMsg(SchedulerRX msgStruct)
 	}
 	myFile.close();
 }
+*/
 
 /*
 // Saves users CAN Bus RX messages
@@ -181,17 +196,20 @@ void SDCard::writeMACs(savedMACs msgStruct)
 	Delete File Methods
 ===========================================================*/
 // Delete SD Card file
+/*
 void SDCard::deleteFile(char* filename)
 {
 	//SerialUSB.println(filename);
 	//remove any existing file with this name
 	SD.remove(filename);
 }
+*/
 
 /*=========================================================
 	Read File Methods
 ===========================================================*/
 // Reads in PID scan results file
+/*
 void SDCard::readFile(char* filename, uint8_t* arrayIn)
 {
 	// File created and opened for writing
@@ -208,7 +226,9 @@ void SDCard::readFile(char* filename, uint8_t* arrayIn)
 	}
 	myFile.close();
 }
+*/
 
+/*
 // Reads users saved CAN Bus RX messages
 void SDCard::readSendMsg(SchedulerRX& msgStruct)
 {
@@ -247,40 +267,11 @@ void SDCard::readSendMsg(SchedulerRX& msgStruct)
 			{
 				strncpy(msgStruct.node[i].name, s1, 9);
 			}
-
-			/*
-			SerialUSB.print("Index: ");
-			SerialUSB.println(i);
-			SerialUSB.println(msgStruct.node[i].name);
-			SerialUSB.println(msgStruct.node[i].channel);
-			SerialUSB.println(msgStruct.node[i].interval);
-			SerialUSB.println(msgStruct.node[i].id);
-			SerialUSB.println(msgStruct.node[i].timer);
-			SerialUSB.print("data: ");
-			SerialUSB.print(msgStruct.node[i].data[0]);
-			SerialUSB.print(" ");
-			SerialUSB.print(msgStruct.node[i].data[1]);
-			SerialUSB.print(" ");
-			SerialUSB.print(msgStruct.node[i].data[2]);
-			SerialUSB.print(" ");
-			SerialUSB.print(msgStruct.node[i].data[3]);
-			SerialUSB.print(" ");
-			SerialUSB.print(msgStruct.node[i].data[4]);
-			SerialUSB.print(" ");
-			SerialUSB.print(msgStruct.node[i].data[5]);
-			SerialUSB.print(" ");
-			SerialUSB.print(msgStruct.node[i].data[6]);
-			SerialUSB.print(" ");
-			SerialUSB.println(msgStruct.node[i].data[7]);
-			SerialUSB.println(msgStruct.node[i].isOn);
-			SerialUSB.println(msgStruct.node[i].isDel);
-			SerialUSB.println("");
-			SerialUSB.println("");
-			*/
 		}
 		myFile.close();
 	}
 }
+*/
 
 /*
 // Reads users saved CAN Bus RX messages
@@ -477,6 +468,7 @@ bool SDCard::readLogFileLCD(char* filename, uint32_t& index, bool isBackwards)
 	Create File Methods
 ===========================================================*/
 // Create SD Card folder
+/*
 void SDCard::createDRIVE(char* foldername)
 {
 	SD.mkdir(foldername);
@@ -543,7 +535,7 @@ uint32_t SDCard::fileLength(char* filename)
 	myFile.close();
 	return length;
 }
-
+*/
 /*
 // Splits file into two halves
 void SDCard::split(char* filename, uint32_t size)

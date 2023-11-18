@@ -52,9 +52,10 @@ typedef enum capture_config_btn {
 	BTN_config_output_Serial,
 	BTN_config_output_SDCard,
 	BTN_config_output_Wireless,
-	BTN_config_output_Start,
-	BTN_config_output_Stop,
-	BTN_config_output_Filename,
+	BTN_config_state_Start,
+	BTN_config_state_Stop,
+	BTN_config_state_Filename,
+	BTN_config_state_Filename_Accept,
 	BTN_config_button_count
 }Capture_Config_BTN;
 
@@ -79,6 +80,7 @@ void CAPTURE_captureConfig(int userInput);
 extern uint8_t CAPTURE_input_config;
 extern uint8_t CAPTURE_output_config;
 
+void CAPTURE_clearLocalVar();
 uint8_t CAPTURE_createMenuBtns();
 uint8_t CAPTURE_createCaptureBtns();
 uint8_t CAPTURE_createLCDBtns();
