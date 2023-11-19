@@ -19,6 +19,7 @@ static bool isCaptureRunning = false;
 static uint32_t messageNum = 0;
 static uint8_t inputIndex = 0;
 static char *filename = "Filename";
+static char newFilename[8] = "";
 
 void CAPTURE_clearLocalVar()
 {
@@ -184,16 +185,31 @@ void CAPTURE_processSerialCapture()
 }
 
 extern File myFile;
-void CAPTURE_processSDCapture()
+void CAPTURE_processSDCapture(int userInput)
 {
 	char buffer[80];
 	static bool isFilename = false;
 	const uint8_t MAX_INPUT_SIZE = 4;
 	uint8_t change; // For keypad controller output
 
-	if ((CAPTURE_state == BTN_config_state_Filename) && (CAPTURE_output_config == BTN_config_output_SDCard))
+	if ((CAPTURE_state == BTN_config_state_keyInput) && (CAPTURE_output_config == BTN_config_output_SDCard))
 	{
-
+		change = KEYINPUT_keyboardController(inputIndex, newFilename);
+		if (change == KEY_CHANGE)
+		{
+			GUI_drawRoundBtn(340, 75, 475, 110, newFilename, themeBackground, frameBorder, menuBtnText, ALIGN_CENTER, 0);
+		}
+		if (userInput == BTN_config_state_Filename_Accept)
+		{
+			CAPTURE_state = BTN_config_state_Filename_Accept;
+			graphicLoaderState = 0;
+			GUI_drawRoundBtn(0, 163, 479, 319, F(""), themeBackground, themeBackground, themeBackground, ALIGN_CENTER, 0);
+			while (GUI_drawPage(userInterfaceButton, graphicLoaderState, BTN_config_output_Wireless+1));
+			CAPTURE_enableDisableConfigBtn(true);
+			CAPTURE_activateStartBtn();
+			CAPTURE_deactivateStopBtn();
+			display.updateScreen();
+		}
 	}
 
 	if ((CAPTURE_state == BTN_config_state_Start) && (CAPTURE_output_config == BTN_config_output_SDCard))
@@ -246,6 +262,7 @@ void CAPTURE_processSDCapture()
 	myFile.close();
 }
 
+//
 void CAPTURE_processWirelessCapture()
 {
 	if ((CAPTURE_state == BTN_config_state_Start) && (CAPTURE_output_config == BTN_config_output_Wireless))
@@ -254,7 +271,7 @@ void CAPTURE_processWirelessCapture()
 	}
 }
 
-
+//
 void CAPTURE_printFilenameBtns()
 {
 	userInterfaceButton[BTN_config_state_Filename].setClickable(true);
@@ -263,6 +280,7 @@ void CAPTURE_printFilenameBtns()
 	GUI_drawRoundBtn(340, 115, 475, 150, F("Accept"), themeBackground, frameBorder, menuBtnText, ALIGN_CENTER, 0);
 }
 
+//
 void CAPTURE_removeFilenameBtn()
 {
 	userInterfaceButton[BTN_config_state_Filename].setClickable(false);
@@ -271,24 +289,28 @@ void CAPTURE_removeFilenameBtn()
 	GUI_drawRoundBtn(340, 115, 475, 150, F("Accept"), themeBackground, themeBackground, themeBackground, ALIGN_CENTER, 0);
 }
 
+//
 void CAPTURE_activateStartBtn()
 {
 	userInterfaceButton[BTN_config_state_Start].setClickable(true);
 	GUI_drawRoundBtn(340, 230, 475, 270, F("START"), OrangeBtnColor, frameBorder, menuBtnText, ALIGN_CENTER, 0);
 }
 
+//
 void CAPTURE_deactivateStartBtn()
 {
 	userInterfaceButton[BTN_config_state_Start].setClickable(false);
 	GUI_drawRoundBtn(340, 230, 475, 270, F("START"), themeBackground, frameBorder, menuBtnText, ALIGN_CENTER, 0);
 }
 
+//
 void CAPTURE_activateStopBtn()
 {
 	userInterfaceButton[BTN_config_state_Stop].setClickable(true);
 	GUI_drawRoundBtn(340, 275, 475, 315, F("STOP"), OrangeBtnColor, frameBorder, menuBtnText, ALIGN_CENTER, 0);
 }
 
+//
 void CAPTURE_deactivateStopBtn()
 {
 	userInterfaceButton[BTN_config_state_Stop].setClickable(false);
@@ -444,16 +466,17 @@ void CAPTURE_captureConfig(int userInput)
 	if (userInput == BTN_config_state_Filename)
 	{
 		CAPTURE_state = BTN_config_state_Filename;
-
+		CAPTURE_enableDisableConfigBtn(false);
 		graphicLoaderState = 0;
 		keyPadButtons = KEYINPUT_createKeyboardButtons();
 		while (GUI_drawPage(userKeyButtons, graphicLoaderState, keyPadButtons));
+		CAPTURE_state = BTN_config_state_keyInput;
 		display.updateScreen();
 	}
 
 	// -----------PROCESS-----------
 	CAPTURE_processSerialCapture();
-	CAPTURE_processSDCapture();
+	CAPTURE_processSDCapture(userInput);
 	CAPTURE_processWirelessCapture();
 }
 
@@ -504,7 +527,6 @@ void CAPTURE_LCD_Print(uint32_t id, uint8_t length, uint8_t * data)
 	display.updateScreen();
 	display.setFont(Michroma_11);
 }
-
 
 // 
 void CAPTURE_LCD_scan(int userInput)

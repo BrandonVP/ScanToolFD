@@ -23,7 +23,7 @@ uint8_t KEYINPUT_createKeyboardButtons(void)
 	uint8_t index = 0;
 	userKeyButtons[index].setButton(0, 165, 479, 319, 1, true, 6, F(""), ALIGN_CENTER, themeBackground, themeBackground, themeBackground);
 	userKeyButtons[index++].setClickable(false);
-	userKeyButtons[index].setButton(0, 160, 480, 165, 1, true, 6, F(""), ALIGN_CENTER, menuBorder, menuBorder, menuBorder);
+	userKeyButtons[index].setButton(0, 163, 480, 165, 1, true, 6, F(""), ALIGN_CENTER, menuBorder, menuBorder, menuBorder);
 	userKeyButtons[index++].setClickable(false);
 
 	userKeyButtons[index++].setButton(4, 167, 45, 203, 1, true, 6, F("1#"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
@@ -37,9 +37,9 @@ uint8_t KEYINPUT_createKeyboardButtons(void)
 	userKeyButtons[index++].setButton(299, 167, 333, 203, 'i', true, 6, F("i"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
 	userKeyButtons[index++].setButton(335, 167, 369, 203, 'o', true, 6, F("o"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
 	userKeyButtons[index++].setButton(371, 167, 405, 203, 'p', true, 6, F("p"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setButton(407, 167, 476, 203, 1, true, 6, F("<x"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(407, 167, 476, 203, 0xF2, true, 6, F("<x"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
 
-	userKeyButtons[index++].setButton(4, 205, 70, 241, 0xcc, true, 6, F("ABC"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(4, 205, 70, 241, 0xc1, true, 6, F("ABC"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
 	userKeyButtons[index++].setButton(72, 205, 106, 241, 'a', true, 6, F("a"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
 	userKeyButtons[index++].setButton(108, 205, 142, 241, 's', true, 6, F("s"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
 	userKeyButtons[index++].setButton(144, 205, 178, 241, 'd', true, 6, F("d"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
@@ -78,7 +78,7 @@ uint8_t KEYINPUT_createUpperCaseButtons()
 	uint8_t index = 0;
 	userKeyButtons[index].setButton(0, 165, 479, 319, 1, true, 6, F(""), ALIGN_CENTER, themeBackground, themeBackground, themeBackground);
 	userKeyButtons[index++].setClickable(false);
-	userKeyButtons[index].setButton(0, 160, 480, 165, 1, true, 6, F(""), ALIGN_CENTER, menuBorder, menuBorder, menuBorder);
+	userKeyButtons[index].setButton(0, 163, 480, 165, 1, true, 6, F(""), ALIGN_CENTER, menuBorder, menuBorder, menuBorder);
 	userKeyButtons[index++].setClickable(false);
 
 	userKeyButtons[index++].setButton(47, 167, 81, 203, 'Q', true, 6, F("Q"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
@@ -91,9 +91,9 @@ uint8_t KEYINPUT_createUpperCaseButtons()
 	userKeyButtons[index++].setButton(299, 167, 333, 203, 'I', true, 6, F("I"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
 	userKeyButtons[index++].setButton(335, 167, 369, 203, 'O', true, 6, F("O"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
 	userKeyButtons[index++].setButton(371, 167, 405, 203, 'P', true, 6, F("P"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setButton(407, 167, 476, 203, 1, true, 6, F("<x"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(407, 167, 476, 203, 0xF2, true, 6, F("<x"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
 
-	userKeyButtons[index++].setButton(4, 205, 70, 241, 0xaa, true, 6, F("abc"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(4, 205, 70, 241, 0xc2, true, 6, F("abc"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
 	userKeyButtons[index++].setButton(72, 205, 106, 241, 'A', true, 6, F("A"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
 	userKeyButtons[index++].setButton(108, 205, 142, 241, 'S', true, 6, F("S"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
 	userKeyButtons[index++].setButton(144, 205, 178, 241, 'D', true, 6, F("D"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
@@ -301,5 +301,47 @@ uint8_t KEYINPUT_keypadHexController(uint32_t& total, uint8_t& numIndex, uint8_t
 		(numIndex > 0) ? --numIndex : 0;
 		return KEY_CHANGE;
 	}
+	return KEY_NO_CHANGE;
+}
+
+/*
+* No change returns 0xFF
+* Accept returns 0xF1
+* Cancel returns 0xF0
+* Value contained in global keyboardInput
+*
+* index: Letter place (0-7)
+*/
+uint8_t KEYINPUT_keyboardController(uint8_t& index, char *keyboardInput)
+{
+	uint8_t input = GUI_subMenuButtonMonitor(userKeyButtons, keyPadButtons);
+
+	if (input > 0x29 && input < 0x7B && index < 8) // 8 is max size of a filename
+	{
+		keyboardInput[index] = input;
+		
+		++index;
+		return KEY_CHANGE;
+	}
+	else if (input == 0xF2 && index > 0)
+	{
+		keyboardInput[index - 1] = 0x20;
+		
+		--index;
+		return KEY_CHANGE;
+	}
+	else if (input == 0xc1)
+	{
+		KEYINPUT_createUpperCaseButtons();
+		graphicLoaderState = 0;
+		while (GUI_drawPage(userKeyButtons, graphicLoaderState, keyPadButtons));
+	}
+	else if (input == 0xc2)
+	{
+		KEYINPUT_createKeyboardButtons();
+		graphicLoaderState = 0;
+		while (GUI_drawPage(userKeyButtons, graphicLoaderState, keyPadButtons));
+	}
+
 	return KEY_NO_CHANGE;
 }

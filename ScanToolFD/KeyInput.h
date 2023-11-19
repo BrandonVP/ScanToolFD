@@ -30,12 +30,13 @@ uint8_t KEYINPUT_createNumpadButtons(int offset);
 extern uint8_t keyPadButtons;
 extern UserInterfaceClass userKeyButtons[43];
 
+void KEYINPUT_clearInput();
 uint8_t KEYINPUT_createKeyboardButtons(void);
 uint8_t KEYINPUT_createNumpadButtons(int offset);
 uint8_t KEYINPUT_createHexpadButtons(int offset);
 uint8_t KEYINPUT_keypadController(uint16_t& total, uint8_t& numIndex, uint8_t maxSize);
 uint8_t KEYINPUT_keypadHexController(uint32_t& total, uint8_t& numIndex, uint8_t maxSize);
-void KEYINPUT_clearInput();
+uint8_t KEYINPUT_keyboardController(uint8_t& index, char* keyboardInput);
 
 #endif // _KEYINPUT_C
 #endif // _KEYINPUT_H

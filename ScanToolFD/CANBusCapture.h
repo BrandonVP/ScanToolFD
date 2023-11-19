@@ -56,6 +56,7 @@ typedef enum capture_config_btn {
 	BTN_config_state_Stop,
 	BTN_config_state_Filename,
 	BTN_config_state_Filename_Accept,
+	BTN_config_state_keyInput,
 	BTN_config_button_count
 }Capture_Config_BTN;
 
@@ -71,9 +72,24 @@ extern bool enableCB3;
 uint8_t CAPTURE_input_config = 0;
 uint8_t CAPTURE_output_config = 0;
 
+void CAPTURE_clearLocalVar();
 uint8_t CAPTURE_createMenuBtns();
 uint8_t CAPTURE_createCaptureBtns();
+uint8_t CAPTURE_createLCDBtns();
+uint8_t CAPTURE_createBaudBtns();
+void CAPTURE_enableDisableConfigBtn(bool isEnabled);
+void CAPTURE_processSerialCapture();
+void CAPTURE_processSDCapture(int userInput);
+void CAPTURE_processWirelessCapture();
+void CAPTURE_printFilenameBtns();
+void CAPTURE_removeFilenameBtn();
+void CAPTURE_activateStartBtn();
+void CAPTURE_deactivateStartBtn();
+void CAPTURE_activateStopBtn();
+void CAPTURE_deactivateStopBtn();
 void CAPTURE_captureConfig(int userInput);
+void CAPTURE_LCD_Print(uint32_t id, uint8_t length, uint8_t* data);
+void CAPTURE_LCD_scan(int userInput);
 
 #else
 
