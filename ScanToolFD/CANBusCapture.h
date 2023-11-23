@@ -12,6 +12,7 @@
 
 #include "common.h"
 #include "cbBuffer.h"
+#include "cbBufferFD.h"
 
 #define TIMED_TX_MAX_SIZE 20
 
@@ -64,7 +65,7 @@ typedef enum capture_config_btn {
 
 extern cbBuffer can1Buffer;
 extern cbBuffer can2Buffer;
-extern cbBuffer can3Buffer;
+extern cbBufferFD can3Buffer;
 extern bool enableCB1;
 extern bool enableCB2;
 extern bool enableCB3;
@@ -88,6 +89,7 @@ void CAPTURE_deactivateStartBtn();
 void CAPTURE_activateStopBtn();
 void CAPTURE_deactivateStopBtn();
 void CAPTURE_captureConfig(int userInput);
+void CAPTURE_LCD_clear();
 void CAPTURE_LCD_Print(uint32_t id, uint8_t length, uint8_t* data);
 void CAPTURE_LCD_scan(int userInput);
 
@@ -95,12 +97,16 @@ void CAPTURE_LCD_scan(int userInput);
 
 extern uint8_t CAPTURE_input_config;
 extern uint8_t CAPTURE_output_config;
+extern bool isCaptureRunning;
 
 void CAPTURE_clearLocalVar();
 uint8_t CAPTURE_createMenuBtns();
 uint8_t CAPTURE_createCaptureBtns();
 uint8_t CAPTURE_createLCDBtns();
 uint8_t CAPTURE_createBaudBtns();
+void CAPTURE_processSerialCapture();
+void CAPTURE_processSDCapture(int userInput);
+void CAPTURE_processWirelessCapture();
 void CAPTURE_captureConfig(int userInput);
 void CAPTURE_LCD_scan(int userInput);
 

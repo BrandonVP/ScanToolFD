@@ -26,6 +26,7 @@ void UserInterfaceClass::setButton(uint16_t xStart, uint16_t yStart, uint16_t xS
 	this->borderColor = menuBtnBorder;
 	this->clickBorderColor = menuBtnColor;
 	this->textColor = menuBtnText;
+	this->textSize = 11;
 }
 
 void UserInterfaceClass::setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint16_t clickReturn, bool isRound, String btnText, uint8_t alignText)
@@ -44,6 +45,7 @@ void UserInterfaceClass::setButton(uint16_t xStart, uint16_t yStart, uint16_t xS
 	this->borderColor = menuBtnBorder;
 	this->clickBorderColor = menuBtnColor;
 	this->textColor = menuBtnText;
+	this->textSize = 11;
 }
 
 void UserInterfaceClass::setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint16_t clickReturn, bool isRound, uint8_t radius, String btnText, uint8_t alignText, uint16_t btnC, uint16_t borderC, uint16_t textC)
@@ -62,6 +64,7 @@ void UserInterfaceClass::setButton(uint16_t xStart, uint16_t yStart, uint16_t xS
 	this->borderColor = borderC;
 	this->clickBorderColor = borderC;
 	this->textColor = textC;
+	this->textSize = 11;
 }
 
 void UserInterfaceClass::setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint16_t clickReturn, bool isRound, uint8_t radius, String btnText, uint8_t alignText, uint16_t btnC, uint16_t borderC, uint16_t clickBorderC, uint16_t textC)
@@ -80,6 +83,7 @@ void UserInterfaceClass::setButton(uint16_t xStart, uint16_t yStart, uint16_t xS
 	this->borderColor = borderC;
 	this->clickBorderColor = clickBorderC;
 	this->textColor = textC;
+	this->textSize = 11;
 }
 
 void UserInterfaceClass::setShape(uint8_t isRound)

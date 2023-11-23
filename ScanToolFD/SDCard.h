@@ -7,6 +7,7 @@
  ===========================================================================
  */
 
+/*
 #include "common.h"
 #include <SD.h>
 #include "CANBusCapture.h"
@@ -53,3 +54,4 @@ public:
 	bool readLogFileLCD(char* filename, uint32_t&, bool);
 };
 #endif
+*/

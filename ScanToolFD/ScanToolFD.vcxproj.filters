@@ -80,6 +80,9 @@
     <ClInclude Include="SDCard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="cbBufferFD.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="userInterface.cpp">
@@ -123,6 +126,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SDCard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cbBufferFD.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

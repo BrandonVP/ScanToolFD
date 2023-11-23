@@ -33,7 +33,6 @@
  =========================================================*/
 
 #include "SDCard.h"
-#include "cbBuffer.h"
 #include <MTP_Teensy.h>
 #include <TimeLib.h>
 #include <FlexCAN_T4.h>
@@ -54,6 +53,7 @@
 #include "serialTransfer.h"
 #include "variableLock.h"
 #include "cbBuffer.h"
+#include "cbBufferFD.h"
 
 #include "ili9488_t3_font_Arial.h"
 //#include "ili9488_t3_font_ComicSansMS.h"
@@ -102,7 +102,7 @@ FlexCAN_T4FD<CAN3, RX_SIZE_256, TX_SIZE_16> Can3; // FD
 
 cbBuffer can1Buffer;
 cbBuffer can2Buffer;
-cbBuffer can3Buffer;
+cbBufferFD can3Buffer;
 bool enableCB1 = true;
 bool enableCB2 = true;
 bool enableCB3 = true;
@@ -196,6 +196,7 @@ uint8_t createToolBtns()
 	return btnPos;
 }
 
+
 uint8_t createSettingsBtns()
 {
 	uint8_t btnPos = 0;
@@ -209,6 +210,7 @@ uint8_t createSettingsBtns()
 	userInterfaceButton[btnPos++].setButton(260, 260, 425, 300, 0, true, F("Reset"), ALIGN_CENTER);
 	return btnPos;
 }
+
 
 void loadApps()
 {
@@ -251,6 +253,18 @@ void drawMenu()
 	graphicLoaderState = 0;
 
 	print_icon(5, 5, battery_bits, 32, 4, menuBtnTextColor, 1);
+}
+
+void setFDclock(FLEXCAN_CLOCK clock)
+{
+	CANFD_timings_t config;
+	config.clock = clock; // CLK_24MHz;// CLK_60MHz;
+	config.baudrate = 500000;
+	config.baudrateFD = 5000000;
+	config.propdelay = 190;
+	config.bus_length = 1;
+	config.sample = 70;
+	Can3.setBaudRate(config);
 }
 
 // -------------------------------------------------------------
@@ -341,7 +355,7 @@ void setup(void)
 	Can2.mailboxStatus();
 	Can2.disableFIFOInterrupt();
 
-	/*
+	/* // Start as nonFD
 	Can3.begin();
 	Can3.setBaudRate(500000);
 	Can3.setMaxMB(16);
@@ -352,20 +366,10 @@ void setup(void)
 	Can3.disableFIFOInterrupt();
 	*/
 
-	
 	Can3.begin();
-	CANFD_timings_t config;
-	config.clock = CLK_60MHz;
-	config.baudrate = 500000;
-	config.baudrateFD = 5000000;
-	config.propdelay = 190;
-	config.bus_length = 1;
-	config.sample = 70;
-	Can3.setBaudRate(config);
+	setFDclock(CLK_24MHz); //CLK_24MHz;// CLK_60MHz;
 	Can3.setRegions(64);
-	//Can3.onReceive(CANBus3_IRQHandler);
 	
-
 	CAPTURE_createCaptureBtns();
 
 	// mandatory to begin the MTP session.
@@ -880,6 +884,7 @@ void createMenuBtns()
 //
 void CANBus1_IRQHandler(const CAN_message_t& msg)
 {
+	LED_pulse((RGB)LED_RED);
 	//Serial.printf("%03X  %d  %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\n", msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
 	can1Buffer.push_cb(msg.id, msg.len, msg.buf);
 }
@@ -887,20 +892,34 @@ void CANBus1_IRQHandler(const CAN_message_t& msg)
 //
 void CANBus2_IRQHandler(const CAN_message_t& msg)
 {
+	LED_pulse((RGB)LED_BLUE);
 	//Serial.printf("%03X  %d  %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\n", msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
-
 	can2Buffer.push_cb(msg.id, msg.len, msg.buf);
 }
 
-void CANBus3_IRQHandler(const CAN_message_t& msg)
+//
+void CANBus3_IRQHandler()
 {
+	CANFD_message_t msg;
+	if (Can3.read(msg))
+	{
+		LED_pulse((RGB)LED_GREEN);
+		//Serial.print(msg.id, HEX);
+		//Serial.print("   ");
+		//for (int i = 0; i < msg.len; i++)
+		//{
+		//	Serial.print(msg.buf[i], HEX);
+		//	Serial.print("  ");
+		//}
+		//Serial.println();
+		can3Buffer.push_cb(msg.id, msg.len, msg.buf);
+	}
 	//Serial.printf("%03X  %d  %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\n", msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
-
-	can3Buffer.push_cb(msg.id, msg.len, msg.buf);
+	
 }
 
-
-void CANBus3_IRQHandler()
+//
+void CANBus3_IRQHandler2()
 //void CANBus3_IRQHandler(const CANFD_message_t& msg)
 {
 	CANFD_message_t msg;
@@ -926,15 +945,16 @@ void CANBus3_IRQHandler()
 void backgroundProcess()
 {
 	GUI_buttonMonitor(userInterfaceMenuButton, MENU_BUTTON_SIZE);
-	//serialOut();
-	//SDCardOut();
-	//timedTXSend();
 	BATTERY_printLevel();
 	updateTime();
-	CANBus3_IRQHandler();
+	MTP.loop();
 
 	LED_strobe((RGB)LED_OFF);
-	MTP.loop();
+	
+	CANBus3_IRQHandler();
+	CAPTURE_processSerialCapture();
+	CAPTURE_processWirelessCapture();
+	//timedTXSend();
 }
 
 // Displays time in menu
@@ -961,17 +981,6 @@ void updateTime()
 	}
 }
 
-/*
-void ILI9488_t3::scrollTextArea(uint8_t scrollSize) {
-	uint16_t awColors[scroll_width];
-	for (int y = scroll_y + scrollSize; y < (scroll_y + scroll_height); y++) {
-		readRect(scroll_x, y, scroll_width, 1, awColors);
-		writeRect(scroll_x, y - scrollSize, scroll_width, 1, awColors);
-	}
-	fillRect(scroll_x, (scroll_y + scroll_height) - scrollSize, scroll_width, scrollSize, scrollbgcolor);
-}
-*/
-
 /*=========================================================
 	Main loop
 ===========================================================*/
@@ -979,7 +988,6 @@ void ILI9488_t3::scrollTextArea(uint8_t scrollSize) {
 void loop(void)
 {
 	appLoader();
-	//appManager1();
 	backgroundProcess();
 
 	Can1.events();
@@ -988,47 +996,39 @@ void loop(void)
 
 	static uint32_t timeout123 = millis();
 	static uint16_t rotatingID = 0;
-	if (millis() - timeout123 > 500)
-	{
-		CANFD_message_t msg;
-		msg.id = 0x4CA;
-		msg.len = 64;
-		for (uint8_t i = 0; i < 64; i++) msg.buf[i] = i + 0x25;
-		Can3.write(msg);
-	
-
-		//drawMenu();
-
-		
-		//CAN_message_t msg2;
-		//msg2.id = rotatingID++;
-		//msg2.len = 8;
-		//for (uint8_t i = 0; i < 8; i++) msg2.buf[i] = (uint8_t)millis() + (i * 0x3C);
-		//Can1.write(msg2);
-
-		timeout123 = millis();
-	}
-	
-	
-	/*
 	if (millis() - timeout123 > 2000)
 	{
+		if (CAPTURE_input_config == BTN_config_input_C3)
+		{
+			CANFD_message_t msg;
+			msg.id = 0x4CA;
+			msg.len = 64;
+			for (uint8_t i = 0; i < 64; i++) msg.buf[i] = i + 0x25;
+			Can3.write(msg);
+		}
+		else if (CAPTURE_input_config == BTN_config_input_C2)
+		{
+			CAN_message_t msg;
+			msg.id = rotatingID++;
+			msg.len = 8;
+			for (uint8_t i = 0; i < 8; i++) msg.buf[i] = (uint8_t)millis() + (i * 0x3C);
+			Can2.write(msg);
+		}
+		else if (CAPTURE_input_config == BTN_config_input_C1)
+		{
+			CAN_message_t msg;
+			msg.id = rotatingID++;
+			msg.len = 8;
+			for (uint8_t i = 0; i < 8; i++) msg.buf[i] = (uint8_t)millis() + (i * 0x3C);
+			Can1.write(msg);
+		}
+
+		//drawMenu();
 		
-		CAN_message_t msg;
-		msg.id = 0x654;
-		msg.len = 8;
-		for (uint8_t i = 0; i < 8; i++) msg.buf[i] = i + 0x25;
-		Can1.write(msg);
-		delay(10);
-		
-		CAN_message_t msg2;
-		msg2.id = 0x654;
-		msg2.len = 8;
-		for (uint8_t i = 0; i < 8; i++) msg2.buf[i] = i + 0x25;
-		Can2.write(msg2);
+		//Serial.printf("activeApp: %d\n", activeApp);
+		//Serial.printf("isCaptureRunning: %d   CAPTURE_input_config: %d   CAPTURE_input_config: %d \n", isCaptureRunning, CAPTURE_input_config, CAPTURE_output_config);
 		timeout123 = millis();
 	}
-	*/
 }
 
 

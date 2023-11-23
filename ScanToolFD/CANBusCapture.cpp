@@ -15,11 +15,13 @@
 static uint8_t CAPTURE_state = 0;
 static int printIndex = 0;
 static char printString[16][64];
-static bool isCaptureRunning = false;
+bool isCaptureRunning = false;
 static uint32_t messageNum = 0;
 static uint8_t inputIndex = 0;
-static char *filename = "Filename";
-static char newFilename[8] = "";
+static char* filename = "Filename";
+//static char filename[9] = { 'F', 'i', 'l', 'e', 'n', 'a', 'm', 'e' };
+static char newFilename[8];
+static char SDfilename[50];
 
 void CAPTURE_clearLocalVar()
 {
@@ -143,7 +145,7 @@ void CAPTURE_processSerialCapture()
 {
 	char buffer[128];
 
-	if ((CAPTURE_state == BTN_config_state_Start) && (CAPTURE_output_config == BTN_config_output_Serial))
+	if ((isCaptureRunning) && (CAPTURE_output_config == BTN_config_output_Serial))
 	{
 		switch (CAPTURE_input_config)
 		{
@@ -168,10 +170,16 @@ void CAPTURE_processSerialCapture()
 		case BTN_config_input_C3:
 			if (can3Buffer.stack_size_cb() > 0)
 			{
-				CAN_Frame msg;
+				CAN_Frame_FD msg;
 				can3Buffer.pop_cb(&msg);
-				sprintf(buffer, "%8ld    %9ld    %04lX   %d   %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\r\n", ++messageNum, millis(), msg.id, msg.length, msg.data[0], msg.data[1], msg.data[2], msg.data[3], msg.data[4], msg.data[5], msg.data[6], msg.data[7]);
-				Serial.print(buffer);
+
+				sprintf(buffer, "%8ld    %9ld    %04lX   %d   ", ++messageNum, millis(), msg.id, msg.length);
+				for (int i = 0; i < msg.length; i++)
+				{
+					Serial.print(msg.data[i], HEX);
+					Serial.print("  ");
+				}
+				Serial.println();
 			}
 			break;
 		case BTN_config_input_Wireless:
@@ -184,12 +192,49 @@ void CAPTURE_processSerialCapture()
 	}
 }
 
+/*
+void hex2String(uint8_t value, char(&result)[N])
+{
+	if (((value >> 4) & 0x0f) < 10)
+	{
+		result[0] = (((value >> 4) & 0x0f) + 48);
+	}
+	else
+	{
+		result[0] = (((value >> 4) & 0x0f) + 55);
+	}
+	if ((value & 0x0f) < 10)
+	{
+		result[1] = (value & 0x0f) + 48;
+	}
+	else
+	{
+		result[1] = (value & 0x0f) + 55;
+	}
+}
+*/
+
+/*
+void CAPTURE_setSDFilename(char* filename)
+{
+	for (uint8_t i = 0; i < 50; i++)
+	{
+		SDfilename[i] = '\0';
+	}
+	char* a1 = SDfilename;
+	memcpy(a1, "canlog/", 7);
+	strcat(SDfilename, filename);
+	strncpy(filename, keyboardInput, 8);
+	strcat(filename, ".txt");
+}
+*/
+
 extern File myFile;
 void CAPTURE_processSDCapture(int userInput)
 {
-	char buffer[80];
-	static bool isFilename = false;
-	const uint8_t MAX_INPUT_SIZE = 4;
+	char buffer[70];
+	//static bool isFilename = false;
+	//const uint8_t MAX_INPUT_SIZE = 4;
 	uint8_t change; // For keypad controller output
 
 	if ((CAPTURE_state == BTN_config_state_keyInput) && (CAPTURE_output_config == BTN_config_output_SDCard))
@@ -208,29 +253,46 @@ void CAPTURE_processSDCapture(int userInput)
 			CAPTURE_enableDisableConfigBtn(true);
 			CAPTURE_activateStartBtn();
 			CAPTURE_deactivateStopBtn();
+			CAPTURE_state = BTN_config_state_Filename_Accept;
 			display.updateScreen();
+
+	
+			//SD.mkdir("canlog");
+			
+			for (uint8_t i = 0; i < 50; i++)
+			{
+				SDfilename[i] = '\0';
+			}
+
+			char* a1 = SDfilename;
+			memcpy(a1, "canlog/", 7);
+			strcat(SDfilename, newFilename);
+			strcat(SDfilename, ".txt");
+			Serial.println(SDfilename);
+		
 		}
 	}
 
 	if ((CAPTURE_state == BTN_config_state_Start) && (CAPTURE_output_config == BTN_config_output_SDCard))
 	{
-		myFile = SD.open("log.txt", FILE_WRITE);
+		myFile = SD.open(SDfilename, FILE_WRITE);
+
 		if (!myFile)
 		{
-			Serial.println("returning");
+			Serial.println("Failed to open");
 			return;
 		}
+		
 
 		switch (CAPTURE_input_config)
 		{
 		case BTN_config_input_C1: // Start
 			if (can1Buffer.stack_size_cb() > 0)
 			{
-				Serial.println("in");
 				CAN_Frame msg;
 				can1Buffer.pop_cb(&msg);
-				sprintf(buffer, "%8ld    %9ld    %04lX   %d   %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\r\n", ++messageNum, millis(), msg.id, msg.length, msg.data[0], msg.data[1], msg.data[2], msg.data[3], msg.data[4], msg.data[5], msg.data[6], msg.data[7]);
-				myFile.write(buffer, 70);
+				sprintf(buffer, "%8d   %9ld   %04lX   %d   %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X", ++messageNum, millis(), msg.id, msg.length, msg.data[0], msg.data[1], msg.data[2], msg.data[3], msg.data[4], msg.data[5], msg.data[6], msg.data[7]);
+				myFile.println(buffer);
 			}
 			break;
 		case BTN_config_input_C2:
@@ -238,17 +300,17 @@ void CAPTURE_processSDCapture(int userInput)
 			{
 				CAN_Frame msg;
 				can2Buffer.pop_cb(&msg);
-				sprintf(buffer, "%8ld    %9ld    %04lX   %d   %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\r\n", ++messageNum, millis(), msg.id, msg.length, msg.data[0], msg.data[1], msg.data[2], msg.data[3], msg.data[4], msg.data[5], msg.data[6], msg.data[7]);
-				myFile.write(buffer, 70);
+				sprintf(buffer, "%8d    %9ld    %04lX   %d   %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X", ++messageNum, millis(), msg.id, msg.length, msg.data[0], msg.data[1], msg.data[2], msg.data[3], msg.data[4], msg.data[5], msg.data[6], msg.data[7]);
+				myFile.println(buffer);
 			}
 			break;
 		case BTN_config_input_C3:
 			if (can3Buffer.stack_size_cb() > 0)
 			{
-				CAN_Frame msg;
+				CAN_Frame_FD msg;
 				can3Buffer.pop_cb(&msg);
-				sprintf(buffer, "%8ld    %9ld    %04lX   %d   %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\r\n", ++messageNum, millis(), msg.id, msg.length, msg.data[0], msg.data[1], msg.data[2], msg.data[3], msg.data[4], msg.data[5], msg.data[6], msg.data[7]);
-				myFile.write(buffer, 70);
+				sprintf(buffer, "%8d    %9ld    %04lX   %d   %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X", ++messageNum, millis(), msg.id, msg.length, msg.data[0], msg.data[1], msg.data[2], msg.data[3], msg.data[4], msg.data[5], msg.data[6], msg.data[7]);
+				myFile.println(buffer);
 			}
 			break;
 		case BTN_config_input_Wireless:
@@ -427,24 +489,34 @@ void CAPTURE_captureConfig(int userInput)
 	// -----------START-----------
 	if (userInput == BTN_config_state_Start)
 	{
+		// These two are duplicated
+		CAPTURE_state = BTN_config_state_Start;
+		isCaptureRunning = true;
 		messageNum = 0;
+
+		can1Buffer.clear_buffer_cb();
+		can2Buffer.clear_buffer_cb();
+		can3Buffer.clear_buffer_cb();
+
+		if (CAPTURE_input_config == BTN_config_input_C3)
+		{
+			setFDclock(CLK_60MHz);
+		}
+		else
+		{
+			setFDclock(CLK_24MHz); 
+		}
+
 		if (CAPTURE_output_config == BTN_config_output_LCD)
 		{
-			can1Buffer.clear_buffer_cb();
-			can2Buffer.clear_buffer_cb();
-			can3Buffer.clear_buffer_cb();
-			
+			CAPTURE_LCD_clear();
 			nextApp = (APP_labels)APP_CAPTURE_LCD;
 			return;
 		}
-		CAPTURE_enableDisableConfigBtn(false);
 
+		CAPTURE_enableDisableConfigBtn(false);
 		CAPTURE_deactivateStartBtn();
 		CAPTURE_activateStopBtn();
-
-		// These two are duplicated
-		isCaptureRunning = true;
-		CAPTURE_state = BTN_config_state_Start;
 
 		display.updateScreen();
 	}
@@ -475,9 +547,20 @@ void CAPTURE_captureConfig(int userInput)
 	}
 
 	// -----------PROCESS-----------
-	CAPTURE_processSerialCapture();
 	CAPTURE_processSDCapture(userInput);
-	CAPTURE_processWirelessCapture();
+}
+
+//
+void CAPTURE_LCD_clear()
+{
+	printIndex = 0;
+	for (uint8_t i = 0; i < 16; i++)
+	{
+		for (uint8_t j = 0; j < 64; j++)
+		{
+			printString[i][j] = '\0';
+		}
+	}
 }
 
 // Print RF packets to the LCD
@@ -548,15 +631,9 @@ void CAPTURE_LCD_scan(int userInput)
 		can2Buffer.clear_buffer_cb();
 		can3Buffer.clear_buffer_cb();
 
-		for (uint8_t i = 0; i < 16; i++)
-		{
-			for (uint8_t j = 0; j < 64; j++)
-			{
-				printString[i][j] = '\0';
-			}
-		}
+		CAPTURE_LCD_clear();
+
 		GUI_drawSquareBtn(0, 51, 408, 320, "", themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
-		printIndex = 0;
 		display.updateScreen();
 	}
 	else if (userInput == BTN_capture_config)
@@ -591,7 +668,7 @@ void CAPTURE_LCD_scan(int userInput)
 		case BTN_config_input_C3: 
 			if (can3Buffer.stack_size_cb() > 0)
 			{
-				CAN_Frame message;
+				CAN_Frame_FD message;
 				can3Buffer.pop_cb(&message);
 				CAPTURE_LCD_Print(message.id, message.length, message.data);
 			}
