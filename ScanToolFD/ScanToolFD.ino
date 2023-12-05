@@ -10,8 +10,23 @@
  /*=========================================================
 	 Todo List
  ===========================================================
+ Wires config
+ C2 out only config
+ Baud
+ filter mask
+ SD FD format for 64 byte data
+ read sd logs on card
+ -delete
+ -replay
+ -view
+ 
+ Tools 
+ -MSG spam
+ -OBD Sim?
+ -VIN
 
-
+ Bug
+ Moving off button after selecting will prevent deselect
  ===========================================================
 	 End Todo List
  =========================================================*/
@@ -110,6 +125,7 @@ bool enableCB3 = true;
 const int chipSelect = 2;
 File myFile;
 
+// Icon
 const uint8_t battery_bits[] = {
   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -124,7 +140,7 @@ const uint8_t battery_bits[] = {
   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
 };
 
-
+// Icon print sub function
 unsigned int reverseBits(uint8_t num)
 {
 	unsigned int NO_OF_BITS = sizeof(num) * 2;
@@ -180,8 +196,7 @@ void appTransition()
 	display.useFrameBuffer(true);
 }
 
-
-
+//
 uint8_t createToolBtns()
 {
 	uint8_t btnPos = 0;
@@ -196,7 +211,7 @@ uint8_t createToolBtns()
 	return btnPos;
 }
 
-
+//
 uint8_t createSettingsBtns()
 {
 	uint8_t btnPos = 0;
@@ -211,7 +226,7 @@ uint8_t createSettingsBtns()
 	return btnPos;
 }
 
-
+//
 void loadApps()
 {
 	myApps.reserve(15);
@@ -231,12 +246,13 @@ void loadApps()
 	myApps.push_back(appObj6);
 	appManager appObj7(MENU_canBus, "Send", APP_SEND, someFn, KEYINPUT_createKeyboardButtons);
 	myApps.push_back(appObj7);	
-	appManager appObj8(MENU_canBus, "BaudRate", APP_BAUD_RATE, someFn, CAPTURE_createBaudBtns);
+	appManager appObj8(MENU_canBus, "BaudRate", APP_BAUD_RATE, CAPTURE_Baud, CAPTURE_createBaudBtns);
 	myApps.push_back(appObj8);
 	
 	//myApps.insert((myApps.begin() + 3), appObj4);
 }
 
+//
 void drawMenu()
 {
 	// 
@@ -255,12 +271,13 @@ void drawMenu()
 	print_icon(5, 5, battery_bits, 32, 4, menuBtnTextColor, 1);
 }
 
-void setFDclock(FLEXCAN_CLOCK clock)
+//
+void setCANBusFD(FLEXCAN_CLOCK clock, int baud)
 {
 	CANFD_timings_t config;
 	config.clock = clock; // CLK_24MHz;// CLK_60MHz;
-	config.baudrate = 500000;
-	config.baudrateFD = 5000000;
+	config.baudrate = baud;
+	config.baudrateFD = baud;
 	config.propdelay = 190;
 	config.bus_length = 1;
 	config.sample = 70;
@@ -355,6 +372,7 @@ void setup(void)
 	Can2.mailboxStatus();
 	Can2.disableFIFOInterrupt();
 
+
 	/* // Start as nonFD
 	Can3.begin();
 	Can3.setBaudRate(500000);
@@ -367,8 +385,19 @@ void setup(void)
 	*/
 
 	Can3.begin();
-	setFDclock(CLK_24MHz); //CLK_24MHz;// CLK_60MHz;
+	/*
+	CANFD_timings_t config;
+	config.clock = CLK_24MHz;
+	config.baudrate = 1000000;
+	config.baudrateFD = 2000000;
+	config.propdelay = 190;
+	config.bus_length = 1;
+	config.sample = 70;
+	FD.setBaudRate(config);
+	*/
+	setCANBusFD(CLK_24MHz, CANBusFDBaudRate); //CLK_24MHz;// CLK_60MHz;
 	Can3.setRegions(64);
+
 	
 	CAPTURE_createCaptureBtns();
 
@@ -446,11 +475,13 @@ void setup(void)
 
 }
 
+//
 void someFn(int a)
 {
-
+	// Temporary holder 
 }
 
+//
 void CAPTURE_CANBus(int userInput)
 {
 	if (userInput >= 0)
@@ -460,6 +491,7 @@ void CAPTURE_CANBus(int userInput)
 	}
 }
 
+//
 void appLoader()
 {
 	// Draw page and lock variables
@@ -485,7 +517,7 @@ void appLoader()
 	// Call buttons or page method
 	myApps[activeApp].runApp(GUI_subMenuButtonMonitor(userInterfaceButton, buttonsOnPage));
 
-	// Release any variable locks if page changed
+	// Load next selected app
 	if (nextApp != activeApp)
 	{
 		appTransition();
@@ -885,7 +917,7 @@ void createMenuBtns()
 void CANBus1_IRQHandler(const CAN_message_t& msg)
 {
 	LED_pulse((RGB)LED_RED);
-	//Serial.printf("%03X  %d  %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\n", msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
+	Serial.printf("1: %03X  %d  %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\n", msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
 	can1Buffer.push_cb(msg.id, msg.len, msg.buf);
 }
 
@@ -893,7 +925,7 @@ void CANBus1_IRQHandler(const CAN_message_t& msg)
 void CANBus2_IRQHandler(const CAN_message_t& msg)
 {
 	LED_pulse((RGB)LED_BLUE);
-	//Serial.printf("%03X  %d  %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\n", msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
+	Serial.printf("2: %03X  %d  %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\n", msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
 	can2Buffer.push_cb(msg.id, msg.len, msg.buf);
 }
 
@@ -964,17 +996,27 @@ void updateTime()
 	if (millis() - updateClock > 999)
 	{
 		display.setTextColor(menuBtnTextColor);
-		char printString[64];
+		char printStringT[64];
+		char printStringB[64];
 
 		display.setFont(Michroma_8);
 
-		display.fillRect(59, 8, 88, 27, menuBackground); // menuBackground
+		 // menuBackground
 
-		sprintf(printString, "%2d:%2d:%2d", hour(), minute(), second());
-		display.drawString(printString, 60, 10);
+		sprintf(printStringT, "%2d:%2d:%2d", hour(), minute(), second());
+		sprintf(printStringB, "%2d/%2d/%2d", month(), day(), year());
 
-		sprintf(printString, "%2d/%2d/%2d", month(), day(), year());
-		display.drawString(printString, 60, 25);
+		// Print to screen
+		display.useFrameBuffer(false);
+		display.fillRect(59, 8, 88, 27, menuBackground);
+		display.drawString(printStringT, 60, 10);
+		display.drawString(printStringB, 60, 25);
+		display.useFrameBuffer(true);
+
+		// Update buffer but DO NOT print buffer
+		display.fillRect(59, 8, 88, 27, menuBackground);
+		display.drawString(printStringT, 60, 10);
+		display.drawString(printStringB, 60, 25);
 
 		display.setFont(Michroma_11);
 		updateClock = millis();

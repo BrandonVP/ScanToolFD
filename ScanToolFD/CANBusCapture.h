@@ -61,6 +61,26 @@ typedef enum capture_config_btn {
 	BTN_config_button_count
 }Capture_Config_BTN;
 
+typedef enum capture_baud_btn {
+	BTN_baud_label1,
+	BTN_baud_can1,
+	BTN_baud_label2,
+	BTN_baud_can2,
+	BTN_baud_label3,
+	BTN_baud_can3,
+	BTN_baud_canSet,
+	BTN_baud_table,
+	BTN_baud_5m,
+	BTN_baud_2m,
+	BTN_baud_1m,
+	BTN_baud_800k,
+	BTN_baud_500k,
+	BTN_baud_250k,
+	BTN_baud_125k,
+	BTN_baud_100k,
+	BTN_baud_button_count
+}Capture_Baud_BTN;
+
 #ifdef _CANBUSCAPTURE_C
 
 extern cbBuffer can1Buffer;
@@ -92,12 +112,14 @@ void CAPTURE_captureConfig(int userInput);
 void CAPTURE_LCD_clear();
 void CAPTURE_LCD_Print(uint32_t id, uint8_t length, uint8_t* data);
 void CAPTURE_LCD_scan(int userInput);
+void CAPTURE_Baud(int userInput);
 
 #else
 
 extern uint8_t CAPTURE_input_config;
 extern uint8_t CAPTURE_output_config;
 extern bool isCaptureRunning;
+extern uint32_t CANBusFDBaudRate;
 
 void CAPTURE_clearLocalVar();
 uint8_t CAPTURE_createMenuBtns();
@@ -109,6 +131,7 @@ void CAPTURE_processSDCapture(int userInput);
 void CAPTURE_processWirelessCapture();
 void CAPTURE_captureConfig(int userInput);
 void CAPTURE_LCD_scan(int userInput);
+void CAPTURE_Baud(int userInput);
 
 #endif // _CANBUSCAPTURE_C
 #endif // _CANBUSCAPTURE_h

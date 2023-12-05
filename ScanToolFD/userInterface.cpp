@@ -86,6 +86,11 @@ void UserInterfaceClass::setButton(uint16_t xStart, uint16_t yStart, uint16_t xS
 	this->textSize = 11;
 }
 
+void UserInterfaceClass::setText(String btnText)
+{
+	this->btnText = btnText;
+}
+
 void UserInterfaceClass::setShape(uint8_t isRound)
 {
 	if (isRound)

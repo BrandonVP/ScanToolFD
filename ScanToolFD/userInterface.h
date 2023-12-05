@@ -53,6 +53,7 @@ class UserInterfaceClass
 	void setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint16_t clickReturn, bool isRound, String btnText, uint8_t alignText);
 	void setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint16_t clickReturn, bool isRound, uint8_t radius, String btnText, uint8_t alignText, uint16_t btnC, uint16_t borderC, uint16_t textC);
 	void setButton(uint16_t xStart, uint16_t yStart, uint16_t xStop, uint16_t yStop, uint16_t clickReturn, bool isRound, uint8_t radius, String btnText, uint8_t alignText, uint16_t btnC, uint16_t borderC, uint16_t clickBorderC, uint16_t textC);
+	void setText(String btnText);
 	void setShape(uint8_t isRound);
 	void setClickable(uint8_t isClickable);
 	void setBgColor(uint16_t color);
