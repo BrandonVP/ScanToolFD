@@ -12,7 +12,7 @@
 #include "KeyInput.h"
 
  // Local variables
-UserInterfaceClass userKeyButtons[43];
+UserInterfaceClass userKeyButtons[45];
 uint8_t keyPadButtons = 0;
 uint8_t keypadInput[5] = { 0, 0, 0, 0, 0 };
 uint8_t hexInput[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };

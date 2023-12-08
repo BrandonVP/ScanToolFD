@@ -33,8 +33,6 @@ bool GUI_Touch_getXY()
 //
 void GUI_drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int alignText, int radius)
 {
-    const uint8_t LETTER_WIDTH = 10;
-    //const uint8_t SIDE_OFFSET = 2;
     const uint8_t yMagicOffset = 6;
     int stringLength, buttonWidth, offset;
 
@@ -72,8 +70,6 @@ void GUI_drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String b
 //
 void GUI_drawSquareBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int alignText)
 {
-    const uint8_t LETTER_WIDTH = 11;
-    const uint8_t SIDE_OFFSET = 2;
     const uint8_t yMagicOffset = 6;
     int stringLength, buttonWidth, offset;
 
@@ -119,7 +115,7 @@ void GUI_waitForIt(int x_start, int y_start, int x_stop, int y_stop, int radius,
     else
     {
         // < 50 indicates this is a menu button press
-        GUI_drawSquareBtn(0, 45, 480, 50, "", menuBorder, menuBorder, menuBorder, ALIGN_CENTER);
+        GUI_drawSquareBtn(62, 45, 480, 50, "", menuBorder, menuBorder, menuBorder, ALIGN_CENTER);
     }
 
     while (ts.touched())
@@ -136,7 +132,7 @@ void GUI_waitForIt(int x_start, int y_start, int x_stop, int y_stop, int radius,
     {
         GUI_drawSquareBtn(x_start, 45, x_stop, 50, "", menuBtnColor, menuBtnColor, borderC, ALIGN_CENTER);
         display.useFrameBuffer(true);
-        GUI_drawSquareBtn(0, 45, 480, 50, "", menuBorder, menuBorder, menuBorder, ALIGN_CENTER);
+        GUI_drawSquareBtn(62, 45, 480, 50, "", menuBorder, menuBorder, menuBorder, ALIGN_CENTER);
         GUI_drawSquareBtn(x_start, 45, x_stop, 50, "", menuBtnColor, menuBtnColor, borderC, ALIGN_CENTER);
     }
 }
@@ -174,7 +170,7 @@ void GUI_buttonMonitor(UserInterfaceClass* buttons, uint16_t size)
                     {
                         GUI_waitForItRect(buttons[i].getXStart(), buttons[i].getYStart(), buttons[i].getXStop(), buttons[i].getYStop(), buttons[i].getRadius(), buttons[i].getBorderColor(), buttons[i].getClickBorderColor());
                     }
-                    nextApp = buttons[i].getClickReturn();
+                    nextApp = (APP_labels)buttons[i].getClickReturn();
                 }
             }
         }

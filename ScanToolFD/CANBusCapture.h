@@ -57,8 +57,9 @@ typedef enum capture_config_btn {
 	BTN_config_state_Stop,
 	BTN_config_state_Filename,
 	BTN_config_state_Filename_Accept,
-	BTN_config_state_keyInput,
-	BTN_config_button_count
+	BTN_config_button_count,
+	BTN_config_state_keyInput
+	
 }Capture_Config_BTN;
 
 typedef enum capture_baud_btn {
@@ -81,6 +82,31 @@ typedef enum capture_baud_btn {
 	BTN_baud_button_count
 }Capture_Baud_BTN;
 
+typedef enum capture_filterMask_btn {
+	BTN_filterMask_CANLabel,
+	BTN_filterMask_CAN1Label,
+	BTN_filterMask_CAN2Label,
+	BTN_filterMask_CAN3Label,
+	BTN_filterMask_WiFiLabel,
+	BTN_filterMask_filterLabel,
+	BTN_filterMask_filter1,
+	BTN_filterMask_filter2,
+	BTN_filterMask_filter3,
+	BTN_filterMask_filterWiFi,
+	BTN_filterMask_maskLabel,
+	BTN_filterMask_mask1,
+	BTN_filterMask_mask2,
+	BTN_filterMask_mask3,
+	BTN_filterMask_maskWiFi,
+	BTN_filterMask_openLabel,
+	BTN_filterMask_open1,
+	BTN_filterMask_open2,
+	BTN_filterMask_open3,
+	BTN_filterMask_openWifi,
+	BTN_filterMask_button_count
+}Capture_FilterMask_BTN;
+
+
 #ifdef _CANBUSCAPTURE_C
 
 extern cbBuffer can1Buffer;
@@ -98,6 +124,7 @@ uint8_t CAPTURE_createMenuBtns();
 uint8_t CAPTURE_createCaptureBtns();
 uint8_t CAPTURE_createLCDBtns();
 uint8_t CAPTURE_createBaudBtns();
+uint8_t CAPTURE_createFilterMaskBtns();
 void CAPTURE_enableDisableConfigBtn(bool isEnabled);
 void CAPTURE_processSerialCapture();
 void CAPTURE_processSDCapture(int userInput);
@@ -126,12 +153,14 @@ uint8_t CAPTURE_createMenuBtns();
 uint8_t CAPTURE_createCaptureBtns();
 uint8_t CAPTURE_createLCDBtns();
 uint8_t CAPTURE_createBaudBtns();
+uint8_t CAPTURE_createFilterMaskBtns();
 void CAPTURE_processSerialCapture();
 void CAPTURE_processSDCapture(int userInput);
 void CAPTURE_processWirelessCapture();
 void CAPTURE_captureConfig(int userInput);
 void CAPTURE_LCD_scan(int userInput);
 void CAPTURE_Baud(int userInput);
+uint8_t CAPTURE_drawCANLogScroll();
 
 #endif // _CANBUSCAPTURE_C
 #endif // _CANBUSCAPTURE_h

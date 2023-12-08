@@ -47,6 +47,7 @@
 	 End README
  =========================================================*/
 
+#include "icons.h"
 #include "SDCard.h"
 #include <MTP_Teensy.h>
 #include <TimeLib.h>
@@ -69,6 +70,7 @@
 #include "variableLock.h"
 #include "cbBuffer.h"
 #include "cbBufferFD.h"
+#include "icons.h"
 
 #include "ili9488_t3_font_Arial.h"
 //#include "ili9488_t3_font_ComicSansMS.h"
@@ -124,61 +126,6 @@ bool enableCB3 = true;
 
 const int chipSelect = 2;
 File myFile;
-
-// Icon
-const uint8_t battery_bits[] = {
-  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-  0x00,0x00,0x00,0x00,0xFE,0xFF,0xFF,0x07,0xFE,0xFF,0xFF,0x07,
-  0x8E,0xE3,0x18,0x07,0x8E,0xE3,0x18,0x07,0x8E,0xE3,0x18,0x7F,
-  0x8E,0xE3,0x18,0x7F,0x8E,0xE3,0x18,0x7F,0x8E,0xE3,0x18,0x7F,
-  0x8E,0xE3,0x18,0x7F,0x8E,0xE3,0x18,0x7F,0x8E,0xE3,0x18,0x7F,
-  0x8E,0xE3,0x18,0x7F,0x8E,0xE3,0x18,0x7F,0x8E,0xE3,0x18,0x7F,
-  0x8E,0xE3,0x18,0x07,0x8E,0xE3,0x18,0x07,0xFE,0xFF,0xFF,0x07,
-  0xFE,0xFF,0xFF,0x07,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
-  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
-};
-
-// Icon print sub function
-unsigned int reverseBits(uint8_t num)
-{
-	unsigned int NO_OF_BITS = sizeof(num) * 2;
-	unsigned int reverse_num = 0, i, temp;
-
-	for (i = 0; i < NO_OF_BITS; i++)
-	{
-		temp = (num & (1 << i));
-		if (temp) reverse_num |= (1 << ((NO_OF_BITS - 1) - i));
-	}
-	return reverse_num;
-}
-
-// Then wrote this function to print the bits (located in icons.h)
-void print_icon(uint16_t x, uint16_t y, const uint8_t icon[], uint8_t maxRow, uint8_t maxColumn, uint16_t color1, uint16_t color2)
-{
-	int16_t i = 0, row, column, bit, temp;
-	for (row = 0; row < maxRow; row++) //64
-	{
-		for (column = 0; column < maxColumn; column++) // 8
-		{
-			temp = icon[i];
-			for (bit = 7; bit >= 0; bit--)
-			{
-				if (temp & 1)
-				{
-					display.drawPixel(x + (column * 8) + (8 - bit), y + row, color1);
-				}
-				else
-				{
-					//display.drawPixel(x + (column * 8) + (8 - bit), y + row, menuBtnColor);
-				}
-				temp >>= 1;
-			}
-			i++;
-		}
-	}
-}
 
 // Arduino library time update
 time_t getTeensy3Time()
@@ -240,9 +187,9 @@ void loadApps()
 	myApps.push_back(appObj3);
 	appManager appObj4(MENU_sub, "CaptureLCD", APP_CAPTURE_LCD, CAPTURE_LCD_scan, CAPTURE_createLCDBtns);
 	myApps.push_back(appObj4);
-	appManager appObj5(MENU_canBus, "Files", APP_FILES, someFn, KEYINPUT_createKeyboardButtons);
+	appManager appObj5(MENU_canBus, "Files", APP_FILES, someFn, CAPTURE_drawCANLogScroll);
 	myApps.push_back(appObj5);
-	appManager appObj6(MENU_canBus, "FilterMask", APP_FILTER_MASK, someFn, KEYINPUT_createKeyboardButtons);
+	appManager appObj6(MENU_canBus, "FilterMask", APP_FILTER_MASK, someFn, CAPTURE_createFilterMaskBtns);
 	myApps.push_back(appObj6);
 	appManager appObj7(MENU_canBus, "Send", APP_SEND, someFn, KEYINPUT_createKeyboardButtons);
 	myApps.push_back(appObj7);	
@@ -268,7 +215,7 @@ void drawMenu()
 	while (GUI_drawPage(userInterfaceMenuButton, graphicLoaderState, 3));
 	graphicLoaderState = 0;
 
-	print_icon(5, 5, battery_bits, 32, 4, menuBtnTextColor, 1);
+	ICONS_printIcon(5, 5, battery_bits, 32, 4, menuBtnTextColor, 1);
 }
 
 //
@@ -282,6 +229,12 @@ void setCANBusFD(FLEXCAN_CLOCK clock, int baud)
 	config.bus_length = 1;
 	config.sample = 70;
 	Can3.setBaudRate(config);
+}
+
+void dateTime(uint16_t* date, uint16_t* time)
+{
+	*date = FAT_DATE(year(), month(), day());
+	*time = FAT_TIME(hour(), minute(), second());
 }
 
 // -------------------------------------------------------------
@@ -408,38 +361,42 @@ void setup(void)
 	// so you have to close this one before opening another.
 	SD.begin(chipSelect);
 	
+	SdFile::dateTimeCallback(dateTime);
+
 	MTP.addFilesystem(SD, "SD Card");
-	myFile = SD.open("a.txt", FILE_WRITE);
+	//myFile = SD.open("a.txt", FILE_WRITE);
+
+	SD.remove("a.txt");
 
 	// if the file opened okay, write to it:
-	if (myFile) {
-		Serial.print("Writing to test.txt...");
-		myFile.println("testing 1, 2, 3.");
-		// close the file:
-		myFile.close();
-		Serial.println("done.");
-	}
-	else {
-		// if the file didn't open, print an error:
-		Serial.println("error opening a.txt");
-	}
+	//if (myFile) {
+	//	Serial.print("Writing to test.txt...");
+	//	myFile.println("testing 1, 2, 3.");
+	//	// close the file:
+	//	myFile.close();
+	//	Serial.println("done.");
+	//}
+	//else {
+	//	// if the file didn't open, print an error:
+	//	Serial.println("error opening a.txt");
+	//}
 
-	// re-open the file for reading:
-	myFile = SD.open("a.txt");
-	if (myFile) {
-		Serial.println("a.txt:");
+	//// re-open the file for reading:
+	//myFile = SD.open("a.txt");
+	//if (myFile) {
+	//	Serial.println("a.txt:");
 
-		// read from the file until there's nothing else in it:
-		while (myFile.available()) {
-			Serial.write(myFile.read());
-		}
-		// close the file:
-		myFile.close();
-	}
-	else {
-		// if the file didn't open, print an error:
-		Serial.println("error opening a.txt");
-	}
+	//	// read from the file until there's nothing else in it:
+	//	while (myFile.available()) {
+	//		Serial.write(myFile.read());
+	//	}
+	//	// close the file:
+	//	myFile.close();
+	//}
+	//else {
+	//	// if the file didn't open, print an error:
+	//	Serial.println("error opening a.txt");
+	//}
 	
 	pinMode(6, OUTPUT);
 	digitalWrite(6, LOW);
@@ -487,14 +444,14 @@ void CAPTURE_CANBus(int userInput)
 	if (userInput >= 0)
 	{
 		nextApp = (APP_labels)userInput;
-		Serial.printf("nextApp: %d \n", nextApp);
+		//Serial.printf("nextApp: %d \n", nextApp);
 	}
 }
 
 //
 void appLoader()
 {
-	// Draw page and lock variables
+	// Draw page
 	if (!hasDrawn)
 	{
 		if (graphicLoaderState == 0)
@@ -508,8 +465,8 @@ void appLoader()
 		{
 			return;
 		}
-		Serial.printf("App: %d\n", (int)activeApp);
-		Serial.println(myApps[(int)activeApp].getName());
+		//Serial.printf("App: %d\n", (int)activeApp);
+		//Serial.println(myApps[(int)activeApp].getName());
 		hasDrawn = true;
 		display.updateScreen();
 	}
@@ -917,7 +874,7 @@ void createMenuBtns()
 void CANBus1_IRQHandler(const CAN_message_t& msg)
 {
 	LED_pulse((RGB)LED_RED);
-	Serial.printf("1: %03X  %d  %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\n", msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
+	//Serial.printf("1: %03X  %d  %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\n", msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
 	can1Buffer.push_cb(msg.id, msg.len, msg.buf);
 }
 
@@ -976,6 +933,11 @@ void CANBus3_IRQHandler2()
 // All background process should be called from here
 void backgroundProcess()
 {
+
+	Can1.events();
+	Can2.events();
+	//Can3.events();
+
 	GUI_buttonMonitor(userInterfaceMenuButton, MENU_BUTTON_SIZE);
 	BATTERY_printLevel();
 	updateTime();
@@ -986,6 +948,7 @@ void backgroundProcess()
 	CANBus3_IRQHandler();
 	CAPTURE_processSerialCapture();
 	CAPTURE_processWirelessCapture();
+
 	//timedTXSend();
 }
 
@@ -1008,15 +971,15 @@ void updateTime()
 
 		// Print to screen
 		display.useFrameBuffer(false);
-		display.fillRect(59, 8, 88, 27, menuBackground);
-		display.drawString(printStringT, 60, 10);
-		display.drawString(printStringB, 60, 25);
+		display.fillRect(64, 8, 88, 27, menuBackground);
+		display.drawString(printStringT, 65, 10);
+		display.drawString(printStringB, 65, 25);
 		display.useFrameBuffer(true);
 
 		// Update buffer but DO NOT print buffer
-		display.fillRect(59, 8, 88, 27, menuBackground);
-		display.drawString(printStringT, 60, 10);
-		display.drawString(printStringB, 60, 25);
+		display.fillRect(64, 8, 88, 27, menuBackground);
+		display.drawString(printStringT, 65, 10);
+		display.drawString(printStringB, 65, 25);
 
 		display.setFont(Michroma_11);
 		updateClock = millis();
@@ -1032,9 +995,6 @@ void loop(void)
 	appLoader();
 	backgroundProcess();
 
-	Can1.events();
-	Can2.events();
-	//Can3.events();
 
 	static uint32_t timeout123 = millis();
 	static uint16_t rotatingID = 0;
