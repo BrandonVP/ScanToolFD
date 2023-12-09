@@ -141,12 +141,24 @@ void appTransition()
 	activeApp = nextApp;
 	GUI_stopLoadBarTimed();
 	display.useFrameBuffer(true);
+	CAPTURE_clearLocalVar();
 }
 
-//
+// TODO: Make auto populated
 uint8_t createToolBtns()
 {
 	uint8_t btnPos = 0;
+	userInterfaceButton[btnPos++].setButton(45, 75, 230, 125, APP_TOOLS, true, 10, F(""), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(45, 135, 230, 185, APP_TOOLS, true, 10, F(""), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(45, 195, 230, 245, APP_TOOLS, true, 10, F(""), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
+	//userInterfaceButton[btnPos++].setButton(45, 260, 220, 300, APP_TOOLS, true, F(""), ALIGN_CENTER);
+
+	userInterfaceButton[btnPos++].setButton(250, 75, 435, 125, APP_TOOLS, true, 10, F(""), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(250, 135, 435, 185, APP_TOOLS, true, 10, F(""), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(250, 195, 435, 245, APP_TOOLS, true, 10, F(""), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
+	//userInterfaceButton[btnPos++].setButton(270, 260, 425, 300, APP_TOOLS, true, F(""), ALIGN_CENTER);
+
+	/*
 	userInterfaceButton[btnPos++].setButton(55, 80, 220, 120, 1, true, F("PID Scan"), ALIGN_CENTER);
 	userInterfaceButton[btnPos++].setButton(260, 80, 425, 120, 2, true, F("PID Stream"), ALIGN_CENTER);
 	userInterfaceButton[btnPos++].setButton(55, 140, 220, 180, 0, true, F("Get VIN"), ALIGN_CENTER);
@@ -155,13 +167,25 @@ uint8_t createToolBtns()
 	userInterfaceButton[btnPos++].setButton(260, 200, 425, 240, 0, true, F("Gauges"), ALIGN_CENTER);
 	userInterfaceButton[btnPos++].setButton(55, 260, 220, 300, 0, true, F("TX Spam"), ALIGN_CENTER);
 	userInterfaceButton[btnPos++].setButton(260, 260, 425, 300, 0, true, F(""), ALIGN_CENTER);
+	*/
 	return btnPos;
 }
 
-//
+// TODO: Make auto populated
 uint8_t createSettingsBtns()
 {
 	uint8_t btnPos = 0;
+	userInterfaceButton[btnPos++].setButton( 45,  75, 230, 125, APP_SETTINGS, true, 10, F(""), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton( 45, 135, 230, 185, APP_SETTINGS, true, 10, F(""), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton( 45, 195, 230, 245, APP_SETTINGS, true, 10, F(""), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
+	//userInterfaceButton[btnPos++].setButton(45, 260, 220, 300, APP_SETTINGS, true, F(""), ALIGN_CENTER);
+
+	userInterfaceButton[btnPos++].setButton(250,  75, 435, 125, APP_SETTINGS, true, 10, F(""), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(250, 135, 435, 185, APP_SETTINGS, true, 10, F(""), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].  setButton(250, 195, 435, 245, APP_SETTINGS, true, 10, F(""), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
+	//userInterfaceButton[btnPos++].setButton(270, 260, 425, 300, APP_SETTINGS, true, F(""), ALIGN_CENTER);
+	
+	/*
 	userInterfaceButton[btnPos++].setButton(55, 80, 220, 120, 1, true, F("Memory"), ALIGN_CENTER);
 	userInterfaceButton[btnPos++].setButton(260, 80, 425, 120, 2, true, F("About"), ALIGN_CENTER);
 	userInterfaceButton[btnPos++].setButton(55, 140, 220, 180, 0, true, F("WiFi MAC"), ALIGN_CENTER);
@@ -170,6 +194,7 @@ uint8_t createSettingsBtns()
 	userInterfaceButton[btnPos++].setButton(260, 200, 425, 240, 0, true, F("Set Time"), ALIGN_CENTER);
 	userInterfaceButton[btnPos++].setButton(55, 260, 220, 300, 0, true, F("Dongle"), ALIGN_CENTER);
 	userInterfaceButton[btnPos++].setButton(260, 260, 425, 300, 0, true, F("Reset"), ALIGN_CENTER);
+	*/
 	return btnPos;
 }
 
@@ -189,9 +214,9 @@ void loadApps()
 	myApps.push_back(appObj4);
 	appManager appObj5(MENU_canBus, "Files", APP_FILES, someFn, CAPTURE_drawCANLogScroll);
 	myApps.push_back(appObj5);
-	appManager appObj6(MENU_canBus, "FilterMask", APP_FILTER_MASK, someFn, CAPTURE_createFilterMaskBtns);
+	appManager appObj6(MENU_canBus, "FilterMask", APP_FILTER_MASK, CAPTURE_filterMask, CAPTURE_createFilterMaskBtns);
 	myApps.push_back(appObj6);
-	appManager appObj7(MENU_canBus, "Send", APP_SEND, someFn, KEYINPUT_createKeyboardButtons);
+	appManager appObj7(MENU_canBus, "", APP_SEND, someFn, CAPTURE_createMenuBtns);
 	myApps.push_back(appObj7);	
 	appManager appObj8(MENU_canBus, "BaudRate", APP_BAUD_RATE, CAPTURE_Baud, CAPTURE_createBaudBtns);
 	myApps.push_back(appObj8);
@@ -310,48 +335,38 @@ void setup(void)
 
 	Can1.begin();
 	Can1.setBaudRate(500000);
-	Can1.setMaxMB(16);
-	Can1.enableFIFO();
-	Can1.enableFIFOInterrupt();
-	Can1.onReceive(CANBus1_IRQHandler);
+	Can1.setMaxMB(8);
+	Can1.setMB((FLEXCAN_MAILBOX)0, RX, STD);
+	Can1.setMB((FLEXCAN_MAILBOX)1, RX, EXT);
+	Can1.setMB((FLEXCAN_MAILBOX)2, TX, STD);
+	Can1.setMB((FLEXCAN_MAILBOX)3, TX, EXT);
+	Can1.setMBFilter(REJECT_ALL);
+	Can1.enableMBInterrupts();
+	Can1.onReceive(MB0, CANBus1_IRQHandler);
+	Can1.onReceive(MB1, CANBus1_IRQHandler);
+	Can1.setMBFilter(MB0, 0x0, 0x7FF);
+	Can1.setMBFilter(MB1, 0x0, 0x1FFFFFF);
 	Can1.mailboxStatus();
 
 	Can2.begin();
 	Can2.setBaudRate(500000);
-	Can2.setMaxMB(16);
-	Can2.enableFIFO();
-	Can2.enableFIFOInterrupt();
-	Can2.onReceive(CANBus2_IRQHandler);
+	Can2.setMaxMB(8);
+	Can2.setMB((FLEXCAN_MAILBOX)0, RX, STD);
+	Can2.setMB((FLEXCAN_MAILBOX)1, RX, EXT);
+	Can2.setMB((FLEXCAN_MAILBOX)2, TX, STD);
+	Can2.setMB((FLEXCAN_MAILBOX)3, TX, EXT);
+	Can2.setMBFilter(REJECT_ALL);
+	Can2.enableMBInterrupts();
+	Can2.onReceive(MB0, CANBus1_IRQHandler);
+	Can2.onReceive(MB1, CANBus1_IRQHandler);
+	Can2.setMBFilter(MB0, 0x0, 0x7FF);
+	Can2.setMBFilter(MB1, 0x0, 0x1FFFFFF);
 	Can2.mailboxStatus();
-	Can2.disableFIFOInterrupt();
-
-
-	/* // Start as nonFD
-	Can3.begin();
-	Can3.setBaudRate(500000);
-	Can3.setMaxMB(16);
-	Can3.enableFIFO();
-	Can3.enableFIFOInterrupt();
-	Can3.onReceive(CANBus3_IRQHandler);
-	Can3.mailboxStatus();
-	Can3.disableFIFOInterrupt();
-	*/
 
 	Can3.begin();
-	/*
-	CANFD_timings_t config;
-	config.clock = CLK_24MHz;
-	config.baudrate = 1000000;
-	config.baudrateFD = 2000000;
-	config.propdelay = 190;
-	config.bus_length = 1;
-	config.sample = 70;
-	FD.setBaudRate(config);
-	*/
-	setCANBusFD(CLK_24MHz, CANBusFDBaudRate); //CLK_24MHz;// CLK_60MHz;
+	setCANBusFD(CLK_24MHz, CAPTURE_CANBusFDBaudRate); //CLK_24MHz;// CLK_60MHz;
 	Can3.setRegions(64);
 
-	
 	CAPTURE_createCaptureBtns();
 
 	// mandatory to begin the MTP session.
@@ -366,9 +381,9 @@ void setup(void)
 	MTP.addFilesystem(SD, "SD Card");
 	//myFile = SD.open("a.txt", FILE_WRITE);
 
-	SD.remove("a.txt");
+	//SD.remove("a.txt");
 
-	// if the file opened okay, write to it:
+	 //if the file opened okay, write to it:
 	//if (myFile) {
 	//	Serial.print("Writing to test.txt...");
 	//	myFile.println("testing 1, 2, 3.");
@@ -875,6 +890,7 @@ void CANBus1_IRQHandler(const CAN_message_t& msg)
 {
 	LED_pulse((RGB)LED_RED);
 	//Serial.printf("1: %03X  %d  %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\n", msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
+	//Serial.printf("%d\n", msg.mb);
 	can1Buffer.push_cb(msg.id, msg.len, msg.buf);
 }
 
@@ -882,7 +898,7 @@ void CANBus1_IRQHandler(const CAN_message_t& msg)
 void CANBus2_IRQHandler(const CAN_message_t& msg)
 {
 	LED_pulse((RGB)LED_BLUE);
-	Serial.printf("2: %03X  %d  %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\n", msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
+	//Serial.printf("2: %03X  %d  %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\n", msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
 	can2Buffer.push_cb(msg.id, msg.len, msg.buf);
 }
 
@@ -942,7 +958,7 @@ void backgroundProcess()
 	BATTERY_printLevel();
 	updateTime();
 	MTP.loop();
-
+	
 	LED_strobe((RGB)LED_OFF);
 	
 	CANBus3_IRQHandler();

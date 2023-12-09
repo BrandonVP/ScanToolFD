@@ -83,30 +83,39 @@ typedef enum capture_baud_btn {
 }Capture_Baud_BTN;
 
 typedef enum capture_filterMask_btn {
-	BTN_filterMask_CANLabel,
-	BTN_filterMask_CAN1Label,
-	BTN_filterMask_CAN2Label,
-	BTN_filterMask_CAN3Label,
-	BTN_filterMask_WiFiLabel,
-	BTN_filterMask_filterLabel,
+	BTN_filterMask_CANLabel,    // Turned OFF
+	BTN_filterMask_CAN1Label,   // Turned OFF
+	BTN_filterMask_CAN2Label,   // Turned OFF
+	BTN_filterMask_CAN3Label,   // Turned OFF
+	BTN_filterMask_WiFiLabel,   // Turned OFF
+
+	BTN_filterMask_filterLabel, // Turned OFF
 	BTN_filterMask_filter1,
 	BTN_filterMask_filter2,
 	BTN_filterMask_filter3,
 	BTN_filterMask_filterWiFi,
-	BTN_filterMask_maskLabel,
+
+	BTN_filterMask_maskLabel,   // Turned OFF
 	BTN_filterMask_mask1,
 	BTN_filterMask_mask2,
 	BTN_filterMask_mask3,
 	BTN_filterMask_maskWiFi,
-	BTN_filterMask_openLabel,
+
+	BTN_filterMask_openLabel,   // Turned OFF
 	BTN_filterMask_open1,
 	BTN_filterMask_open2,
 	BTN_filterMask_open3,
-	BTN_filterMask_openWifi,
-	BTN_filterMask_button_count
+	BTN_filterMask_openWifi,    // Turned OFF
+
+	BTN_filterMask_button_count // Turned OFF
 }Capture_FilterMask_BTN;
 
 
+typedef enum capture_filterStates {
+	BTN_filterState_print,
+	BTN_filterState_min,
+	BTN_filterState_max,
+}Capture_FilterStates;
 #ifdef _CANBUSCAPTURE_C
 
 extern cbBuffer can1Buffer;
@@ -145,8 +154,8 @@ void CAPTURE_Baud(int userInput);
 
 extern uint8_t CAPTURE_input_config;
 extern uint8_t CAPTURE_output_config;
-extern bool isCaptureRunning;
-extern uint32_t CANBusFDBaudRate;
+extern bool CAPTURE_isRunning;
+extern uint32_t CAPTURE_CANBusFDBaudRate;
 
 void CAPTURE_clearLocalVar();
 uint8_t CAPTURE_createMenuBtns();
@@ -161,6 +170,7 @@ void CAPTURE_captureConfig(int userInput);
 void CAPTURE_LCD_scan(int userInput);
 void CAPTURE_Baud(int userInput);
 uint8_t CAPTURE_drawCANLogScroll();
+void CAPTURE_filterMask(int userInput);
 
 #endif // _CANBUSCAPTURE_C
 #endif // _CANBUSCAPTURE_h

@@ -311,6 +311,15 @@ void GUI_clearAppSpace()
     display.fillRect(0, 51, 480, 269, themeBackground);
 }
 
+// Enable or disable buttons start -> end(including end)
+void GUI_isButtonsEnabled(UserInterfaceClass* buttons, uint8_t start, uint8_t end, bool isDisabled)
+{
+    for (uint8_t i = start; i <= end; i++)
+    {
+        buttons[i].setClickable(isDisabled);
+    }
+}
+
 //
 void GUI_setLoadBarRuntime(uint16_t time)
 {

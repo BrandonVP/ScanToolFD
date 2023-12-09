@@ -120,31 +120,31 @@ uint8_t KEYINPUT_createUpperCaseButtons()
 // Print the hex keypad
 uint8_t KEYINPUT_createHexpadButtons(int offset)
 {
+	GUI_drawSquareBtn(245 - offset, 53, 480 - offset, 319, "", menuBackground, BlackBtnColor, menuBtnText, ALIGN_LEFT);
 	uint8_t index = 0;
-	userKeyButtons[index++].setButton(248, 55, 303, 105, 0x0, true, 6, F("0"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setButton(306, 55, 361, 105, 0x1, true, 6, F("1"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setButton(364, 55, 419, 105, 0x2, true, 6, F("2"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setButton(422, 55, 477, 105, 0x3, true, 6, F("3"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(248 - offset, 55, 303 - offset, 105, 0x0, true, 6, F("0"), ALIGN_CENTER, themeBackground, BlackBtnColor, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(306 - offset, 55, 361 - offset, 105, 0x1, true, 6, F("1"), ALIGN_CENTER, themeBackground, BlackBtnColor, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(364 - offset, 55, 419 - offset, 105, 0x2, true, 6, F("2"), ALIGN_CENTER, themeBackground, BlackBtnColor, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(422 - offset, 55, 477 - offset, 105, 0x3, true, 6, F("3"), ALIGN_CENTER, themeBackground, BlackBtnColor, menuBtnColor, menuBtnTextColor);
+																																
+	userKeyButtons[index++].setButton(248 - offset, 108, 303 - offset, 158, 0x4, true, 6, F("4"), ALIGN_CENTER, themeBackground, BlackBtnColor, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(306 - offset, 108, 361 - offset, 158, 0x5, true, 6, F("5"), ALIGN_CENTER, themeBackground, BlackBtnColor, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(364 - offset, 108, 419 - offset, 158, 0x6, true, 6, F("6"), ALIGN_CENTER, themeBackground, BlackBtnColor, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(422 - offset, 108, 477 - offset, 158, 0x7, true, 6, F("7"), ALIGN_CENTER, themeBackground, BlackBtnColor, menuBtnColor, menuBtnTextColor);
+																															
+	userKeyButtons[index++].setButton(248 - offset, 161, 303 - offset, 211, 0x8, true, 6, F("8"), ALIGN_CENTER, themeBackground, BlackBtnColor, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(306 - offset, 161, 361 - offset, 211, 0x9, true, 6, F("9"), ALIGN_CENTER, themeBackground, BlackBtnColor, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(364 - offset, 161, 419 - offset, 211, 0xA, true, 6, F("A"), ALIGN_CENTER, themeBackground, BlackBtnColor, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(422 - offset, 161, 477 - offset, 211, 0xB, true, 6, F("B"), ALIGN_CENTER, themeBackground, BlackBtnColor, menuBtnColor, menuBtnTextColor);
+																															
+	userKeyButtons[index++].setButton(248 - offset, 214, 303 - offset, 264, 0xC, true, 6, F("C"), ALIGN_CENTER, themeBackground, BlackBtnColor, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(306 - offset, 214, 361 - offset, 264, 0xD, true, 6, F("D"), ALIGN_CENTER, themeBackground, BlackBtnColor, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(364 - offset, 214, 419 - offset, 264, 0xE, true, 6, F("E"), ALIGN_CENTER, themeBackground, BlackBtnColor, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(422 - offset, 214, 477 - offset, 264, 0xF, true, 6, F("F"), ALIGN_CENTER, themeBackground, BlackBtnColor, menuBtnColor, menuBtnTextColor);
 
-	userKeyButtons[index++].setButton(248, 108, 303, 158, 0x4, true, 6, F("4"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setButton(306, 108, 361, 158, 0x5, true, 6, F("5"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setButton(364, 108, 419, 158, 0x6, true, 6, F("6"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setButton(422, 108, 477, 158, 0x7, true, 6, F("7"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-
-	userKeyButtons[index++].setButton(248, 161, 303, 211, 0x8, true, 6, F("8"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setButton(306, 161, 361, 211, 0x9, true, 6, F("9"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setButton(364, 161, 419, 211, 0xA, true, 6, F("A"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setButton(422, 161, 477, 211, 0xB, true, 6, F("B"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-
-	userKeyButtons[index++].setButton(248, 214, 303, 264, 0xC, true, 6, F("C"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setButton(306, 214, 361, 264, 0xD, true, 6, F("D"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setButton(364, 214, 419, 264, 0xE, true, 6, F("E"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setButton(422, 214, 477, 264, 0xF, true, 6, F("F"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-
-	userKeyButtons[index].setButton(248, 267, 419, 317, 0, true, 6, F(""), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
-	userKeyButtons[index++].setClickable(false);
-
-	userKeyButtons[index++].setButton(422, 267, 477, 317, 0x10, true, 6, F("del"), ALIGN_CENTER, themeBackground, menuBackground, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(248 - offset, 267, 361 - offset, 317, KEY_ACCEPT, true, 6, F("Accept"), ALIGN_CENTER, themeBackground, BlackBtnColor, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(364 - offset, 267, 419 - offset, 317, KEY_DEL, true, 6, F("del"), ALIGN_CENTER, themeBackground, BlackBtnColor, menuBtnColor, menuBtnTextColor);
+	userKeyButtons[index++].setButton(422 - offset, 267, 477 - offset, 317, KEY_CANCEL, true, 6, F("X"), ALIGN_CENTER, themeBackground, BlackBtnColor, menuBtnColor, menuBtnTextColor);
 	return index;
 }
 
@@ -259,7 +259,8 @@ uint8_t KEYINPUT_keypadHexController(uint32_t& total, uint8_t& numIndex, uint8_t
 	uint8_t maxIndex = maxSize;
 	(maxIndex > 8) ? maxIndex = 8 : maxIndex = maxIndex;
 
-	if ((input >= 0x00) && (input < 0x10) && (numIndex < maxIndex))
+	// User selected a hex value
+	if ((input >= 0x00) && (input <= 0x0F) && (numIndex < maxIndex))
 	{
 		for (uint8_t i = 7; i > 0; i--)
 		{
@@ -270,15 +271,13 @@ uint8_t KEYINPUT_keypadHexController(uint32_t& total, uint8_t& numIndex, uint8_t
 		total = (hexInput[0] << 0) + (hexInput[1] << 4) + (hexInput[2] << 8) + (hexInput[3] << 12)
 			+ (hexInput[4] << 16) + (hexInput[5] << 20) + (hexInput[6] << 24) + (hexInput[7] << 28);
 
-		GUI_drawRoundBtn(248, 267, 419, 317, String(total, 16), themeBackground, menuBackground, menuBtnTextColor, ALIGN_CENTER, 6);
-
 		//Serial.printf("input: %X \n", input);
 		//Serial.printf("total: %X \n", total);
 
 		++numIndex;
 		return KEY_CHANGE;
 	}
-	else if (input == 0x10)
+	else if (input == KEY_DEL)
 	{
 		for (uint8_t i = 0; i < 8; i++)
 		{
@@ -295,11 +294,17 @@ uint8_t KEYINPUT_keypadHexController(uint32_t& total, uint8_t& numIndex, uint8_t
 		total = (hexInput[0] << 0) + (hexInput[1] << 4) + (hexInput[2] << 8) + (hexInput[3] << 12)
 			+ (hexInput[4] << 16) + (hexInput[5] << 20) + (hexInput[6] << 24) + (hexInput[7] << 28);
 
-		GUI_drawRoundBtn(248, 267, 419, 317, String(total, 16), themeBackground, menuBackground, menuBtnTextColor, ALIGN_CENTER, 6);
-
 		//Serial.printf("total: %X \n", total);
 		(numIndex > 0) ? --numIndex : 0;
 		return KEY_CHANGE;
+	}
+	else if (input == KEY_ACCEPT)
+	{
+		return KEY_ACCEPT;
+	}
+	else if (input == KEY_CANCEL)
+	{
+		return KEY_CANCEL;
 	}
 	return KEY_NO_CHANGE;
 }

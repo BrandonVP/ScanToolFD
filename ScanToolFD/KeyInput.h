@@ -14,10 +14,11 @@
 #include "common.h"
 
 typedef enum key_returns {
-	KEY_CHANGE = 0xF3,
-	KEY_ACCEPT = 0xF1,
-	KEY_CANCEL = 0xF0,
-	KEY_NO_CHANGE = 0xFF
+	KEY_CHANGE = 0xF1,
+	KEY_DEL = 0xF2,
+	KEY_ACCEPT = 0xF3,
+	KEY_CANCEL = 0xF4,
+	KEY_NO_CHANGE = 0xF5
 }Key_Returns;
 
 #ifdef _KEYINPUT_C

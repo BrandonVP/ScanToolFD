@@ -63,6 +63,7 @@ int GUI_subMenuButtonMonitor(UserInterfaceClass* buttons, uint8_t size);
 void GUI_setTextSize(int textSize);
 bool GUI_drawPage(UserInterfaceClass* buttons, uint8_t& pos, uint8_t buttonsToPrint);
 void GUI_clearAppSpace(void);
+void GUI_isButtonsEnabled(UserInterfaceClass* buttons, uint8_t start, uint8_t end, bool isDisabled);
 void GUI_setLoadBarRuntime(uint16_t time);
 void GUI_startLoadBar(void);
 void GUI_stopLoadBarTimed(void);
