@@ -256,6 +256,7 @@ void setCANBusFD(FLEXCAN_CLOCK clock, int baud)
 	Can3.setBaudRate(config);
 }
 
+//
 void dateTime(uint16_t* date, uint16_t* time)
 {
 	*date = FAT_DATE(year(), month(), day());
@@ -266,7 +267,7 @@ void dateTime(uint16_t* date, uint16_t* time)
 void setup(void)
 {
 	Serial.begin(115200); // USB is always 12 or 480 Mbit/sec
-	//Serial2.begin(115200); // ESP8266
+	Serial2.begin(115200); // ESP8266
 
 	//while (!Serial);
 
@@ -364,9 +365,17 @@ void setup(void)
 	Can2.mailboxStatus();
 
 	Can3.begin();
+	//Can3.setMB((FLEXCAN_MAILBOX)0, RX, STD);
+	//Can3.setMB((FLEXCAN_MAILBOX)1, RX, EXT);
+	//Can3.setMB((FLEXCAN_MAILBOX)2, TX, STD);
+	//Can3.setMB((FLEXCAN_MAILBOX)3, TX, EXT);
+	//Can3.setMBFilter(REJECT_ALL);
+	//Can3.enableMBInterrupts();
+	//Can3.setMBFilter(MB0, 0x0, 0x7FF);
+	//Can3.setMBFilter(MB1, 0x0, 0x1FFFFFF);
+	//Can3.mailboxStatus();
 	setCANBusFD(CLK_24MHz, CAPTURE_CANBusFDBaudRate); //CLK_24MHz;// CLK_60MHz;
 	Can3.setRegions(64);
-
 	CAPTURE_createCaptureBtns();
 
 	// mandatory to begin the MTP session.
@@ -379,11 +388,12 @@ void setup(void)
 	SdFile::dateTimeCallback(dateTime);
 
 	MTP.addFilesystem(SD, "SD Card");
+
 	//myFile = SD.open("a.txt", FILE_WRITE);
 
-	//SD.remove("a.txt");
+	////SD.remove("a.txt");
 
-	 //if the file opened okay, write to it:
+	// //if the file opened okay, write to it:
 	//if (myFile) {
 	//	Serial.print("Writing to test.txt...");
 	//	myFile.println("testing 1, 2, 3.");
@@ -444,6 +454,36 @@ void setup(void)
 	delay(100);
   }
   */
+//#define SEND_MAC                (0xAC)
+//#define SEND_MAC_CONFIRM        (0xAD)
+//#define CONNECT_NEW_DONGLE      (0xCA)
+//#define CONNECT_DONGLE_CONFIRM  (0xCC)
+//#define RESET_DEVICE            (0xBA)
+//#define RESET_DEVICE_CONFIRM    (0xBF)
+//	delay(100);
+//	Serial2.write(CONNECT_NEW_DONGLE);
+//	delay(1);
+//	Serial2.write(CONNECT_DONGLE_CONFIRM);
+//	delay(1);
+//	Serial2.write(0xC8);
+//	delay(1);
+//	Serial2.write(0xC9);
+//	delay(1);
+//	Serial2.write(0xA3);
+//	delay(1);
+//	Serial2.write(0xF9);
+//	delay(1);
+//	Serial2.write(0xFD);
+//	delay(1);
+//	Serial2.write(0x04);
+//	delay(500);
+//	Serial2.write(RESET_DEVICE);
+//	delay(1);
+//	Serial2.write(RESET_DEVICE_CONFIRM);
+//	delay(2500);
+//	Serial2.write(SEND_MAC);
+//	delay(1);
+//	Serial2.write(SEND_MAC_CONFIRM);
 
 }
 
@@ -1011,7 +1051,12 @@ void loop(void)
 	appLoader();
 	backgroundProcess();
 
+	//if (Serial2.available())
+	//{
+		//Serial.println(Serial2.read(), 16);
+	//}
 
+	/*
 	static uint32_t timeout123 = millis();
 	static uint16_t rotatingID = 0;
 	if (millis() - timeout123 > 2000)
@@ -1042,11 +1087,12 @@ void loop(void)
 		}
 
 		//drawMenu();
-		
+
 		//Serial.printf("activeApp: %d\n", activeApp);
 		//Serial.printf("isCaptureRunning: %d   CAPTURE_input_config: %d   CAPTURE_input_config: %d \n", isCaptureRunning, CAPTURE_input_config, CAPTURE_output_config);
 		timeout123 = millis();
 	}
+	*/
 }
 
 
@@ -1089,3 +1135,50 @@ void loop(void)
 	//delay(100);
   }
 */
+/*
+45 (E)
+53 (S)
+50 (P)
+52 (82)
+42 (66)
+
+98
+F4
+AB
+B4
+40
+2B
+0
+
+0
+FF
+0
+26
+2C
+
+FD // ENDING_BYTE
+
+45
+53
+50
+52
+42
+
+98
+F4
+AB
+B4
+40
+2B
+
+C8
+FF
+FF
+FF
+FF
+FF
+FD
+
+*/
+
+

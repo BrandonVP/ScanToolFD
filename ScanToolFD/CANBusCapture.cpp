@@ -17,6 +17,19 @@
 #include "KeyInput.h"
 #include "icons.h"
 
+ // States for serial transfer
+#define START_BYTE              (0)
+#define PACKET_LENGTH           (1)
+#define CAN_BUS_ID1             (2)
+#define CAN_BUS_ID2             (3)
+#define CAN_BUS_LENGTH          (4)
+#define CAN_BUS_DATA            (5)
+#define END_BYTE                (6)
+// Serial transfer
+#define STARTING_BYTE           (0xFE)
+#define ENDING_BYTE             (0xFD)
+#define PACKET_SIZE             (0x0A)
+
 static char* filename = "Filename";
 static char newFilename[8];
 static char SDfilename[50];
@@ -701,7 +714,7 @@ void CAPTURE_captureConfig(int userInput)
 		CAPTURE_enableDisableConfigBtn(false);
 		graphicLoaderState = 1;
 		keyPadButtons = KEYINPUT_createKeyboardButtons();
-		Serial.println(keyPadButtons);
+		//Serial.println(keyPadButtons);
 		while (GUI_drawPage(userKeyButtons, graphicLoaderState, keyPadButtons));
 		CAPTURE_state = BTN_config_state_keyInput;
 		display.updateScreen();
@@ -772,6 +785,89 @@ void CAPTURE_LCD_Print(uint32_t id, uint8_t length, uint8_t * data)
 	display.setFont(Michroma_11);
 }
 
+
+uint8_t WIFI_state = 0;
+uint8_t packetIndex = 0;
+uint32_t wifiID = 0;
+uint8_t wifiLength = 0;
+uint8_t wifiData[8] = {0};
+
+void CAPTURE_processWiFi()
+{
+	/*if (Serial2.available())
+	{
+		Serial.println(Serial2.read(), 16);
+	}*/
+	
+	if (Serial2.available())
+	{
+		uint8_t recByte = Serial2.read();
+		//Serial.println(recByte, 16);
+		
+		switch (WIFI_state)
+		{
+		case START_BYTE:
+			if (recByte == STARTING_BYTE)
+			{
+				WIFI_state = PACKET_LENGTH;
+				return;
+			}
+			break;
+		case PACKET_LENGTH:
+			WIFI_state = CAN_BUS_ID1;
+			if (recByte == PACKET_SIZE)
+			{
+				packetIndex = 0;
+				return;
+			}
+			else
+			{
+				// Bad packet
+				WIFI_state = START_BYTE;
+			}
+			break;
+		case CAN_BUS_ID1:
+			wifiID = recByte;
+			WIFI_state = CAN_BUS_ID2;
+			break;
+		case CAN_BUS_ID2:
+			wifiID += (recByte << 8);
+			WIFI_state = CAN_BUS_LENGTH;
+			break;
+		case CAN_BUS_LENGTH:
+			wifiLength = recByte;
+			WIFI_state = CAN_BUS_DATA;
+			break;
+		case CAN_BUS_DATA:
+			wifiData[packetIndex] = recByte;
+			packetIndex++;
+			if (packetIndex == PACKET_SIZE - 2)
+			{
+				WIFI_state = END_BYTE;
+			}
+			break;
+		case END_BYTE:
+			if (recByte == ENDING_BYTE)
+			{
+				// Successful packet
+				WIFI_state = START_BYTE;
+
+				
+				CAPTURE_LCD_Print(wifiID, wifiLength, wifiData);
+
+
+			}
+			else
+			{
+				// packet failed restart
+				WIFI_state = START_BYTE;
+			}
+			break;
+		}
+		
+	}
+	
+}
 // 
 void CAPTURE_LCD_scan(int userInput)
 {
@@ -835,7 +931,10 @@ void CAPTURE_LCD_scan(int userInput)
 			}
 			break;
 		case BTN_config_input_Wireless:
-
+			CAPTURE_processWiFi();
+			
+		
+			
 			break;
 		case BTN_config_input_C2tx:
 			if (can1Buffer.stack_size_cb() > 0)
@@ -899,7 +998,7 @@ void CAPTURE_Baud(int userInput)
 		if (userInput >= BTN_baud_can1 && (userInput <= BTN_baud_can3))
 		{
 
-			Serial.println(userInput);
+			//Serial.println(userInput);
 			// Dehighlight current selected port
 			if (CAPTURE_baudInput == userInput)
 			{
@@ -1244,7 +1343,8 @@ void CAPTURE_filterMask(int userInput)
 			}
 			else if ((CAPTURE_state == BTN_filterMask_filter3) || (CAPTURE_state == BTN_filterMask_mask3))
 			{
-
+				//Can3.setMBFilter(MB0, (CAPTURE_filterTable[0][1] & 0x7FF), (CAPTURE_filterTable[1][1] & 0x7FF));
+				//Can3.setMBFilter(MB1, (CAPTURE_filterTable[0][1] & 0x1FFFFFFF), (CAPTURE_filterTable[1][1] & 0x1FFFFFFF));
 			}
 			else if ((CAPTURE_state == BTN_filterMask_filterWiFi) || (CAPTURE_state == BTN_filterMask_maskWiFi))
 			{
@@ -1289,8 +1389,31 @@ void CAPTURE_filterMask(int userInput)
 		}
 	}
 
-	if ((CAPTURE_state >= BTN_filterMask_open1) && (CAPTURE_state <= BTN_filterMask_openWifi))
+	if ((userInput >= BTN_filterMask_open1) && (userInput <= BTN_filterMask_openWifi))
 	{
-
+		if (userInput == BTN_filterMask_open1)
+		{
+			CAPTURE_filterTable[0][0] = 0x00;
+			CAPTURE_filterTable[1][0] = 0x1FFFFFFF;
+		}
+		else if(userInput == BTN_filterMask_open2)
+		{
+			CAPTURE_filterTable[0][1] = 0x00;
+			CAPTURE_filterTable[1][1] = 0x1FFFFFFF;
+		}
+		else if (userInput == BTN_filterMask_open3)
+		{
+			CAPTURE_filterTable[0][2] = 0x00;
+			CAPTURE_filterTable[1][2] = 0x1FFFFFFF;
+		}
+		else if (userInput == BTN_filterMask_openWifi)
+		{
+			CAPTURE_filterTable[0][3] = 0x00;
+			CAPTURE_filterTable[1][3] = 0x1FFFFFFF;
+		}
+		graphicLoaderState = 1;
+		CAPTURE_createFilterMaskBtns();
+		while (GUI_drawPage(&userInterfaceButton[BTN_filterMask_filter1], graphicLoaderState, 9));
+		display.updateScreen();
 	}
 }
