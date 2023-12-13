@@ -48,6 +48,10 @@ uint32_t CAPTURE_CANBusFDBaudRate = 1000000;
 
 uint32_t CAPTURE_hexTotal = 0;
 
+
+#include "appManager.h"
+extern std::vector<appManager> myApps;
+
 //
 void CAPTURE_clearLocalVar()
 {
@@ -56,20 +60,21 @@ void CAPTURE_clearLocalVar()
 	CAPTURE_hexTotal = 0;
 }
 
+
+
 //
 uint8_t CAPTURE_createMenuBtns()
 {
 	uint8_t btnPos = 0;
-	userInterfaceButton[btnPos++].setButton(45, 75, 230, 125, APP_CAPTURE, true, 10, F("Capture"), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
-	userInterfaceButton[btnPos++].setButton(45, 135, 230, 185, APP_FILES, true, 10, F("Files"), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
-	userInterfaceButton[btnPos++].setButton(45, 195, 230, 245, APP_FILTER_MASK, true, 10, F("Filter"), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
-	//userInterfaceButton[btnPos++].setButton(45, 260, 220, 300, 0, true, F(""), ALIGN_CENTER);
-	userInterfaceButton[btnPos].setButton(250, 75, 435, 125, APP_SEND, true, 10, F(""), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText); // Send 
-	userInterfaceButton[btnPos++].setClickable(false);
-	userInterfaceButton[btnPos++].setButton(250, 135, 435, 185, APP_BAUD_RATE, true, 10, F("Baud"), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
-	userInterfaceButton[btnPos].setButton(250, 195, 435, 245, 0, true, 10, F(""), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
-	userInterfaceButton[btnPos++].setClickable(false);
-	//userInterfaceButton[btnPos++].setButton(270, 260, 425, 300, 0, true, F(""), ALIGN_CENTER);
+	uint8_t menuCoordIndex = 0;
+	for (int i = 0; i < myApps.size(); i++) 
+	{
+		if ((myApps[i].getAssignedMenu() == MENU_canBus) && (myApps[i].getAppLabel() != APP_CANBUS))
+		{
+			userInterfaceButton[btnPos++].setButton(MENU_COORD[menuCoordIndex][0], MENU_COORD[menuCoordIndex][1], MENU_COORD[menuCoordIndex][2], MENU_COORD[menuCoordIndex][3], myApps[i].getAppLabel(), true, 10, myApps[i].getName(), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
+			menuCoordIndex++;
+		}
+	}
 	return btnPos;
 }
 

@@ -216,7 +216,7 @@ void loadApps()
 	myApps.push_back(appObj5);
 	appManager appObj6(MENU_canBus, "FilterMask", APP_FILTER_MASK, CAPTURE_filterMask, CAPTURE_createFilterMaskBtns);
 	myApps.push_back(appObj6);
-	appManager appObj7(MENU_canBus, "", APP_SEND, someFn, CAPTURE_createMenuBtns);
+	appManager appObj7(MENU_canBus, "Send", APP_SEND, someFn, CAPTURE_createMenuBtns);
 	myApps.push_back(appObj7);	
 	appManager appObj8(MENU_canBus, "BaudRate", APP_BAUD_RATE, CAPTURE_Baud, CAPTURE_createBaudBtns);
 	myApps.push_back(appObj8);

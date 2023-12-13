@@ -9,7 +9,7 @@
 
 #pragma once
 #include "common.h"
-#include "config.h"
+//#include "config.h"
 
 class appManager
 {

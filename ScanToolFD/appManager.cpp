@@ -11,6 +11,9 @@
 
 appManager::appManager(menus menuLocation, String descriptiveTxt, APP_labels label, void (*appFunc)(int), uint8_t(*printFunc)(void), void (*animationFunc)(void), void (*CBFunc)(void))
 {
+	assignedMenu = menuLocation;
+	descriptiveName = descriptiveTxt;
+	appLabel = label;
 	runAppPtr = (void(*)(int))appFunc;
 	printBtnPtr = (uint8_t(*)(void))printFunc;
 	runAnimationsPtr = (void(*)(void))animationFunc;
@@ -19,6 +22,9 @@ appManager::appManager(menus menuLocation, String descriptiveTxt, APP_labels lab
 
 appManager::appManager(menus menuLocation, String descriptiveTxt, APP_labels label, void (*appFunc)(int), uint8_t(*printFunc)(void), void (*animationFunc)(void))
 {
+	assignedMenu = menuLocation;
+	descriptiveName = descriptiveTxt;
+	appLabel = label;
 	runAppPtr = (void(*)(int))appFunc;
 	printBtnPtr = (uint8_t(*)(void))printFunc;
 	runAnimationsPtr = (void(*)(void))animationFunc;
