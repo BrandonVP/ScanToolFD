@@ -358,8 +358,8 @@ void setup(void)
 	Can2.setMB((FLEXCAN_MAILBOX)3, TX, EXT);
 	Can2.setMBFilter(REJECT_ALL);
 	Can2.enableMBInterrupts();
-	Can2.onReceive(MB0, CANBus1_IRQHandler);
-	Can2.onReceive(MB1, CANBus1_IRQHandler);
+	Can2.onReceive(MB0, CANBus2_IRQHandler);
+	Can2.onReceive(MB1, CANBus2_IRQHandler);
 	Can2.setMBFilter(MB0, 0x0, 0x7FF);
 	Can2.setMBFilter(MB1, 0x0, 0x1FFFFFF);
 	Can2.mailboxStatus();
@@ -938,7 +938,7 @@ void CANBus1_IRQHandler(const CAN_message_t& msg)
 void CANBus2_IRQHandler(const CAN_message_t& msg)
 {
 	LED_pulse((RGB)LED_BLUE);
-	//Serial.printf("2: %03X  %d  %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\n", msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
+	Serial.printf("2: %03X  %d  %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\n", msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
 	can2Buffer.push_cb(msg.id, msg.len, msg.buf);
 }
 

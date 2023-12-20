@@ -60,8 +60,6 @@ void CAPTURE_clearLocalVar()
 	CAPTURE_hexTotal = 0;
 }
 
-
-
 //
 uint8_t CAPTURE_createMenuBtns()
 {
