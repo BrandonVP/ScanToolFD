@@ -10,8 +10,6 @@
 #define _GUI_C
 #include "gui.h"
 
-
-
  // Local load bar variables
 static uint16_t loadBarIndex = 471; // ends at 470
 static uint32_t loadBarTimer = 0;
@@ -30,7 +28,7 @@ bool GUI_Touch_getXY()
     return false;
 }
 
-//
+// Draw a square button with round edges
 void GUI_drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int alignText, int radius)
 {
     const uint8_t yMagicOffset = 6;
@@ -67,7 +65,7 @@ void GUI_drawRoundBtn(int x_start, int y_start, int x_stop, int y_stop, String b
     }
 }
 
-//
+// Draw a square button
 void GUI_drawSquareBtn(int x_start, int y_start, int x_stop, int y_stop, String buttonText, int btnBgColor, int btnBorderColor, int btnTxtColor, int alignText)
 {
     const uint8_t yMagicOffset = 6;
@@ -77,7 +75,6 @@ void GUI_drawSquareBtn(int x_start, int y_start, int x_stop, int y_stop, String 
     display.fillRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), btnBgColor);
     display.drawRect(x_start, y_start, (x_stop - x_start), (y_stop - y_start), btnBorderColor);
     display.setTextColor(btnTxtColor);
-
 
     char c[0xFF];
     buttonText.toCharArray(c, sizeof(buttonText));
@@ -102,7 +99,6 @@ void GUI_drawSquareBtn(int x_start, int y_start, int x_stop, int y_stop, String 
         break;
     }
 }
-
 
 // Holds round button down while pressed
 void GUI_waitForIt(int x_start, int y_start, int x_stop, int y_stop, int radius, int borderC, int clickBorderC)
@@ -151,7 +147,7 @@ void GUI_waitForItRect(int x_start, int y_start, int x_stop, int y_stop, int rad
     display.useFrameBuffer(true);
 }
 
-//
+// Loop through active button objects looking for a screen touch - Button press clickReturn directly load Apps
 void GUI_buttonMonitor(UserInterfaceClass* buttons, uint16_t size)
 {
     if (GUI_Touch_getXY())
@@ -177,7 +173,7 @@ void GUI_buttonMonitor(UserInterfaceClass* buttons, uint16_t size)
     }
 }
 
-// Returns button clickReturn value - No press returns -1
+// Loop through active button objects looking for a screen touch - Button press returns button clickReturn value and No press returns -1
 int GUI_subMenuButtonMonitor(UserInterfaceClass* buttons, uint8_t size)
 {
     if (GUI_Touch_getXY())
@@ -204,7 +200,7 @@ int GUI_subMenuButtonMonitor(UserInterfaceClass* buttons, uint8_t size)
     return -1;
 }
 
-//
+// Select font based off provided text size
 void GUI_setTextSize(int textSize)
 {
     if (textSize < 10)
@@ -277,9 +273,15 @@ void GUI_setTextSize(int textSize)
     }
 }
 
-//
+// Used to draw an App page
 bool GUI_drawPage(UserInterfaceClass* buttons, uint8_t& pos, uint8_t buttonsToPrint)
 {
+    if (pos == 0)
+    {
+        pos++;
+        return true;
+    }
+
     uint8_t btn = pos - 1;
     if (buttonsToPrint != 0)
     {
@@ -305,7 +307,7 @@ bool GUI_drawPage(UserInterfaceClass* buttons, uint8_t& pos, uint8_t buttonsToPr
     }
 }
 
-//
+/// Clear non top menu space
 void GUI_clearAppSpace()
 {
     display.fillRect(0, 51, 480, 269, themeBackground);
@@ -320,29 +322,30 @@ void GUI_isButtonsEnabled(UserInterfaceClass* buttons, uint8_t start, uint8_t en
     }
 }
 
-//
+// Set how long to run the load bar
 void GUI_setLoadBarRuntime(uint16_t time)
 {
     loarBarRunTime = time;
 }
 
-//
+// Always starts at px 250
 void GUI_startLoadBar(void)
 {
     loadBarIndex = 250;
     loadBarTimer = millis();
+    display.useFrameBuffer(false);
 }
 
-//
+// End the loadbar early
 void GUI_stopLoadBarTimed(void)
 {
-    loadBarIndex = 471;
+    loadBarIndex = LOADBAR_TURN_OFF;
 }
 
 // Load bar
 void GUI_sideLoadBarTimed(void)
 {
-    if (loadBarIndex > 470)
+    if (loadBarIndex > LOADBAR_TURN_OFF - 1)
     {
         return;
     }
@@ -368,7 +371,7 @@ void GUI_LoadBarPrintStart(void)
 {
     display.fillRect(241, 51, 480, 269, themeBackground);
     display.setFont(Michroma_10);
-    GUI_drawSquareBtn(245, 127, 480, 142, F("Place tool next to TPMS"), themeBackground, themeBackground, menuBtnTextColor, ALIGN_LEFT);
+    GUI_drawSquareBtn(245, 127, 480, 142, F("Starting"), themeBackground, themeBackground, menuBtnTextColor, ALIGN_LEFT);
     display.setFont(Michroma_11);
 }
 
@@ -376,7 +379,7 @@ void GUI_LoadBarPrintStart(void)
 void GUI_loadBarPrintFailed(void)
 {
     display.setFont(Michroma_10);
-    GUI_drawSquareBtn(242, 200, 480, 220, F("TPMS not detected"), themeBackground, themeBackground, menuBtnTextColor, ALIGN_CENTER);
+    GUI_drawSquareBtn(242, 200, 480, 220, F("Failed"), themeBackground, themeBackground, menuBtnTextColor, ALIGN_CENTER);
     display.setFont(Michroma_11);
 }
 

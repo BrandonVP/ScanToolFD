@@ -11,16 +11,23 @@
 #ifndef _GUI_H
 #define _GUI_H
 
+#include "common.h"
 #include "userInterface.h"
 
 #define FINISH_SIDE_LOADBAR 270
-
-#ifdef _GUI_C
-
-#include "common.h"
-
+#define LOADBAR_TURN_OFF 471
+#define LOADBAR_DEFAULT_RUN_TIME 8000
 #define SCREEN_WIDTH 480
 #define SCREEN_HEIGHT 320
+
+enum textAlignment
+{
+	GUI_Align_Text_Left = 1,
+	GUI_Align_Text_Center = 2,
+	GUI_Align_Text_Right = 3
+};
+
+#ifdef _GUI_C
 
 // For touch controls
 int x, y;

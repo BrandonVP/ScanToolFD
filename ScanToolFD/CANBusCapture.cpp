@@ -749,6 +749,7 @@ void CAPTURE_LCD_Print(uint32_t id, uint8_t length, uint8_t * data)
 	display.setTextColor(menuBtnText);
 	display.setFont(Michroma_9);
 	uint8_t temp = 0;
+	display.useFrameBuffer(false);
 	if (CAPTURE_index == 0)
 	{
 		temp = 15;
@@ -784,8 +785,9 @@ void CAPTURE_LCD_Print(uint32_t id, uint8_t length, uint8_t * data)
 			k--;
 		}
 	}
-	display.updateScreen();
+	//display.updateScreen();
 	display.setFont(Michroma_11);
+	display.useFrameBuffer(true);
 }
 
 

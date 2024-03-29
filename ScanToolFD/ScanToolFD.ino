@@ -201,24 +201,26 @@ uint8_t createSettingsBtns()
 //
 void loadApps()
 {
-	myApps.reserve(15);
+	myApps.reserve(APP_COUNT);
+	/*--------------------Menu---------Title----------------App Label---------------Main Function--------------Create Button Function----------Animation-----------------App Exit Function-----*/
 	appManager appObj0(MENU_canBus, "CAN Bus", APP_CANBUS, CAPTURE_CANBus, CAPTURE_createMenuBtns);
-	myApps.push_back(appObj0);
 	appManager appObj1(MENU_tools, "Tools", APP_TOOLS, someFn, createToolBtns);
-	myApps.push_back(appObj1);
 	appManager appObj2(MENU_settings, "Settings", APP_SETTINGS, someFn, createSettingsBtns);
-	myApps.push_back(appObj2);
 	appManager appObj3(MENU_canBus, "Capture", APP_CAPTURE, CAPTURE_captureConfig, CAPTURE_createCaptureBtns);
-	myApps.push_back(appObj3);
 	appManager appObj4(MENU_sub, "CaptureLCD", APP_CAPTURE_LCD, CAPTURE_LCD_scan, CAPTURE_createLCDBtns);
-	myApps.push_back(appObj4);
 	appManager appObj5(MENU_canBus, "Files", APP_FILES, someFn, CAPTURE_drawCANLogScroll);
-	myApps.push_back(appObj5);
 	appManager appObj6(MENU_canBus, "FilterMask", APP_FILTER_MASK, CAPTURE_filterMask, CAPTURE_createFilterMaskBtns);
-	myApps.push_back(appObj6);
 	appManager appObj7(MENU_canBus, "Send", APP_SEND, someFn, CAPTURE_createMenuBtns);
-	myApps.push_back(appObj7);	
 	appManager appObj8(MENU_canBus, "BaudRate", APP_BAUD_RATE, CAPTURE_Baud, CAPTURE_createBaudBtns);
+
+	myApps.push_back(appObj0);
+	myApps.push_back(appObj1);
+	myApps.push_back(appObj2);
+	myApps.push_back(appObj3);
+	myApps.push_back(appObj4);
+	myApps.push_back(appObj5);
+	myApps.push_back(appObj6);
+	myApps.push_back(appObj7);
 	myApps.push_back(appObj8);
 	
 	//myApps.insert((myApps.begin() + 3), appObj4);
@@ -384,7 +386,7 @@ void setup(void)
 	// open the file. note that only one file can be open at a time,
 	// so you have to close this one before opening another.
 	SD.begin(chipSelect);
-	
+
 	SdFile::dateTimeCallback(dateTime);
 
 	MTP.addFilesystem(SD, "SD Card");
@@ -920,9 +922,9 @@ void createMenuBtns()
 	// Create Menu Buttons
 	uint8_t menuPosition = 0;
 
-	userInterfaceMenuButton[menuPosition++].setButton(160, 0, 260, 40, APP_CANBUS, true, 0, F("CAN Bus"), ALIGN_CENTER, menuBackground, menuBackground, menuBtnTextColor);
-	userInterfaceMenuButton[menuPosition++].setButton(270, 0, 370, 40, APP_TOOLS, true, 0, F("Tools"), ALIGN_CENTER, menuBackground, menuBackground, menuBtnTextColor);
-	userInterfaceMenuButton[menuPosition++].setButton(375, 0, 475, 40, APP_SETTINGS, true, 0, F("Settings"), ALIGN_CENTER, menuBackground, menuBackground, menuBtnTextColor);
+	userInterfaceMenuButton[menuPosition++].setButton(155, 0, 260, 45, APP_CANBUS, true, 0, F("CAN Bus"), ALIGN_CENTER, menuBackground, menuBackground, menuBtnTextColor);
+	userInterfaceMenuButton[menuPosition++].setButton(265, 0, 365, 45, APP_TOOLS, true, 0, F("Tools"), ALIGN_CENTER, menuBackground, menuBackground, menuBtnTextColor);
+	userInterfaceMenuButton[menuPosition++].setButton(370, 0, 475, 45, APP_SETTINGS, true, 0, F("Settings"), ALIGN_CENTER, menuBackground, menuBackground, menuBtnTextColor);
 }
 
 //
@@ -1094,47 +1096,6 @@ void loop(void)
 	}
 	*/
 }
-
-
-// works
-/*
-
-  tft.setTextColor(ILI9488_WHITE);  tft.setTextSize(4);
-  tft.enableScroll();
-  tft.setScrollTextArea(0,0,120,240);
-  tft.setScrollBackgroundColor(ILI9488_GREEN);
-
-  tft.setCursor(180, 100);
-
-  tft.setFont(ComicSansMS_12);
-  tft.print("Fixed text");
-
-  tft.setCursor(0, 0);
-
-  tft.setTextColor(ILI9488_BLACK);
-
-  for(int i=0;i<20;i++){
-	tft.print("  this is line ");
-	tft.println(i);
-	tft.updateScreen();
-	delay(100);
-  }
-
-  tft.fillScreen(ILI9488_BLACK);
-  tft.setScrollTextArea(40,50,120,120);
-  tft.setScrollBackgroundColor(ILI9488_GREEN);
-  tft.setFont(ComicSansMS_10);
-
-  tft.setTextSize(1);
-  tft.setCursor(40, 50);
-  tft.updateScreen();
-  for(int i=0;i<2000;i++){
-	tft.print("  this is line ");
-	tft.println(i);
-	  tft.updateScreen();
-	//delay(100);
-  }
-*/
 /*
 45 (E)
 53 (S)
