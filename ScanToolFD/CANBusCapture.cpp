@@ -11,11 +11,15 @@
 #include <SD.h>
 #include <TimeLib.h>
 #include <algorithm>
-#include<stdio.h> 
-#include<string.h>
+#include <stdio.h> 
+#include <string.h>
 #include "CANBusCapture.h"
 #include "KeyInput.h"
 #include "icons.h"
+#include "App.h"
+#include "appManager.h"
+
+extern App app;
 
  // States for serial transfer
 #define START_BYTE              (0)
@@ -45,12 +49,8 @@ static char CAPTURE_printString[16][64];
 bool CAPTURE_isRunning = false;
 uint32_t CAPTURE_filterTable[2][4] = { {0x00 , 0x00 , 0x00 , 0x00}, {0x1FFFFFFF, 0x1FFFFFFF, 0x1FFFFFFF, 0x1FFFFFFF} };
 uint32_t CAPTURE_CANBusFDBaudRate = 1000000;
-
 uint32_t CAPTURE_hexTotal = 0;
 
-
-#include "appManager.h"
-extern std::vector<appManager> myApps;
 
 //
 void CAPTURE_clearLocalVar()
@@ -60,19 +60,25 @@ void CAPTURE_clearLocalVar()
 	CAPTURE_hexTotal = 0;
 }
 
-//
+// 
 uint8_t CAPTURE_createMenuBtns()
 {
 	uint8_t btnPos = 0;
 	uint8_t menuCoordIndex = 0;
-	for (int i = 0; i < myApps.size(); i++) 
+
+	Serial.printf("app.getAppSize(): %d \n", app.getAppSize());
+	for (int i = 0; i < app.getAppSize(); i++) 
 	{
-		if ((myApps[i].getAssignedMenu() == MENU_canBus) && (myApps[i].getAppLabel() != APP_CANBUS))
+		Serial.printf("app.getMenu(i): %d \n", app.getMenu(i));
+		Serial.printf("app.getLabel(i): %d \n", app.getLabel(i));
+		if ((app.getMenu(i) == MENU_canBus) && (app.getLabel(i) != APP_CANBUS))
 		{
-			userInterfaceButton[btnPos++].setButton(MENU_COORD[menuCoordIndex][0], MENU_COORD[menuCoordIndex][1], MENU_COORD[menuCoordIndex][2], MENU_COORD[menuCoordIndex][3], myApps[i].getAppLabel(), true, 10, myApps[i].getName(), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
+			userInterfaceButton[btnPos++].setButton(MENU_COORD[menuCoordIndex][0], MENU_COORD[menuCoordIndex][1], MENU_COORD[menuCoordIndex][2], MENU_COORD[menuCoordIndex][3], app.getLabel(i), true, 10, app.getName(i), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
 			menuCoordIndex++;
+			Serial.printf("menuCoordIndex: %d \n", menuCoordIndex);
 		}
 	}
+	Serial.printf("btnPos: %d \n", btnPos);
 	return btnPos;
 }
 
@@ -237,6 +243,7 @@ uint8_t CAPTURE_createFilterMaskBtns()
 
 	return BTN_filterMask_button_count;
 }
+
 
 //
 void CAPTURE_enableDisableConfigBtn(bool isEnabled)
@@ -676,7 +683,7 @@ void CAPTURE_captureConfig(int userInput)
 		if (CAPTURE_output_config == BTN_config_output_LCD)
 		{
 			CAPTURE_LCD_clear();
-			nextApp = (APP_labels)APP_CAPTURE_LCD;
+			app.newApp((APP_labels)APP_CAPTURE_LCD);
 			return;
 		}
 
@@ -743,6 +750,8 @@ void CAPTURE_LCD_clear()
 // Print RF packets to the LCD
 void CAPTURE_LCD_Print(uint32_t id, uint8_t length, uint8_t * data)
 {
+	int timerin = millis();
+
 	sprintf(CAPTURE_printString[CAPTURE_index++], "%03lX   %d   %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X", id, length, data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7]);
 
 	//char printString[128];
@@ -785,9 +794,12 @@ void CAPTURE_LCD_Print(uint32_t id, uint8_t length, uint8_t * data)
 			k--;
 		}
 	}
+	
 	//display.updateScreen();
 	display.setFont(Michroma_11);
 	display.useFrameBuffer(true);
+
+	Serial.println(millis() - timerin);
 }
 
 
@@ -904,7 +916,7 @@ void CAPTURE_LCD_scan(int userInput)
 	}
 	else if (userInput == BTN_capture_back)
 	{
-		nextApp = (APP_labels)APP_CAPTURE;
+		app.newApp((APP_labels)APP_CAPTURE);
 	}
 
 	if (CAPTURE_isRunning)
@@ -1420,5 +1432,14 @@ void CAPTURE_filterMask(int userInput)
 		CAPTURE_createFilterMaskBtns();
 		while (GUI_drawPage(&userInterfaceButton[BTN_filterMask_filter1], graphicLoaderState, 9));
 		display.updateScreen();
+	}
+}
+
+//
+void CAPTURE_CANBus(int userInput)
+{
+	if (userInput >= 0)
+	{
+		app.newApp((APP_labels)userInput);
 	}
 }

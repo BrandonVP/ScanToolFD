@@ -24,12 +24,6 @@ enum APP_labels {
 extern APP_labels nextApp;
 extern APP_labels activeApp;
 
-enum menus {
-	MENU_canBus = 0,
-	MENU_tools,
-	MENU_settings,
-	MENU_sub
-};
 
 const uint16_t MENU_COORD[8][4] = { {45,  75, 230, 125}, {250,  75, 435, 125},
 									{45, 135, 230, 185}, {250, 135, 435, 185},
@@ -52,7 +46,7 @@ const uint16_t MENU_COORD[8][4] = { {45,  75, 230, 125}, {250,  75, 435, 125},
 #define menuBorder 0x39E8 // 
 #define frameBorder 0x8452 // 
 #define OrangeBtnColor 0xFC00 // Orange
-#define BlackBtnColor 0x0000 // 
+#define BlackBtnColor 0x0000 // Black
 /*
 #define themeBackground 0xFFFF // White
 #define menuBtnText 0x0000 // White

@@ -7,9 +7,20 @@
  ===========================================================================
  */
 
+#ifndef APPMANAGER_H
+#define APPMANAGER_H
+
 #pragma once
 #include "common.h"
-//#include "config.h"
+#include "config.h"
+//#include "App.h"
+
+enum menus {
+	MENU_canBus = 0,
+	MENU_tools,
+	MENU_settings,
+	MENU_sub
+};
 
 class appManager
 {
@@ -22,6 +33,11 @@ private:
 	void (*runAnimationsPtr)(void);
 	void (*callBackPtr)(void);
 public:
+	appManager()
+	{
+
+	}
+
 	appManager(menus menuLocation, String descriptiveTxt, APP_labels label, void (*appFunc)(int), uint8_t(*printFunc)(void), void (*animationFunc)(void), void (*CBFunc)(void));
 	appManager(menus menuLocation, String descriptiveTxt, APP_labels label, void (*appFunc)(int), uint8_t(*printFunc)(void), void (*animationFunc)(void));
 	appManager(menus menuLocation, String descriptiveTxt, APP_labels label, void (*appFunc)(int), uint8_t(*printFunc)(void));
@@ -37,5 +53,5 @@ public:
 	String getName();
 	APP_labels getAppLabel();
 };
-
+#endif
 

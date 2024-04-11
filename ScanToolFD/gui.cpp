@@ -9,6 +9,8 @@
 
 #define _GUI_C
 #include "gui.h"
+#include "app.h"
+extern App app;
 
  // Local load bar variables
 static uint16_t loadBarIndex = 471; // ends at 470
@@ -166,7 +168,7 @@ void GUI_buttonMonitor(UserInterfaceClass* buttons, uint16_t size)
                     {
                         GUI_waitForItRect(buttons[i].getXStart(), buttons[i].getYStart(), buttons[i].getXStop(), buttons[i].getYStop(), buttons[i].getRadius(), buttons[i].getBorderColor(), buttons[i].getClickBorderColor());
                     }
-                    nextApp = (APP_labels)buttons[i].getClickReturn();
+                    app.newApp((APP_labels)buttons[i].getClickReturn());
                 }
             }
         }

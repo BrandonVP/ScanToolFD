@@ -149,6 +149,7 @@ void CAPTURE_LCD_clear();
 void CAPTURE_LCD_Print(uint32_t id, uint8_t length, uint8_t* data);
 void CAPTURE_LCD_scan(int userInput);
 void CAPTURE_Baud(int userInput);
+void CAPTURE_CANBus(int userInput);
 
 #else
 
@@ -171,6 +172,7 @@ void CAPTURE_LCD_scan(int userInput);
 void CAPTURE_Baud(int userInput);
 uint8_t CAPTURE_drawCANLogScroll();
 void CAPTURE_filterMask(int userInput);
+void CAPTURE_CANBus(int userInput);
 
 #endif // _CANBUSCAPTURE_C
 #endif // _CANBUSCAPTURE_h
