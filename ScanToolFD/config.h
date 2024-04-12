@@ -29,7 +29,9 @@ const uint16_t MENU_COORD[8][4] = { {45,  75, 230, 125}, {250,  75, 435, 125},
 									{45, 135, 230, 185}, {250, 135, 435, 185},
 									{45, 195, 230, 245}, {250, 195, 435, 245},
 									{45, 255, 230, 305}, {250, 255, 435, 305} };
-
+#define SCREEN_WIDTH 480
+#define SCREEN_HEIGHT 320
+#define SD_CARD_CS_PIN 2
 #define LCD_BL 14
 #define LCD_RST 15
 #define TFT_CS 10
@@ -156,3 +158,109 @@ Version Log
 
 
 */
+
+// Unused pins on back
+// 27 28 29 32 33
+// 
+// if removed LED
+// 24, 25, 26
+
+// SPI0 
+// SCK0  13 // Orange
+// MISO0 12 // Blue
+// MOSI0 11 // White/Pink
+// CS0   10 // Brown
+
+// SPI1
+// SCK1  27
+// MISO1 1
+// MOSI1 26
+// CS1   0
+
+// SPI2  
+// SCK2  37
+// MISO2 34
+// MOSI2 35
+// CS2   36
+
+// Blue   - MISO
+// White  - MOSI
+// Orange - SCK
+// Brown  - CS
+
+/*
+45 (E)
+53 (S)
+50 (P)
+52 (82)
+42 (66)
+
+98
+F4
+AB
+B4
+40
+2B
+0
+
+0
+FF
+0
+26
+2C
+
+FD // ENDING_BYTE
+
+45
+53
+50
+52
+42
+
+98
+F4
+AB
+B4
+40
+2B
+
+C8
+FF
+FF
+FF
+FF
+FF
+FD
+
+*/
+
+//#define SEND_MAC                (0xAC)
+//#define SEND_MAC_CONFIRM        (0xAD)
+//#define CONNECT_NEW_DONGLE      (0xCA)
+//#define CONNECT_DONGLE_CONFIRM  (0xCC)
+//#define RESET_DEVICE            (0xBA)
+//#define RESET_DEVICE_CONFIRM    (0xBF)
+//	delay(100);
+//	Serial2.write(CONNECT_NEW_DONGLE);
+//	delay(1);
+//	Serial2.write(CONNECT_DONGLE_CONFIRM);
+//	delay(1);
+//	Serial2.write(0xC8);
+//	delay(1);
+//	Serial2.write(0xC9);
+//	delay(1);
+//	Serial2.write(0xA3);
+//	delay(1);
+//	Serial2.write(0xF9);
+//	delay(1);
+//	Serial2.write(0xFD);
+//	delay(1);
+//	Serial2.write(0x04);
+//	delay(500);
+//	Serial2.write(RESET_DEVICE);
+//	delay(1);
+//	Serial2.write(RESET_DEVICE_CONFIRM);
+//	delay(2500);
+//	Serial2.write(SEND_MAC);
+//	delay(1);
+//	Serial2.write(SEND_MAC_CONFIRM);

@@ -1205,6 +1205,7 @@ uint32_t fileSize(char* filename)
 uint8_t CAPTURE_drawCANLogScroll()
 {
 	// Scan card for .txt files
+	/*
 	File root1 = SD.open("/");
 	if (root1)
 	{
@@ -1216,6 +1217,7 @@ uint8_t CAPTURE_drawCANLogScroll()
 	{
 		return 0;
 	}
+	*/
 
 	// Starting y location for list
 	uint16_t y = 78;
@@ -1288,6 +1290,7 @@ uint8_t CAPTURE_drawCANLogScroll()
 		}
 		y = y + 33;
 	}
+	display.updateScreen();
 	return 0;
 }
 

@@ -47,8 +47,7 @@
 	 End README
  =========================================================*/
 
-
- //#include <MTP_Teensy.h>
+#include <MTP_Teensy.h>
 #include <TimeLib.h>
 #include <SPI.h>
 #include <SD.h>
@@ -63,36 +62,29 @@
 #include "cbBuffer.h"
 #include "cbBufferFD.h"
 
-
+File myFile;
 ILI9488_t3 display = ILI9488_t3(&SPI, TFT_CS, TFT_DC);
 Adafruit_FT6206 ts = Adafruit_FT6206();
 
-#define SCREEN_WIDTH 480
-#define SCREEN_HEIGHT 320
-
-// Use to load pages in pieces to prevent blocking while loading entire page
-uint8_t graphicLoaderState = 0;
-
 App app;
-
+cbBuffer can1Buffer;
+cbBuffer can2Buffer;
+cbBufferFD can3Buffer;
 UserInterfaceClass userInterfaceButton[APP_BUTTON_SIZE];
 UserInterfaceClass userInterfaceCaptureButton[CAPTURE_BUTTON_SIZE];
 UserInterfaceClass userInterfaceMenuButton[MENU_BUTTON_SIZE];
+
+// Use to load pages in pieces to prevent blocking while loading entire page
+uint8_t graphicLoaderState = 0;
 
 FlexCAN_T4<CAN1, RX_SIZE_256, TX_SIZE_16> Can1;
 FlexCAN_T4<CAN2, RX_SIZE_256, TX_SIZE_16> Can2;
 //FlexCAN_T4<CAN3, RX_SIZE_256, TX_SIZE_16> Can3;
 FlexCAN_T4FD<CAN3, RX_SIZE_256, TX_SIZE_16> Can3; // FD
 
-cbBuffer can1Buffer;
-cbBuffer can2Buffer;
-cbBufferFD can3Buffer;
 bool enableCB1 = true;
 bool enableCB2 = true;
 bool enableCB3 = true;
-
-const int chipSelect = 2;
-File myFile;
 
 // Arduino library time update
 time_t getTeensy3Time()
@@ -101,9 +93,15 @@ time_t getTeensy3Time()
 }
 
 //
+void dateTime(uint16_t* date, uint16_t* time)
+{
+	*date = FAT_DATE(year(), month(), day());
+	*time = FAT_TIME(hour(), minute(), second());
+}
+
+//
 void drawMenu()
 {
-	// 
 	GUI_drawSquareBtn(0, 0, 479, 319, "", themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
 	GUI_drawSquareBtn(0, 0, 480, 45, "", menuBackground, menuBackground, menuBackground, ALIGN_CENTER);
 	GUI_drawSquareBtn(0, 45, 480, 50, "", menuBorder, menuBorder, menuBorder, ALIGN_CENTER);
@@ -133,52 +131,15 @@ void setCANBusFD(FLEXCAN_CLOCK clock, int baud)
 	Can3.setBaudRate(config);
 }
 
-//
-void dateTime(uint16_t* date, uint16_t* time)
-{
-	*date = FAT_DATE(year(), month(), day());
-	*time = FAT_TIME(hour(), minute(), second());
-}
-
 // -------------------------------------------------------------
 void setup(void)
 {
 	Serial.begin(115200); // USB is always 12 or 480 Mbit/sec
-	Serial2.begin(115200); // ESP8266
-
 	//while (!Serial);
-
+	Serial2.begin(115200); // ESP8266
+	
 	// Update time
 	setSyncProvider(getTeensy3Time);
-
-	// Unused pins on back
-	// 27 28 29 32 33
-	// 
-	// if removed LED
-	// 24, 25, 26
-
-	// SPI0 
-	// SCK0  13 // Orange
-	// MISO0 12 // Blue
-	// MOSI0 11 // White/Pink
-	// CS0   10 // Brown
-
-	// SPI1
-	// SCK1  27
-	// MISO1 1
-	// MOSI1 26
-	// CS1   0
-
-	// SPI2  
-	// SCK2  37
-	// MISO2 34
-	// MOSI2 35
-	// CS2   36
-
-	// Blue   - MISO
-	// White  - MOSI
-	// Orange - SCK
-	// Brown  - CS
 
 	LED_initialize();
 
@@ -255,93 +216,16 @@ void setup(void)
 	Can3.setRegions(64);
 	CAPTURE_createCaptureBtns();
 
-	// mandatory to begin the MTP session.
-	//MTP.begin();
-
-	// open the file. note that only one file can be open at a time,
-	// so you have to close this one before opening another.
-	SD.begin(chipSelect);
-
+	MTP.begin();
+	SD.begin(SD_CARD_CS_PIN);
 	SdFile::dateTimeCallback(dateTime);
-
-	//MTP.addFilesystem(SD, "SD Card");
-
-	//myFile = SD.open("a.txt", FILE_WRITE);
-
-	////SD.remove("a.txt");
-
-	// //if the file opened okay, write to it:
-	//if (myFile) {
-	//	Serial.print("Writing to test.txt...");
-	//	myFile.println("testing 1, 2, 3.");
-	//	// close the file:
-	//	myFile.close();
-	//	Serial.println("done.");
-	//}
-	//else {
-	//	// if the file didn't open, print an error:
-	//	Serial.println("error opening a.txt");
-	//}
-
-	//// re-open the file for reading:
-	//myFile = SD.open("a.txt");
-	//if (myFile) {
-	//	Serial.println("a.txt:");
-
-	//	// read from the file until there's nothing else in it:
-	//	while (myFile.available()) {
-	//		Serial.write(myFile.read());
-	//	}
-	//	// close the file:
-	//	myFile.close();
-	//}
-	//else {
-	//	// if the file didn't open, print an error:
-	//	Serial.println("error opening a.txt");
-	//}
+	MTP.addFilesystem(SD, "SD Card");
 
 	pinMode(6, OUTPUT);
 	digitalWrite(6, LOW);
 
 	app.init();
-
 	drawMenu();
-
-
-
-
-
-	//#define SEND_MAC                (0xAC)
-	//#define SEND_MAC_CONFIRM        (0xAD)
-	//#define CONNECT_NEW_DONGLE      (0xCA)
-	//#define CONNECT_DONGLE_CONFIRM  (0xCC)
-	//#define RESET_DEVICE            (0xBA)
-	//#define RESET_DEVICE_CONFIRM    (0xBF)
-	//	delay(100);
-	//	Serial2.write(CONNECT_NEW_DONGLE);
-	//	delay(1);
-	//	Serial2.write(CONNECT_DONGLE_CONFIRM);
-	//	delay(1);
-	//	Serial2.write(0xC8);
-	//	delay(1);
-	//	Serial2.write(0xC9);
-	//	delay(1);
-	//	Serial2.write(0xA3);
-	//	delay(1);
-	//	Serial2.write(0xF9);
-	//	delay(1);
-	//	Serial2.write(0xFD);
-	//	delay(1);
-	//	Serial2.write(0x04);
-	//	delay(500);
-	//	Serial2.write(RESET_DEVICE);
-	//	delay(1);
-	//	Serial2.write(RESET_DEVICE_CONFIRM);
-	//	delay(2500);
-	//	Serial2.write(SEND_MAC);
-	//	delay(1);
-	//	Serial2.write(SEND_MAC_CONFIRM);
-
 }
 
 //
@@ -368,7 +252,7 @@ void CANBus1_IRQHandler(const CAN_message_t& msg)
 void CANBus2_IRQHandler(const CAN_message_t& msg)
 {
 	LED_pulse((RGB)LED_BLUE);
-	Serial.printf("2: %03X  %d  %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\n", msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
+	//Serial.printf("2: %03X  %d  %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\n", msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
 	can2Buffer.push_cb(msg.id, msg.len, msg.buf);
 }
 
@@ -390,7 +274,6 @@ void CANBus3_IRQHandler()
 		can3Buffer.push_cb(msg.id, msg.len, msg.buf);
 	}
 	//Serial.printf("%03X  %d  %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X\n", msg.id, msg.len, msg.buf[0], msg.buf[1], msg.buf[2], msg.buf[3], msg.buf[4], msg.buf[5], msg.buf[6], msg.buf[7]);
-
 }
 
 //
@@ -427,7 +310,7 @@ void backgroundProcess()
 	GUI_buttonMonitor(userInterfaceMenuButton, MENU_BUTTON_SIZE);
 	BATTERY_printLevel();
 	updateTime();
-	//MTP.loop();
+	MTP.loop();
 
 	LED_strobe((RGB)LED_OFF);
 
@@ -472,21 +355,13 @@ void updateTime()
 	}
 }
 
-/*=========================================================
-	Main loop
-===========================================================*/
-// Main loop runs the user interface and calls for background processes
-void loop(void)
+void debugLoop()
 {
-	app.run();
-	backgroundProcess();
-
 	//if (Serial2.available())
 	//{
 		//Serial.println(Serial2.read(), 16);
 	//}
 
-	/*
 	static uint32_t timeout123 = millis();
 	static uint16_t rotatingID = 0;
 	if (millis() - timeout123 > 2000)
@@ -515,59 +390,16 @@ void loop(void)
 			for (uint8_t i = 0; i < 8; i++) msg.buf[i] = (uint8_t)millis() + (i * 0x3C);
 			Can1.write(msg);
 		}
-
-		//drawMenu();
-
-		//Serial.printf("activeApp: %d\n", activeApp);
-		//Serial.printf("isCaptureRunning: %d   CAPTURE_input_config: %d   CAPTURE_input_config: %d \n", isCaptureRunning, CAPTURE_input_config, CAPTURE_output_config);
 		timeout123 = millis();
 	}
-	*/
 }
-/*
-45 (E)
-53 (S)
-50 (P)
-52 (82)
-42 (66)
-
-98
-F4
-AB
-B4
-40
-2B
-0
-
-0
-FF
-0
-26
-2C
-
-FD // ENDING_BYTE
-
-45
-53
-50
-52
-42
-
-98
-F4
-AB
-B4
-40
-2B
-
-C8
-FF
-FF
-FF
-FF
-FF
-FD
-
-*/
-
-
+/*=========================================================
+	Main loop
+===========================================================*/
+// Main loop runs the user interface and calls for background processes
+void loop(void)
+{
+	app.run();
+	backgroundProcess();
+	//debugLoop();
+}
