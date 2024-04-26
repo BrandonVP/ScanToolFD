@@ -14,26 +14,6 @@
 #include "cbBuffer.h"
 #include "cbBufferFD.h"
 
-#define TIMED_TX_MAX_SIZE 20
-
-struct MessageRX
-{
-	char name[9];
-	uint8_t channel = 0;
-	uint16_t interval = 0;
-	uint32_t id = 0;
-	uint32_t timer = 0;
-	uint8_t data[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
-	bool isOn = false;
-	bool isDel = true;
-};
-
-struct SchedulerRX
-{
-	uint8_t nodeLength = 0;
-	MessageRX node[TIMED_TX_MAX_SIZE];
-};
-
 typedef enum capture_lcd_btn {
 	BTN_capture_noInput = 1,
 	BTN_capture_start,

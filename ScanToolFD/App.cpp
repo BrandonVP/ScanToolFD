@@ -39,15 +39,15 @@ uint8_t createToolBtns()
 uint8_t createSettingsBtns()
 {
 	uint8_t btnPos = 0;
-	userInterfaceButton[btnPos++].setButton(45, 75, 230, 125, APP_SETTINGS, true, 10, F(""), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(45, 75, 230, 125, APP_SETTINGS, true, 10, F("Connect Dongle"), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
 	userInterfaceButton[btnPos++].setButton(45, 135, 230, 185, APP_SETTINGS, true, 10, F(""), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
 	userInterfaceButton[btnPos++].setButton(45, 195, 230, 245, APP_SETTINGS, true, 10, F(""), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
-	//userInterfaceButton[btnPos++].setButton(45, 260, 220, 300, APP_SETTINGS, true, F(""), ALIGN_CENTER);
+	userInterfaceButton[btnPos++].setButton(45, 260, 220, 300, APP_SETTINGS, true, F(""), ALIGN_CENTER);
 
-	userInterfaceButton[btnPos++].setButton(250, 75, 435, 125, APP_SETTINGS, true, 10, F(""), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
+	userInterfaceButton[btnPos++].setButton(250, 75, 435, 125, APP_SETTINGS, true, 10, F("About"), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
 	userInterfaceButton[btnPos++].setButton(250, 135, 435, 185, APP_SETTINGS, true, 10, F(""), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
 	userInterfaceButton[btnPos++].setButton(250, 195, 435, 245, APP_SETTINGS, true, 10, F(""), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
-	//userInterfaceButton[btnPos++].setButton(270, 260, 425, 300, APP_SETTINGS, true, F(""), ALIGN_CENTER);
+	userInterfaceButton[btnPos++].setButton(270, 260, 425, 300, APP_SETTINGS, true, F(""), ALIGN_CENTER);
 
 	/*
 	userInterfaceButton[btnPos++].setButton(55, 80, 220, 120, 1, true, F("Memory"), ALIGN_CENTER);
@@ -133,13 +133,6 @@ String App::getName(int index)
 //
 void App::run()
 {
-	static int timer1234 = 0;
-	if (millis() - timer1234 > 2000)
-	{
-		Serial.println("here");
-		timer1234 = millis();
-	}
-
 	// Draw page
 	if (!hasDrawn)
 	{

@@ -7,8 +7,9 @@
  ===========================================================================
  */
 
-//#include "SDCard.h"
-//#include "common.h"
+#include "SDCard.h"
+#include <SD.h>
+//#include "CANBusSend.h"
 
  // Called at setup to initialize the SD Card
 /*
@@ -118,11 +119,13 @@ void SDCard::writeFileln(char* filename)
 }
 */
 
-/*
+
 // Saves users CAN Bus RX messages
-void SDCard::writeSendMsg(SchedulerRX msgStruct)
+void SDCard::writeSendMsg(CANBusTXScheduler msgStruct, int size)
 {
 	char buffer[100];
+
+	//SD.mkdir("SYSTEM");
 
 	// Delete old before writing new file
 	SD.remove("SYSTEM/CANMsg.txt");
@@ -130,21 +133,21 @@ void SDCard::writeSendMsg(SchedulerRX msgStruct)
 	// File created and opened for writing
 	File myFile = SD.open("SYSTEM/CANMsg.txt", FILE_WRITE);
 
-	for (uint8_t i = 0; i < 20; i++)
+	for (uint8_t i = 0; i < size; i++)
 	{
 		if (strcmp(msgStruct.node[i].name, "\0"))
 		{
-			sprintf(buffer, "%s %x %x %x %x %x %x %x %x %x %x %x %x %x \n", msgStruct.node[i].name, msgStruct.node[i].channel, msgStruct.node[i].interval, msgStruct.node[i].id,
+			sprintf(buffer, "%s %x %lx %lx %lx %x %x %x %x %x %x %x %x %x \n", msgStruct.node[i].name, msgStruct.node[i].channel, msgStruct.node[i].interval, msgStruct.node[i].id,
 				msgStruct.node[i].data[0], msgStruct.node[i].data[1], msgStruct.node[i].data[2], msgStruct.node[i].data[3], msgStruct.node[i].data[4], msgStruct.node[i].data[5], msgStruct.node[i].data[6], msgStruct.node[i].data[7],
 				msgStruct.node[i].isOn, msgStruct.node[i].isDel);
-			//SerialUSB.println(msgStruct.node[i].name);
+			Serial.println(msgStruct.node[i].name);
 		}
 		else
 		{
-			sprintf(buffer, "%s %x %x %x %x %x %x %x %x %x %x %x %x %x \n", "(null)", msgStruct.node[i].channel, msgStruct.node[i].interval, msgStruct.node[i].id,
+			sprintf(buffer, "%s %x %lx %lx %lx %x %x %x %x %x %x %x %x %x \n", "(null)", msgStruct.node[i].channel, msgStruct.node[i].interval, msgStruct.node[i].id,
 				msgStruct.node[i].data[0], msgStruct.node[i].data[1], msgStruct.node[i].data[2], msgStruct.node[i].data[3], msgStruct.node[i].data[4], msgStruct.node[i].data[5], msgStruct.node[i].data[6], msgStruct.node[i].data[7],
 				msgStruct.node[i].isOn, msgStruct.node[i].isDel);
-			//SerialUSB.println("(null)");
+			Serial.println("(null)");
 		}
 
 		// Copy buffer to file after confirming file was open
@@ -155,7 +158,7 @@ void SDCard::writeSendMsg(SchedulerRX msgStruct)
 	}
 	myFile.close();
 }
-*/
+
 
 /*
 // Saves users CAN Bus RX messages
@@ -228,13 +231,14 @@ void SDCard::readFile(char* filename, uint8_t* arrayIn)
 }
 */
 
-/*
+
 // Reads users saved CAN Bus RX messages
-void SDCard::readSendMsg(SchedulerRX& msgStruct)
+void SDCard::readSendMsg(CANBusTXScheduler& msgStruct, int size)
 {
+	
 	// File created and opened for writing
 	File myFile = SD.open("SYSTEM/CANMsg.txt", FILE_READ);
-
+	
 	if (myFile)
 	{
 		for (uint8_t i = 0; i < 20; i++)
@@ -245,8 +249,8 @@ void SDCard::readSendMsg(SchedulerRX& msgStruct)
 			myFile.readBytesUntil('\n', buffer, 51);
 
 			sscanf(buffer, "%s %x %x %x %x %x %x %x %x %x %x %x %x %x", s1, &msgStruct.node[i].channel, &msgStruct.node[i].interval, &msgStruct.node[i].id,
-				&msgStruct.node[i].data[0], &msgStruct.node[i].data[1], &msgStruct.node[i].data[2], &msgStruct.node[i].data[3], &msgStruct.node[i].data[4], &msgStruct.node[i].data[5], &msgStruct.node[i].data[6], &msgStruct.node[i].data[7],
-				&msgStruct.node[i].isOn, &msgStruct.node[i].isDel);
+				&msgStruct.node[i].data[0], &msgStruct.node[i].data[1], &msgStruct.node[i].data[2], &msgStruct.node[i].data[3], &msgStruct.node[i].data[4], 
+				&msgStruct.node[i].data[5], &msgStruct.node[i].data[6], &msgStruct.node[i].data[7], &msgStruct.node[i].isOn, &msgStruct.node[i].isDel);
 
 			msgStruct.node[i].isOn = false;
 
@@ -270,8 +274,8 @@ void SDCard::readSendMsg(SchedulerRX& msgStruct)
 		}
 		myFile.close();
 	}
+	
 }
-*/
 
 /*
 // Reads users saved CAN Bus RX messages

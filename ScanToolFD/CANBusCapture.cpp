@@ -34,7 +34,7 @@ extern App app;
 #define ENDING_BYTE             (0xFD)
 #define PACKET_SIZE             (0x0A)
 
-static char* filename = "Filename";
+static char filename[8] = { 'F', 'i', 'l', 'e', 'n', 'a', 'm', 'e' };
 static char newFilename[8];
 static char SDfilename[50];
 
@@ -405,7 +405,6 @@ void CAPTURE_processSDCapture(int userInput)
 				SDfilename[i] = '\0';
 			}
 
-			char* a1 = SDfilename;
 			memcpy(SDfilename, "canlog/", 7);
 			strcat(SDfilename, newFilename);
 			strcat(SDfilename, ".txt");
@@ -439,7 +438,7 @@ void CAPTURE_processSDCapture(int userInput)
 			{
 				CAN_Frame msg;
 				can1Buffer.pop_cb(&msg);
-				sprintf(buffer, "%8d   %9ld   %04lX   %d   %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X", ++CAPTURE_messageNum, millis(), msg.id, msg.length, msg.data[0], msg.data[1], msg.data[2], msg.data[3], msg.data[4], msg.data[5], msg.data[6], msg.data[7]);
+				sprintf(buffer, "%8lu   %9ld   %04lX   %d   %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X", ++CAPTURE_messageNum, millis(), msg.id, msg.length, msg.data[0], msg.data[1], msg.data[2], msg.data[3], msg.data[4], msg.data[5], msg.data[6], msg.data[7]);
 				myFile.println(buffer);
 			}
 			break;
@@ -448,7 +447,7 @@ void CAPTURE_processSDCapture(int userInput)
 			{
 				CAN_Frame msg;
 				can2Buffer.pop_cb(&msg);
-				sprintf(buffer, "%8d    %9ld    %04lX   %d   %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X", ++CAPTURE_messageNum, millis(), msg.id, msg.length, msg.data[0], msg.data[1], msg.data[2], msg.data[3], msg.data[4], msg.data[5], msg.data[6], msg.data[7]);
+				sprintf(buffer, "%8lu    %9ld    %04lX   %d   %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X", ++CAPTURE_messageNum, millis(), msg.id, msg.length, msg.data[0], msg.data[1], msg.data[2], msg.data[3], msg.data[4], msg.data[5], msg.data[6], msg.data[7]);
 				myFile.println(buffer);
 			}
 			break;
@@ -457,7 +456,7 @@ void CAPTURE_processSDCapture(int userInput)
 			{
 				CAN_Frame_FD msg;
 				can3Buffer.pop_cb(&msg);
-				sprintf(buffer, "%8d    %9ld    %04lX   %d   %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X", ++CAPTURE_messageNum, millis(), msg.id, msg.length, msg.data[0], msg.data[1], msg.data[2], msg.data[3], msg.data[4], msg.data[5], msg.data[6], msg.data[7]);
+				sprintf(buffer, "%8lu    %9ld    %04lX   %d   %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X", ++CAPTURE_messageNum, millis(), msg.id, msg.length, msg.data[0], msg.data[1], msg.data[2], msg.data[3], msg.data[4], msg.data[5], msg.data[6], msg.data[7]);
 				myFile.println(buffer);
 			}
 			break;
@@ -482,7 +481,7 @@ void CAPTURE_processSDCapture(int userInput)
 			{
 				CAN_Frame msg;
 				can2Buffer.pop_cb(&msg);
-				sprintf(buffer, "%8d    %9ld    %04lX   %d   %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X", ++CAPTURE_messageNum, millis(), msg.id, msg.length, msg.data[0], msg.data[1], msg.data[2], msg.data[3], msg.data[4], msg.data[5], msg.data[6], msg.data[7]);
+				sprintf(buffer, "%8lu    %9ld    %04lX   %d   %02X  %02X  %02X  %02X  %02X  %02X  %02X  %02X", ++CAPTURE_messageNum, millis(), msg.id, msg.length, msg.data[0], msg.data[1], msg.data[2], msg.data[3], msg.data[4], msg.data[5], msg.data[6], msg.data[7]);
 				myFile.println(buffer);
 
 				CAN_message_t msgOut;
@@ -1135,14 +1134,12 @@ void CAPTURE_Baud(int userInput)
 //
 bool CAPTURE_isCaptureFile(const char* filename) {
 	int8_t len = strlen(filename);
-	bool result;
-	if (strstr(strlwr(filename + (len - 4)), ".txt"))
+	char copy[32];
+	memcpy(copy, copy, strlen(filename));
+	bool result = false;
+	if (strstr(strlwr(copy + (len - 4)), ".txt"))
 	{
 		result = true;
-	}
-	else 
-	{
-		result = false;
 	}
 	return result;
 }

@@ -62,6 +62,9 @@
 #include "cbBuffer.h"
 #include "cbBufferFD.h"
 
+#include "CANBusSend.h"
+
+
 File myFile;
 ILI9488_t3 display = ILI9488_t3(&SPI, TFT_CS, TFT_DC);
 Adafruit_FT6206 ts = Adafruit_FT6206();

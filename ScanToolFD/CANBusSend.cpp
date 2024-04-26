@@ -14,6 +14,7 @@
 //
 uint8_t SEND_createSendBtns()
 {
+	uint8_t btnPos = 0;
 	uint16_t y = 78;
 	GUI_drawSquareBtn(5, y - 25, 160, y, "Send", frameBorder, BlackBtnColor, menuBtnText, ALIGN_CENTER);
 	GUI_drawSquareBtn(160, y - 25, 250, y, "Cycle", frameBorder, BlackBtnColor, menuBtnText, ALIGN_CENTER);
@@ -26,12 +27,6 @@ uint8_t SEND_createSendBtns()
 	ICONS_printIcon(433, 100, upArrow_bits, 32, 4, menuBtnTextColor, 1);
 	ICONS_printIcon(433, 230, downArrow_bits, 32, 4, menuBtnTextColor, 1);
 
-	//GUI_drawSquareBtn(10, 280, 105, 318, "View", OrangeBtnColor, BlackBtnColor, menuBtnText, ALIGN_CENTER);
-	//GUI_drawSquareBtn(105, 280, 210, 318, "Play", OrangeBtnColor, BlackBtnColor, menuBtnText, ALIGN_CENTER);
-	//GUI_drawSquareBtn(210, 280, 315, 318, "Split", OrangeBtnColor, BlackBtnColor, menuBtnText, ALIGN_CENTER);
-	//GUI_drawSquareBtn(315, 280, 420, 318, "Delete", OrangeBtnColor, BlackBtnColor, menuBtnText, ALIGN_CENTER);
-
-
 	// Draw the scroll window
 	for (uint8_t i = 0; i < 6; i++)
 	{
@@ -43,33 +38,17 @@ uint8_t SEND_createSendBtns()
 		y = y + 39;
 	}
 	display.updateScreen();
-
-
-	const int height = 45;
-	const int interval = 6;
-
-	const int R1_S = 55;
-	const int R1_E = R1_S + height;
-	const int R2_S = R1_E + interval;
-	const int R2_E = R2_S + height;
-	const int R3_S = R2_E + interval;
-	const int R3_E = R3_S + height;
-	const int R4_S = R3_E + interval;
-	const int R4_E = R4_S + height;
-	const int R5_S = R4_E + interval;
-	const int R5_E = R5_S + height;
-
-	uint8_t btnPos = 0;
-	/*
-	userInterfaceButton[btnPos++].setButton(5, R1_S, 180, R1_E, 0, false, 0, F(""), ALIGN_CENTER, OrangeBtnColor, BlackBtnColor, menuBtnText, BlackBtnColor);
-	userInterfaceButton[btnPos++].setButton(180, R1_S, 260, R1_E, 0, false, 0, F("OFF"), ALIGN_CENTER, OrangeBtnColor, BlackBtnColor, menuBtnText, BlackBtnColor);
-	userInterfaceButton[btnPos++].setButton(260, R1_S, 340, R1_E, 0, false, 0, F("EDIT"), ALIGN_CENTER, OrangeBtnColor, BlackBtnColor, menuBtnText, BlackBtnColor);
-	userInterfaceButton[btnPos++].setButton(340, R1_S, 420, R1_E, 0, false, 0, F("DATA"), ALIGN_CENTER, OrangeBtnColor, BlackBtnColor, menuBtnText, BlackBtnColor);
-
-	userInterfaceButton[btnPos++].setButton(5, R2_S, 400, R2_E, 0, false, 0, F(""), ALIGN_LEFT, OrangeBtnColor, BlackBtnColor, menuBtnText, menuBtnText);
-	userInterfaceButton[btnPos++].setButton(5, R3_S, 400, R3_E, 0, false, 0, F(""), ALIGN_CENTER, OrangeBtnColor, BlackBtnColor, menuBtnText, menuBtnText);
-	userInterfaceButton[btnPos++].setButton(5, R4_S, 400, R4_E, 0, false, 0, F(""), ALIGN_LEFT, OrangeBtnColor, BlackBtnColor, menuBtnText, menuBtnText);
-	userInterfaceButton[btnPos++].setButton(5, R5_S, 400, R5_E, 0, false, 0, F(""), ALIGN_LEFT, OrangeBtnColor, BlackBtnColor, menuBtnText, menuBtnText);
-		/**/
 	return btnPos;
 }
+
+/*
+void loadCANBusTXMsg()
+{
+	//uiSD.readSendMsg(CANBusSendList, MAX_STORED_MESSAGES);
+}
+
+void saveCANBusTXMsg()
+{
+	//uiSD.writeSendMsg(CANBusSendList, MAX_STORED_MESSAGES);
+}
+*/
