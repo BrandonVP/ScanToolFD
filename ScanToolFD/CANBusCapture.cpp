@@ -18,6 +18,7 @@
 #include "icons.h"
 #include "App.h"
 #include "appManager.h"
+#include "baudRate.h"
 
 extern App app;
 
@@ -34,23 +35,22 @@ extern App app;
 #define ENDING_BYTE             (0xFD)
 #define PACKET_SIZE             (0x0A)
 
+// TODO: What is going on with all these names? Move names to SDCard class and make set/get functions
 static char filename[8] = { 'F', 'i', 'l', 'e', 'n', 'a', 'm', 'e' };
 static char newFilename[8];
 static char SDfilename[50];
+
 
 typedef char MyArray[20][13];
 char CAPTURE_fileList[20][13];
 static uint8_t CAPTURE_state = 0;
 static uint8_t CAPTURE_index = 0;
 static uint32_t CAPTURE_messageNum = 0;
-static uint8_t CAPTURE_baudInput = 0xFF;
-static uint8_t CAPTURE_baudSpeed = 0;
 static char CAPTURE_printString[16][64];
 bool CAPTURE_isRunning = false;
-uint32_t CAPTURE_filterTable[2][4] = { {0x00 , 0x00 , 0x00 , 0x00}, {0x1FFFFFFF, 0x1FFFFFFF, 0x1FFFFFFF, 0x1FFFFFFF} };
-uint32_t CAPTURE_CANBusFDBaudRate = 1000000;
-uint32_t CAPTURE_hexTotal = 0;
 
+uint32_t CAPTURE_hexTotal = 0;
+extern File myFile;
 
 //
 void CAPTURE_clearLocalVar()
@@ -85,6 +85,7 @@ uint8_t CAPTURE_createMenuBtns()
 //
 uint8_t CAPTURE_createCaptureBtns()
 {
+
 	userInterfaceButton[0].setButton( 10,  55, 170,  70,  0, false, 20, F("Input"),      ALIGN_CENTER, themeBackground, themeBackground, menuBackground, menuBtnTextColor);
 	userInterfaceButton[0].setClickable(false);
 	userInterfaceButton[1].setButton(175,  55, 335,  70,  0, false, 20, F("Output"),      ALIGN_CENTER, themeBackground, themeBackground, menuBackground, menuBtnTextColor);
@@ -107,6 +108,8 @@ uint8_t CAPTURE_createCaptureBtns()
 
 	userInterfaceButton[BTN_config_state_Start]    .setButton(340, 230, 475, 270, BTN_config_state_Start, true, 0, F("START"),        ALIGN_CENTER, themeBackground, BlackBtnColor, OrangeBtnColor, menuBtnText);
 	userInterfaceButton[BTN_config_state_Start].setClickable(false);
+
+
 	if (CAPTURE_isRunning)
 	{
 		userInterfaceButton[BTN_config_state_Stop].setButton(340, 275, 475, 315, BTN_config_state_Stop, true, 0, F("STOP"), ALIGN_CENTER, OrangeBtnColor, BlackBtnColor, OrangeBtnColor, menuBtnText);
@@ -116,10 +119,11 @@ uint8_t CAPTURE_createCaptureBtns()
 		userInterfaceButton[BTN_config_state_Stop].setButton(340, 275, 475, 315, BTN_config_state_Stop, true, 0, F("STOP"), ALIGN_CENTER, themeBackground, BlackBtnColor, OrangeBtnColor, menuBtnText);
 		userInterfaceButton[BTN_config_state_Stop].setClickable(false);
 	}
-	
-	userInterfaceButton[BTN_config_state_Filename].setButton(340, 75, 475, 110, BTN_config_state_Filename, true, 0, filename, ALIGN_CENTER, themeBackground, themeBackground, menuBtnColor, themeBackground);
+
+	userInterfaceButton[BTN_config_state_Filename].setButton(340, 75, 475, 110, BTN_config_state_Filename, true, 0, "", ALIGN_CENTER, themeBackground, themeBackground, menuBtnColor, themeBackground); // filename
 	userInterfaceButton[BTN_config_state_Filename].setClickable(false);
-	userInterfaceButton[BTN_config_state_Filename_Accept].setButton(340, 115, 475, 150, BTN_config_state_Filename_Accept, true, 0, F("Accept"), ALIGN_CENTER, themeBackground, themeBackground, menuBtnColor, themeBackground);
+
+	userInterfaceButton[BTN_config_state_Filename_Accept].setButton(340, 115, 475, 150, BTN_config_state_Filename_Accept, true, 0, F("Accept"), ALIGN_CENTER, themeBackground, themeBackground, menuBtnColor, themeBackground); 
 	userInterfaceButton[BTN_config_state_Filename_Accept].setClickable(false);
 
 	// Highlight current selected
@@ -133,7 +137,7 @@ uint8_t CAPTURE_createCaptureBtns()
 	{
 		userInterfaceButton[CAPTURE_output_config].setBgColor(menuBtnColor);
 	}
-		
+
 	return BTN_config_button_count;
 }
 
@@ -155,95 +159,6 @@ uint8_t CAPTURE_createLCDBtns()
 	userInterfaceButton[btnPos++].setTextSize(9);
 	return btnPos;
 }
-
-//
-uint8_t CAPTURE_createBaudBtns()
-{
-	uint16_t lStartX = 255;
-	uint16_t lEndX = 460;
-	uint16_t rStartX = 20;
-	uint16_t rEndX = 235;
-	
-	userInterfaceButton[BTN_baud_label1].setButton(rStartX,  60, rEndX, 90, BTN_baud_label1, false, 0, F("CAN1"), ALIGN_CENTER, themeBackground, BlackBtnColor, menuBtnColor, menuBtnText);
-	userInterfaceButton[BTN_baud_label1].setClickable(false);
-	userInterfaceButton[BTN_baud_can1]  .setButton(rStartX,  90, rEndX, 130, BTN_baud_can1, false, 0, Can1.getBaudRate(), ALIGN_CENTER, menuBtnColor, BlackBtnColor, menuBtnColor, menuBtnText);
-	userInterfaceButton[BTN_baud_label2].setButton(rStartX, 130, rEndX, 160, BTN_baud_label2, false, 0, F("CAN2"), ALIGN_CENTER, themeBackground, BlackBtnColor, menuBtnColor, menuBtnText);
-	userInterfaceButton[BTN_baud_label2].setClickable(false);
-	userInterfaceButton[BTN_baud_can2]  .setButton(rStartX, 160, rEndX, 200, BTN_baud_can2, false, 0, Can2.getBaudRate(), ALIGN_CENTER, menuBtnColor, BlackBtnColor, menuBtnColor, menuBtnText);
-	userInterfaceButton[BTN_baud_label3].setButton(rStartX, 200, rEndX, 230, BTN_baud_label3, false, 0, F("CAN3 FD"), ALIGN_CENTER, themeBackground, BlackBtnColor, menuBtnColor, menuBtnText);
-	userInterfaceButton[BTN_baud_label3].setClickable(false);
-	userInterfaceButton[BTN_baud_can3]  .setButton(rStartX, 230, rEndX, 270, BTN_baud_can3, false, 0, CAPTURE_CANBusFDBaudRate, ALIGN_CENTER, menuBtnColor, BlackBtnColor, menuBtnColor, menuBtnText);
-	userInterfaceButton[BTN_baud_canSet].setButton(rStartX, 270, rEndX, 315, BTN_baud_canSet, false, 0, F("Set"), ALIGN_CENTER, themeBackground, BlackBtnColor, BlackBtnColor, menuBtnText);
-	userInterfaceButton[BTN_baud_canSet].setClickable(false);
-
-	userInterfaceButton[BTN_baud_table].setButton(lStartX,  60, lEndX, 300, BTN_baud_table, false, BTN_baud_table, F(""), ALIGN_CENTER, menuBackground, BlackBtnColor, menuBackground, menuBackground);
-	userInterfaceButton[BTN_baud_table].setClickable(false);
-	userInterfaceButton[BTN_baud_5m]   .setButton(lStartX,  60, lEndX,  92, BTN_baud_5m, false, 0, F("5M"), ALIGN_CENTER, themeBackground, BlackBtnColor, OrangeBtnColor, menuBtnText);
-	userInterfaceButton[BTN_baud_2m]   .setButton(lStartX,  92, lEndX, 124, BTN_baud_2m, false, 0, F("2M"), ALIGN_CENTER, themeBackground, BlackBtnColor, OrangeBtnColor, menuBtnText);
-	userInterfaceButton[BTN_baud_1m]   .setButton(lStartX, 124, lEndX, 156, BTN_baud_1m, false, 0, F("1M"), ALIGN_CENTER, themeBackground, BlackBtnColor, OrangeBtnColor, menuBtnText);
-	userInterfaceButton[BTN_baud_800k] .setButton(lStartX, 156, lEndX, 188, BTN_baud_800k, false, 0, F("800K"), ALIGN_CENTER, themeBackground, BlackBtnColor, OrangeBtnColor, menuBtnText);
-	userInterfaceButton[BTN_baud_500k] .setButton(lStartX, 188, lEndX, 220, BTN_baud_500k, false, 0, F("500K"), ALIGN_CENTER, themeBackground, BlackBtnColor, OrangeBtnColor, menuBtnText);
-	userInterfaceButton[BTN_baud_250k] .setButton(lStartX, 220, lEndX, 252, BTN_baud_250k, false, 0, F("250K"), ALIGN_CENTER, themeBackground, BlackBtnColor, OrangeBtnColor, menuBtnText);
-	userInterfaceButton[BTN_baud_125k] .setButton(lStartX, 252, lEndX, 284, BTN_baud_125k, false, 0, F("125K"), ALIGN_CENTER, themeBackground, BlackBtnColor, OrangeBtnColor, menuBtnText);
-	userInterfaceButton[BTN_baud_100k] .setButton(lStartX, 284, lEndX, 315, BTN_baud_100k, false, 0, F("100K"), ALIGN_CENTER, themeBackground, BlackBtnColor, OrangeBtnColor, menuBtnText);
-	
-	return BTN_baud_button_count;
-}
-
-//
-uint8_t CAPTURE_createFilterMaskBtns()
-{
-	uint16_t lStartX = 5;
-	uint16_t lEndX = 98;
-
-	uint16_t fStartX = 98;
-	uint16_t fEndX = 238;
-
-	uint16_t mStartX = 238;
-	uint16_t mEndX = 388;
-
-	uint16_t oStartX = 388;
-	uint16_t oEndX = 485;
-
-	// Column 1
-	userInterfaceButton[BTN_filterMask_CANLabel].setButton(lStartX, 60, lEndX, 110, BTN_filterMask_CANLabel, false, 0, F("CAN"), ALIGN_CENTER, frameBorder, BlackBtnColor, menuBtnColor, menuBtnText);
-	userInterfaceButton[BTN_filterMask_CANLabel].setClickable(false);
-	userInterfaceButton[BTN_filterMask_CAN1Label].setButton(lStartX, 110, lEndX, 160, BTN_filterMask_CAN1Label, false, 0, F("1"), ALIGN_CENTER, frameBorder, BlackBtnColor, menuBtnColor, menuBtnText);
-	userInterfaceButton[BTN_filterMask_CAN1Label].setClickable(false);
-	userInterfaceButton[BTN_filterMask_CAN2Label].setButton(lStartX, 160, lEndX, 210, BTN_filterMask_CAN2Label, false, 0, F("2"), ALIGN_CENTER, frameBorder, BlackBtnColor, menuBtnColor, menuBtnText);
-	userInterfaceButton[BTN_filterMask_CAN2Label].setClickable(false);
-	userInterfaceButton[BTN_filterMask_CAN3Label].setButton(lStartX, 210, lEndX, 260, BTN_filterMask_CAN3Label, false, 0, F("3"), ALIGN_CENTER, frameBorder, BlackBtnColor, menuBtnColor, menuBtnText);
-	userInterfaceButton[BTN_filterMask_CAN3Label].setClickable(false);
-	userInterfaceButton[BTN_filterMask_WiFiLabel].setButton(lStartX, 260, lEndX, 310, BTN_filterMask_WiFiLabel, false, 0, F("WiFi"), ALIGN_CENTER, frameBorder, BlackBtnColor, menuBtnColor, menuBtnText);
-	userInterfaceButton[BTN_filterMask_WiFiLabel].setClickable(false);
-
-	// Column 2
-	userInterfaceButton[BTN_filterMask_filterLabel].setButton(fStartX, 60, fEndX, 110, BTN_filterMask_filterLabel, false, 0, F("Min"), ALIGN_CENTER, frameBorder, BlackBtnColor, menuBtnColor, menuBtnText);
-	userInterfaceButton[BTN_filterMask_filterLabel].setClickable(false);
-	userInterfaceButton[BTN_filterMask_filter1].setButton(fStartX, 110, fEndX, 160, BTN_filterMask_filter1, false, 0, String(CAPTURE_filterTable[0][0], 16), ALIGN_CENTER, menuBtnColor, BlackBtnColor, menuBtnColor, menuBtnText);
-	userInterfaceButton[BTN_filterMask_filter2].setButton(fStartX, 160, fEndX, 210, BTN_filterMask_filter2, false, 0, String(CAPTURE_filterTable[0][1], 16), ALIGN_CENTER, menuBtnColor, BlackBtnColor, menuBtnColor, menuBtnText);
-	userInterfaceButton[BTN_filterMask_filter3].setButton(fStartX, 210, fEndX, 260, BTN_filterMask_filter3, false, 0, String(CAPTURE_filterTable[0][2], 16), ALIGN_CENTER, menuBtnColor, BlackBtnColor, menuBtnColor, menuBtnText);
-	userInterfaceButton[BTN_filterMask_filterWiFi].setButton(fStartX, 260, fEndX, 310, BTN_filterMask_filterWiFi, false, 0, String(CAPTURE_filterTable[0][3], 16), ALIGN_CENTER, menuBtnColor, BlackBtnColor, menuBtnColor, menuBtnText);
-
-	// Column 3
-	userInterfaceButton[BTN_filterMask_maskLabel].setButton(mStartX, 60, mEndX, 110, BTN_filterMask_maskLabel, false, 0, F("Max"), ALIGN_CENTER, frameBorder, BlackBtnColor, menuBtnColor, menuBtnText);
-	userInterfaceButton[BTN_filterMask_maskLabel].setClickable(false);
-	userInterfaceButton[BTN_filterMask_mask1].setButton(mStartX, 110, mEndX, 160, BTN_filterMask_mask1, false, 0, String(CAPTURE_filterTable[1][0], 16), ALIGN_CENTER, menuBtnColor, BlackBtnColor, menuBtnColor, menuBtnText);
-	userInterfaceButton[BTN_filterMask_mask2].setButton(mStartX, 160, mEndX, 210, BTN_filterMask_mask2, false, 0, String(CAPTURE_filterTable[1][1], 16), ALIGN_CENTER, menuBtnColor, BlackBtnColor, menuBtnColor, menuBtnText);
-	userInterfaceButton[BTN_filterMask_mask3].setButton(mStartX, 210, mEndX, 260, BTN_filterMask_mask3, false, 0, String(CAPTURE_filterTable[1][2], 16), ALIGN_CENTER, menuBtnColor, BlackBtnColor, menuBtnColor, menuBtnText);
-	userInterfaceButton[BTN_filterMask_maskWiFi].setButton(mStartX, 260, mEndX, 310, BTN_filterMask_maskWiFi, false, 0, String(CAPTURE_filterTable[1][3], 16), ALIGN_CENTER, menuBtnColor, BlackBtnColor, menuBtnColor, menuBtnText);
-
-	// Column 4
-	userInterfaceButton[BTN_filterMask_openLabel].setButton(oStartX, 60, oEndX, 110, BTN_filterMask_openLabel, false, 0, F("Reset"), ALIGN_CENTER, frameBorder, BlackBtnColor, menuBtnColor, menuBtnText);
-	userInterfaceButton[BTN_filterMask_openLabel].setClickable(false);
-	userInterfaceButton[BTN_filterMask_open1].setButton(oStartX, 110, oEndX, 160, BTN_filterMask_open1, false, 0, F("All"), ALIGN_CENTER, OrangeBtnColor, BlackBtnColor, OrangeBtnColor, menuBtnText);
-	userInterfaceButton[BTN_filterMask_open2].setButton(oStartX, 160, oEndX, 210, BTN_filterMask_open2, false, 0, F("All"), ALIGN_CENTER, OrangeBtnColor, BlackBtnColor, OrangeBtnColor, menuBtnText);
-	userInterfaceButton[BTN_filterMask_open3].setButton(oStartX, 210, oEndX, 260, BTN_filterMask_open3, false, 0, F("All"), ALIGN_CENTER, OrangeBtnColor, BlackBtnColor, OrangeBtnColor, menuBtnText);
-	userInterfaceButton[BTN_filterMask_openWifi].setButton(oStartX, 260, oEndX, 310, BTN_filterMask_openWifi, false, 0, F("All"), ALIGN_CENTER, OrangeBtnColor, BlackBtnColor, OrangeBtnColor, menuBtnText);
-
-	return BTN_filterMask_button_count;
-}
-
 
 //
 void CAPTURE_enableDisableConfigBtn(bool isEnabled)
@@ -366,7 +281,7 @@ void CAPTURE_setSDFilename(char* filename)
 }
 */
 
-extern File myFile;
+
 void CAPTURE_processSDCapture(int userInput)
 {
 	char buffer[80];
@@ -600,6 +515,7 @@ void CAPTURE_captureConfig(int userInput)
 	// -----------OUTPUTS-----------
 	if (userInput >= BTN_config_output_LCD && (userInput <= BTN_config_output_Wireless))
 	{
+
 		//Serial.printf("userInput: %d   CAPTURE_input_config: %d   CAPTURE_input_config: %d \n", userInput, CAPTURE_input_config, CAPTURE_output_config);
 		if (CAPTURE_output_config == userInput)
 		{
@@ -618,6 +534,7 @@ void CAPTURE_captureConfig(int userInput)
 			// Set selection to none
 			CAPTURE_output_config = 0;
 		}
+
 		else
 		{
 			// Dehighlight last selected output
@@ -629,7 +546,7 @@ void CAPTURE_captureConfig(int userInput)
 			graphicLoaderState = userInput + 1;
 			userInterfaceButton[userInput].setBgColor(menuBtnColor);
 			GUI_drawPage(userInterfaceButton, graphicLoaderState, 1);
-
+#if 0
 			// Check for sd button status
 			if (BTN_config_output_SDCard == userInput)
 			{
@@ -639,7 +556,7 @@ void CAPTURE_captureConfig(int userInput)
 			{
 				CAPTURE_removeFilenameBtn();
 			}
-
+#endif
 			// Assign new output
 			CAPTURE_output_config = userInput;
 		}
@@ -672,11 +589,11 @@ void CAPTURE_captureConfig(int userInput)
 
 		if (CAPTURE_input_config == BTN_config_input_C3)
 		{
-			setCANBusFD(CLK_60MHz, CAPTURE_CANBusFDBaudRate);
+			setCANBusFD(CLK_60MHz, BAUD_getBaudRateFD());
 		}
 		else
 		{
-			setCANBusFD(CLK_24MHz, CAPTURE_CANBusFDBaudRate);
+			setCANBusFD(CLK_24MHz, BAUD_getBaudRateFD());
 		}
 
 		if (CAPTURE_output_config == BTN_config_output_LCD)
@@ -728,9 +645,8 @@ void CAPTURE_captureConfig(int userInput)
 		CAPTURE_state = BTN_config_state_keyInput;
 		display.updateScreen();
 	}
-
 	// -----------PROCESS-----------
-	CAPTURE_processSDCapture(userInput);
+	//CAPTURE_processSDCapture(userInput);
 }
 
 //
@@ -884,6 +800,7 @@ void CAPTURE_processWiFi()
 	}
 	
 }
+
 // 
 void CAPTURE_LCD_scan(int userInput)
 {
@@ -979,156 +896,6 @@ void CAPTURE_LCD_scan(int userInput)
 			break;
 		}
 	}
-}
-
-//
-int CAPTURE_getBaudRate(int baud)
-{
-	switch (baud)
-	{
-	case BTN_baud_100k:
-		return 100000;
-	case BTN_baud_125k:
-		return 125000;
-	case BTN_baud_250k:
-		return 250000;
-	case BTN_baud_500k:
-		return 500000;
-	case BTN_baud_800k:
-		return 800000;
-	case BTN_baud_1m:
-		return 1000000;
-	case BTN_baud_2m:
-		return 5000000;
-	case BTN_baud_5m:
-		return 5000000;
-	}
-	return 5000000;
-}
-
-//
-void CAPTURE_Baud(int userInput)
-{
-	
-		// -----------Ports-----------
-		if (userInput >= BTN_baud_can1 && (userInput <= BTN_baud_can3))
-		{
-
-			//Serial.println(userInput);
-			// Dehighlight current selected port
-			if (CAPTURE_baudInput == userInput)
-			{
-				graphicLoaderState = userInput + 1;
-				userInterfaceButton[userInput].setBgColor(menuBtnColor);
-				GUI_drawPage(userInterfaceButton, graphicLoaderState, 1);
-
-				// Set selection to none
-				CAPTURE_baudInput = 0xFF;
-			}
-			else
-			{
-				delay(100);
-				// Dehighlight last selected port
-				graphicLoaderState = CAPTURE_baudInput + 1;
-				userInterfaceButton[CAPTURE_baudInput].setBgColor(menuBtnColor);
-				GUI_drawPage(userInterfaceButton, graphicLoaderState, 1);
-
-				// Highlight current selected port
-				graphicLoaderState = userInput + 1;
-				userInterfaceButton[userInput].setBgColor(OrangeBtnColor);
-				GUI_drawPage(userInterfaceButton, graphicLoaderState, 1);
-
-				// Assign new port
-				CAPTURE_baudInput = userInput;
-			}
-			
-
-			
-			// Check for start/stop button highlights
-			if ((CAPTURE_baudSpeed > 0) && (CAPTURE_baudInput < 0xFF))
-			{
-				userInterfaceButton[BTN_baud_canSet].setClickable(true);
-				GUI_drawRoundBtn(20, 270, 235, 315, F("Set"), menuBtnColor, BlackBtnColor, menuBtnText, ALIGN_CENTER, 0);
-			}
-			else
-			{
-				userInterfaceButton[BTN_baud_canSet].setClickable(false);
-				GUI_drawRoundBtn(20, 270, 235, 315, F("Set"), themeBackground, BlackBtnColor, menuBtnText, ALIGN_CENTER, 0);
-			}
-
-			display.updateScreen();
-			return;
-		}
-
-		
-		// -----------Speeds-----------
-		if (userInput >= BTN_baud_5m && (userInput <= BTN_baud_100k))
-		{
-			// Dehighlight current selected baud
-			if (CAPTURE_baudSpeed == userInput)
-			{
-				graphicLoaderState = userInput + 1;
-				userInterfaceButton[userInput].setBgColor(themeBackground);
-				GUI_drawPage(userInterfaceButton, graphicLoaderState, 1);
-
-				// Set selection to none
-				CAPTURE_baudSpeed = 0;
-			}
-			else
-			{
-				// Dehighlight last selected baud
-				graphicLoaderState = CAPTURE_baudSpeed + 1;
-				userInterfaceButton[CAPTURE_baudSpeed].setBgColor(themeBackground);
-				GUI_drawPage(userInterfaceButton, graphicLoaderState, 1);
-
-				// Highlight current selected baud
-				graphicLoaderState = userInput + 1;
-				userInterfaceButton[userInput].setBgColor(OrangeBtnColor);
-				GUI_drawPage(userInterfaceButton, graphicLoaderState, 1);
-
-				// Assign new baud
-				CAPTURE_baudSpeed = userInput;
-			}
-
-			// Check for start/stop button highlights
-			if ((CAPTURE_baudSpeed > 0) && (CAPTURE_baudInput < 0xFF))
-			{
-				userInterfaceButton[BTN_baud_canSet].setClickable(true);
-				GUI_drawRoundBtn(20, 270, 235, 315, F("Set"), menuBtnColor, BlackBtnColor, menuBtnText, ALIGN_CENTER, 0);
-			}
-			else
-			{
-				userInterfaceButton[BTN_baud_canSet].setClickable(false);
-				GUI_drawRoundBtn(20, 270, 235, 315, F("Set"), themeBackground, BlackBtnColor, menuBtnText, ALIGN_CENTER, 0);
-			}
-			display.updateScreen();
-			return;
-		}
-
-		// -----------Set-----------
-		if (userInput == BTN_baud_canSet)
-		{
-			switch (CAPTURE_baudInput)
-			{
-			case BTN_baud_can1:
-				Can1.setBaudRate(CAPTURE_getBaudRate((capture_baud_btn)CAPTURE_baudSpeed));
-				userInterfaceButton[BTN_baud_can1].setText(Can1.getBaudRate());
-				GUI_drawRoundBtn(20, 90, 235, 130, Can1.getBaudRate(), OrangeBtnColor, frameBorder, menuBtnText, ALIGN_CENTER, 0);
-				break;
-			case BTN_baud_can2:
-				Can2.setBaudRate(CAPTURE_getBaudRate((capture_baud_btn)CAPTURE_baudSpeed));
-				userInterfaceButton[BTN_baud_can2].setText(Can2.getBaudRate());
-				GUI_drawRoundBtn(20, 160, 235, 200, Can2.getBaudRate(), OrangeBtnColor, frameBorder, menuBtnText, ALIGN_CENTER, 0);
-				break;
-			case BTN_baud_can3:
-				CAPTURE_CANBusFDBaudRate = CAPTURE_getBaudRate((capture_baud_btn)CAPTURE_baudSpeed);
-				userInterfaceButton[BTN_baud_can3].setText(CAPTURE_CANBusFDBaudRate);
-				GUI_drawRoundBtn(20, 230, 235, 270, CAPTURE_CANBusFDBaudRate, OrangeBtnColor, frameBorder, menuBtnText, ALIGN_CENTER, 0);
-				setCANBusFD(CLK_24MHz, CAPTURE_CANBusFDBaudRate);
-				break;
-			}
-			display.updateScreen();
-		}
 }
 
 //
@@ -1289,150 +1056,6 @@ uint8_t CAPTURE_drawCANLogScroll()
 	}
 	display.updateScreen();
 	return 0;
-}
-
-//
-void CAPTURE_filterMask(int userInput)
-{
-	const uint8_t MAX_SIZE_EXT_ID = 7;
-	const uint8_t ALIGN_KEYPAD_LEFT = 244;
-	const uint8_t ALIGN_KEYPAD_RIGHT = 4;
-
-	// Print the hex keypad
-	if (CAPTURE_state == 0 && (userInput >= BTN_filterMask_filter1) && (userInput <= BTN_filterMask_maskWiFi))
-	{
-		display.useFrameBuffer(false);
-		if (userInput < BTN_filterMask_maskLabel)
-		{
-			keyPadButtons = KEYINPUT_createHexpadButtons(ALIGN_KEYPAD_RIGHT);
-		}
-		else
-		{
-			keyPadButtons = KEYINPUT_createHexpadButtons(ALIGN_KEYPAD_LEFT);
-		}
-		graphicLoaderState = 1;
-		while (GUI_drawPage(userKeyButtons, graphicLoaderState, keyPadButtons));
-		GUI_isButtonsEnabled(userInterfaceButton, BTN_filterMask_CANLabel, BTN_filterMask_openWifi, false);
-		CAPTURE_state = userInput;
-		display.useFrameBuffer(true);
-	}
-	
-	// Do something with the hex keypad input
-	if ((CAPTURE_state > BTN_filterMask_filterLabel) && (CAPTURE_state < BTN_filterMask_openLabel))
-	{
-		uint8_t change = KEYINPUT_keypadHexController(CAPTURE_hexTotal, CAPTURE_index, MAX_SIZE_EXT_ID);
-		if (change == KEY_CHANGE)
-		{
-			graphicLoaderState = 1;
-			userInterfaceButton[CAPTURE_state].setText(String(CAPTURE_hexTotal, 16));
-			while (GUI_drawPage(&userInterfaceButton[CAPTURE_state], graphicLoaderState, 1));
-		}
-		if (change == KEY_ACCEPT)
-		{
-			if ((CAPTURE_state >= BTN_filterMask_filter1) && (CAPTURE_state <= BTN_filterMask_filterWiFi))
-			{
-				GUI_drawSquareBtn(245 - ALIGN_KEYPAD_RIGHT, 53, 480 - ALIGN_KEYPAD_RIGHT, 319, themeBackground, themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
-				CAPTURE_filterTable[0][CAPTURE_state - BTN_filterMask_filter1] = CAPTURE_hexTotal;
-				// Print right side
-				graphicLoaderState = 1;
-				CAPTURE_createFilterMaskBtns();
-				while (GUI_drawPage(&userInterfaceButton[BTN_filterMask_maskLabel], graphicLoaderState, 10));
-			}
-			else
-			{
-				GUI_drawSquareBtn(245 - ALIGN_KEYPAD_LEFT, 53, 480 - ALIGN_KEYPAD_LEFT, 319, themeBackground, themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
-				CAPTURE_filterTable[1][CAPTURE_state - BTN_filterMask_mask1] = CAPTURE_hexTotal;
-				// Print left side
-				graphicLoaderState = 1;
-				CAPTURE_createFilterMaskBtns();
-				while (GUI_drawPage(&userInterfaceButton[BTN_filterMask_CANLabel], graphicLoaderState, 10));
-			}
-
-			if ((CAPTURE_state == BTN_filterMask_filter1) || (CAPTURE_state == BTN_filterMask_mask1))
-			{
-				Can1.setMBFilter(MB0, (CAPTURE_filterTable[0][0] & 0x7FF), (CAPTURE_filterTable[1][0] & 0x7FF));
-				Can1.setMBFilter(MB1, (CAPTURE_filterTable[0][0] & 0x1FFFFFFF), (CAPTURE_filterTable[1][0] & 0x1FFFFFFF));
-			}
-			else if ((CAPTURE_state == BTN_filterMask_filter2) || (CAPTURE_state == BTN_filterMask_mask2))
-			{
-				Can2.setMBFilter(MB0, (CAPTURE_filterTable[0][1] & 0x7FF), (CAPTURE_filterTable[1][1] & 0x7FF));
-				Can2.setMBFilter(MB1, (CAPTURE_filterTable[0][1] & 0x1FFFFFFF), (CAPTURE_filterTable[1][1] & 0x1FFFFFFF));
-			}
-			else if ((CAPTURE_state == BTN_filterMask_filter3) || (CAPTURE_state == BTN_filterMask_mask3))
-			{
-				//Can3.setMBFilter(MB0, (CAPTURE_filterTable[0][1] & 0x7FF), (CAPTURE_filterTable[1][1] & 0x7FF));
-				//Can3.setMBFilter(MB1, (CAPTURE_filterTable[0][1] & 0x1FFFFFFF), (CAPTURE_filterTable[1][1] & 0x1FFFFFFF));
-			}
-			else if ((CAPTURE_state == BTN_filterMask_filterWiFi) || (CAPTURE_state == BTN_filterMask_maskWiFi))
-			{
-
-			}
-
-			display.updateScreen();
-			CAPTURE_clearLocalVar();
-			KEYINPUT_clearInput();
-		}
-		if (change == KEY_CANCEL)
-		{
-			if ((CAPTURE_state >= BTN_filterMask_filter1) && (CAPTURE_state <= BTN_filterMask_filterWiFi))
-			{
-				// Clear input from screen 
-				graphicLoaderState = 1;
-				userInterfaceButton[CAPTURE_state].setText(String(CAPTURE_filterTable[0][CAPTURE_state - BTN_filterMask_filter1], 16));
-				while (GUI_drawPage(&userInterfaceButton[CAPTURE_state], graphicLoaderState, 1));
-				GUI_drawSquareBtn(245 - ALIGN_KEYPAD_RIGHT, 53, 480 - ALIGN_KEYPAD_RIGHT, 319, themeBackground, themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
-
-				// Print right side
-				graphicLoaderState = 1;
-				CAPTURE_createFilterMaskBtns();
-				while (GUI_drawPage(&userInterfaceButton[BTN_filterMask_maskLabel], graphicLoaderState, 10));
-			}
-			else
-			{
-				// Clear input from screen 
-				graphicLoaderState = 1;
-				userInterfaceButton[CAPTURE_state].setText(String(CAPTURE_filterTable[1][CAPTURE_state - BTN_filterMask_mask1], 16));
-				while (GUI_drawPage(&userInterfaceButton[CAPTURE_state], graphicLoaderState, 1));
-				GUI_drawSquareBtn(245 - ALIGN_KEYPAD_LEFT, 53, 480 - ALIGN_KEYPAD_LEFT, 319, themeBackground, themeBackground, themeBackground, themeBackground, ALIGN_CENTER);
-
-				// Print left side
-				graphicLoaderState = 1;
-				CAPTURE_createFilterMaskBtns();
-				while (GUI_drawPage(&userInterfaceButton[BTN_filterMask_CANLabel], graphicLoaderState, 10));
-			}
-			display.updateScreen();
-			CAPTURE_clearLocalVar();
-			KEYINPUT_clearInput();
-		}
-	}
-
-	if ((userInput >= BTN_filterMask_open1) && (userInput <= BTN_filterMask_openWifi))
-	{
-		if (userInput == BTN_filterMask_open1)
-		{
-			CAPTURE_filterTable[0][0] = 0x00;
-			CAPTURE_filterTable[1][0] = 0x1FFFFFFF;
-		}
-		else if(userInput == BTN_filterMask_open2)
-		{
-			CAPTURE_filterTable[0][1] = 0x00;
-			CAPTURE_filterTable[1][1] = 0x1FFFFFFF;
-		}
-		else if (userInput == BTN_filterMask_open3)
-		{
-			CAPTURE_filterTable[0][2] = 0x00;
-			CAPTURE_filterTable[1][2] = 0x1FFFFFFF;
-		}
-		else if (userInput == BTN_filterMask_openWifi)
-		{
-			CAPTURE_filterTable[0][3] = 0x00;
-			CAPTURE_filterTable[1][3] = 0x1FFFFFFF;
-		}
-		graphicLoaderState = 1;
-		CAPTURE_createFilterMaskBtns();
-		while (GUI_drawPage(&userInterfaceButton[BTN_filterMask_filter1], graphicLoaderState, 9));
-		display.updateScreen();
-	}
 }
 
 //

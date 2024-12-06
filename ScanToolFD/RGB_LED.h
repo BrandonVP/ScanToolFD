@@ -21,9 +21,12 @@ enum RGB
 	LED_OFF = 7,
 };
 
-#define LED_R 24
-#define LED_B 26
-#define LED_G 25
+#define LED1_R 1
+#define LED1_B 2
+#define LED1_G 3
+#define LED2_R 5
+#define LED2_B 6
+#define LED2_G 37
 #define ON LOW
 #define OFF HIGH
 

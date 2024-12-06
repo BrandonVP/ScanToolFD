@@ -15,12 +15,18 @@
 ===========================================================*/
 void LED_initialize(void)
 {
-    pinMode(LED_R, OUTPUT);
-    pinMode(LED_G, OUTPUT);
-    pinMode(LED_B, OUTPUT);
-    digitalWrite(LED_B, OFF);
-    digitalWrite(LED_G, OFF);
-    digitalWrite(LED_R, OFF);
+    pinMode(LED1_R, OUTPUT);
+    pinMode(LED2_R, OUTPUT);
+    pinMode(LED1_G, OUTPUT);
+    pinMode(LED2_G, OUTPUT);
+    pinMode(LED1_B, OUTPUT);
+    pinMode(LED2_B, OUTPUT);
+    digitalWrite(LED2_B, OFF);
+    digitalWrite(LED1_B, OFF);
+    digitalWrite(LED2_G, OFF);
+    digitalWrite(LED1_G, OFF);
+    digitalWrite(LED2_R, OFF);
+    digitalWrite(LED1_R, OFF);
 }
 
 // Set color and on/off status of RGB LED
@@ -29,30 +35,42 @@ void LED_RGB(RGB color)
     switch (color)
     {
         case LED_RED:
-            digitalWrite(LED_R, ON);
+            digitalWrite(LED1_R, ON);
+            digitalWrite(LED2_R, ON);
             break;
         case LED_GREEN:
-            digitalWrite(LED_G, ON);
+            digitalWrite(LED1_G, ON);
+            digitalWrite(LED2_G, ON);
             break;
         case LED_BLUE:
-            digitalWrite(LED_B, ON);
+            digitalWrite(LED1_B, ON);
+            digitalWrite(LED2_B, ON);
             break;
         case LED_YELLOW:
-            digitalWrite(LED_G, ON);
-            digitalWrite(LED_R, ON);
+            digitalWrite(LED1_G, ON);
+            digitalWrite(LED2_G, ON);
+            digitalWrite(LED1_R, ON);
+            digitalWrite(LED2_R, ON);
             break;
         case LED_PURPLE:
-            digitalWrite(LED_B, ON);
-            digitalWrite(LED_R, ON);
+            digitalWrite(LED1_B, ON);
+            digitalWrite(LED2_B, ON);
+            digitalWrite(LED1_R, ON);
+            digitalWrite(LED2_R, ON);
             break;
         case LED_TEAL:
-            digitalWrite(LED_B, ON);
-            digitalWrite(LED_G, ON);
+            digitalWrite(LED1_B, ON);
+            digitalWrite(LED2_B, ON);
+            digitalWrite(LED1_G, ON);
+            digitalWrite(LED2_G, ON);
             break;
         case LED_OFF:
-            digitalWrite(LED_B, OFF);
-            digitalWrite(LED_G, OFF);
-            digitalWrite(LED_R, OFF);
+            digitalWrite(LED1_B, OFF);
+            digitalWrite(LED2_B, OFF);
+            digitalWrite(LED1_G, OFF);
+            digitalWrite(LED2_G, OFF);
+            digitalWrite(LED1_R, OFF);
+            digitalWrite(LED2_R, OFF);
             break;
     }
 }

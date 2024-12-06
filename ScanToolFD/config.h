@@ -152,6 +152,9 @@ uint8_t PIDS[193] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09
 #define CAN_BPS_250K 250000
 #define CAN_BPS_500K 500000
 
+constexpr auto BATTERY_ENABLE_READ = A10;
+constexpr auto BATTERY_READ = A11;
+
 /*
 Version Log
 4.3.1 - Brandon Van Pelt

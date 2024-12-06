@@ -12,8 +12,6 @@
  ===========================================================
  Wires config
  C2 out only config
- Baud
- filter mask
  SD FD format for 64 byte data
  read sd logs on card
  -delete
@@ -47,6 +45,8 @@
 	 End README
  =========================================================*/
 
+#include "filterMask.h"
+#include "baudRate.h"
 #include <MTP_Teensy.h>
 #include <TimeLib.h>
 #include <SPI.h>
@@ -134,16 +134,48 @@ void setCANBusFD(FLEXCAN_CLOCK clock, int baud)
 	Can3.setBaudRate(config);
 }
 
+#define ESP_BLE_TX 29
+#define ESP_BLE_RX 28
+
+#define ESP_WIFI_TX 35
+#define ESP_WIFI_RX 34
+
 // -------------------------------------------------------------
 void setup(void)
 {
 	Serial.begin(115200); // USB is always 12 or 480 Mbit/sec
 	//while (!Serial);
-	Serial2.begin(115200); // ESP8266
-	
+	Serial1.begin(115200); 
+	Serial4.begin(115200); 
+	Serial7.setTX(ESP_BLE_TX);
+	Serial7.setRX(ESP_BLE_RX);
+	Serial7.begin(115200);
+	Serial8.setTX(ESP_WIFI_TX);
+	Serial8.setRX(ESP_WIFI_RX);
+	Serial8.begin(115200);
+
 	// Update time
 	setSyncProvider(getTeensy3Time);
 
+	pinMode(BATTERY_ENABLE_READ, OUTPUT);
+	pinMode(BATTERY_READ, INPUT);
+
+	//pinMode(2, OUTPUT);
+	//pinMode(3, OUTPUT);
+	//pinMode(4, OUTPUT);
+	//pinMode(5, OUTPUT);
+	//pinMode(6, OUTPUT);
+	//pinMode(37, OUTPUT);
+
+	//digitalWrite(2, LOW);
+	//digitalWrite(3, LOW);
+	//digitalWrite(4, LOW);
+	//digitalWrite(5, LOW);
+	//digitalWrite(6, LOW);
+	//digitalWrite(37, LOW);
+
+
+	/*
 	LED_initialize();
 
 	LED_RGB((RGB)LED_RED);
@@ -157,6 +189,9 @@ void setup(void)
 	LED_RGB((RGB)LED_BLUE);
 	delay(200);
 	LED_RGB((RGB)LED_OFF);
+	*/
+
+
 
 	pinMode(LCD_BL, OUTPUT);
 	digitalWrite(LCD_BL, HIGH);
@@ -205,6 +240,17 @@ void setup(void)
 	Can2.setMBFilter(MB1, 0x0, 0x1FFFFFF);
 	Can2.mailboxStatus();
 
+
+	CANFD_timings_t config;
+	config.clock = CLK_24MHz;
+	config.baudrate = 500000;
+	config.baudrateFD = 500000;
+	config.propdelay = 190;
+	config.bus_length = 1;
+	config.sample = 70;
+	Can3.setBaudRate(config);
+
+
 	Can3.begin();
 	//Can3.setMB((FLEXCAN_MAILBOX)0, RX, STD);
 	//Can3.setMB((FLEXCAN_MAILBOX)1, RX, EXT);
@@ -215,12 +261,12 @@ void setup(void)
 	//Can3.setMBFilter(MB0, 0x0, 0x7FF);
 	//Can3.setMBFilter(MB1, 0x0, 0x1FFFFFF);
 	//Can3.mailboxStatus();
-	setCANBusFD(CLK_24MHz, CAPTURE_CANBusFDBaudRate); //CLK_24MHz;// CLK_60MHz;
+	//setCANBusFD(CLK_24MHz, 500000); //CLK_24MHz;// CLK_60MHz; // CAPTURE_CANBusFDBaudRate
 	Can3.setRegions(64);
 	CAPTURE_createCaptureBtns();
 
 	MTP.begin();
-	SD.begin(SD_CARD_CS_PIN);
+	SD.begin(BUILTIN_SDCARD); // SD_CARD_CS_PIN // LCD sd reader in prototype
 	SdFile::dateTimeCallback(dateTime);
 	MTP.addFilesystem(SD, "SD Card");
 
@@ -315,7 +361,7 @@ void backgroundProcess()
 	updateTime();
 	MTP.loop();
 
-	LED_strobe((RGB)LED_OFF);
+	//LED_strobe((RGB)LED_OFF);
 
 	CANBus3_IRQHandler();
 	CAPTURE_processSerialCapture();
@@ -400,8 +446,78 @@ void debugLoop()
 	Main loop
 ===========================================================*/
 // Main loop runs the user interface and calls for background processes
+uint32_t test123 = 0;
+bool swapMe = false;
 void loop(void)
 {
+#if 0
+	if (millis() - test123 > 500)
+	{
+		if (swapMe)
+		{
+			Serial.println("if");
+			swapMe = false;
+			digitalWrite(3, HIGH);
+			digitalWrite(4, HIGH);
+			digitalWrite(5, HIGH);
+			digitalWrite(6, HIGH);
+			digitalWrite(7, HIGH);
+			digitalWrite(8, HIGH);
+		}
+		else
+		{
+			Serial.println("else");
+			swapMe = true;
+			digitalWrite(3, LOW);
+			digitalWrite(4, LOW);
+			digitalWrite(5, LOW);
+			digitalWrite(6, LOW);
+			digitalWrite(7, LOW);
+			digitalWrite(8, LOW);
+		}
+		test123 = millis();
+		Serial.println(millis());
+	}
+
+	//while (Serial7.available() > 0) {
+		//Serial.printf("Serial7: %c\n", Serial7.read());
+		//and whatever else
+	//}
+	//while (Serial8.available() > 0) {
+		//Serial.printf("Serial8: %c\n", Serial8.read());
+		//and whatever else
+	//}
+#endif
+
+#if 0
+	if (millis() - test123 > 500)
+	{
+		CAN_message_t msg_vehicle;
+		CAN_Frame msgRX;
+
+		msg_vehicle.id = 123;
+		msg_vehicle.buf[0] = 1;
+		msg_vehicle.buf[1] = 2;
+		msg_vehicle.buf[2] = 3;
+		msg_vehicle.buf[3] = 4;
+		msg_vehicle.buf[4] = 5;
+		msg_vehicle.buf[5] = 6;
+		msg_vehicle.buf[6] = 7;
+		msg_vehicle.buf[7] = 8;
+
+		Can1.write(msg_vehicle);
+		Can2.write(msg_vehicle);
+
+
+
+		Can3.write(msg_vehicle);
+
+		test123 = millis();
+
+
+		Serial2.println("Serial2");
+	}
+#endif
 	app.run();
 	backgroundProcess();
 	//debugLoop();

@@ -92,6 +92,12 @@
     <ClInclude Include="SDCard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="baudRate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="filterMask.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="userInterface.cpp">
@@ -147,6 +153,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SDCard.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="baudRate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="filterMask.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

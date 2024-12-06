@@ -18,9 +18,12 @@ static uint16_t oldValue = 0;
 // Read in A1 and print battery level on icon
 void BATTERY_printLevel(void)
 {
-	if (millis() - BATTERY_timer > 1000)
+	if (millis() - BATTERY_timer > 100)
 	{
-		int batteryVoltage = analogRead(A1);
+		digitalWrite(BATTERY_ENABLE_READ, LOW);
+		uint16_t batteryVoltage = analogRead(BATTERY_READ);
+		digitalWrite(BATTERY_ENABLE_READ, HIGH);
+		Serial.printf("analogRead: %d \n", batteryVoltage);
 		if (batteryVoltage != oldValue)
 		{
 			oldValue = batteryVoltage;

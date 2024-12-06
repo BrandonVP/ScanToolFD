@@ -1,6 +1,8 @@
 #include "App.h"
 #include "CANBusCapture.h"
 #include "CANBusSend.h"
+#include "baudRate.h"
+#include "filterMask.h"
 
 //
 void someFn(int a)
@@ -76,9 +78,9 @@ void App::init()
 	appManager appObj3(MENU_canBus,    "Capture",         APP_CAPTURE, CAPTURE_captureConfig, CAPTURE_createCaptureBtns);
 	appManager appObj4(MENU_sub,       "CaptureLCD",      APP_CAPTURE_LCD, CAPTURE_LCD_scan, CAPTURE_createLCDBtns);
 	appManager appObj5(MENU_canBus,    "Files",           APP_FILES, someFn, CAPTURE_drawCANLogScroll);
-	appManager appObj6(MENU_canBus,    "FilterMask",      APP_FILTER_MASK, CAPTURE_filterMask, CAPTURE_createFilterMaskBtns);
+	appManager appObj6(MENU_canBus,    "FilterMask",      APP_FILTER_MASK, FILTERMASK_filterMask, FILTERMASK_createFilterMaskBtns);
 	appManager appObj7(MENU_canBus,    "Send",            APP_SEND, someFn, SEND_createSendBtns);
-	appManager appObj8(MENU_canBus,    "BaudRate",        APP_BAUD_RATE, CAPTURE_Baud, CAPTURE_createBaudBtns);
+	appManager appObj8(MENU_canBus,    "BaudRate",        APP_BAUD_RATE, BAUD_Baud, BAUD_createBaudBtns);
 	
 	this->myApps.push_back(appObj0);
 	this->myApps.push_back(appObj1);
