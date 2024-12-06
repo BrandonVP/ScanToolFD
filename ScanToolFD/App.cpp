@@ -4,64 +4,27 @@
 #include "baudRate.h"
 #include "filterMask.h"
 
+extern App app;
+
 //
 void someFn(int a)
 {
 	// Temporary holder 
 }
 
-// TODO: Make auto populated
-uint8_t createToolBtns()
+uint8_t createToolMenu()
 {
-	uint8_t btnPos = 0;
-	userInterfaceButton[btnPos++].setButton(45, 75, 230, 125, APP_TOOLS, true, 10, F(""), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
-	userInterfaceButton[btnPos++].setButton(45, 135, 230, 185, APP_TOOLS, true, 10, F(""), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
-	userInterfaceButton[btnPos++].setButton(45, 195, 230, 245, APP_TOOLS, true, 10, F(""), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
-	//userInterfaceButton[btnPos++].setButton(45, 260, 220, 300, APP_TOOLS, true, F(""), ALIGN_CENTER);
-
-	userInterfaceButton[btnPos++].setButton(250, 75, 435, 125, APP_TOOLS, true, 10, F(""), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
-	userInterfaceButton[btnPos++].setButton(250, 135, 435, 185, APP_TOOLS, true, 10, F(""), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
-	userInterfaceButton[btnPos++].setButton(250, 195, 435, 245, APP_TOOLS, true, 10, F(""), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
-	//userInterfaceButton[btnPos++].setButton(270, 260, 425, 300, APP_TOOLS, true, F(""), ALIGN_CENTER);
-
-	/*
-	userInterfaceButton[btnPos++].setButton(55, 80, 220, 120, 1, true, F("PID Scan"), ALIGN_CENTER);
-	userInterfaceButton[btnPos++].setButton(260, 80, 425, 120, 2, true, F("PID Stream"), ALIGN_CENTER);
-	userInterfaceButton[btnPos++].setButton(55, 140, 220, 180, 0, true, F("Get VIN"), ALIGN_CENTER);
-	userInterfaceButton[btnPos++].setButton(260, 140, 425, 180, 0, true, F("DTC"), ALIGN_CENTER);
-	userInterfaceButton[btnPos++].setButton(55, 200, 220, 240, 0, true, F("OBD Simulator"), ALIGN_CENTER);
-	userInterfaceButton[btnPos++].setButton(260, 200, 425, 240, 0, true, F("Gauges"), ALIGN_CENTER);
-	userInterfaceButton[btnPos++].setButton(55, 260, 220, 300, 0, true, F("TX Spam"), ALIGN_CENTER);
-	userInterfaceButton[btnPos++].setButton(260, 260, 425, 300, 0, true, F(""), ALIGN_CENTER);
-	*/
-	return btnPos;
+	return app.printMenu(MENU_tools, APP_TOOLS);
 }
 
-// TODO: Make auto populated
-uint8_t createSettingsBtns()
+uint8_t createSettingsMenu()
 {
-	uint8_t btnPos = 0;
-	userInterfaceButton[btnPos++].setButton(45, 75, 230, 125, APP_SETTINGS, true, 10, F("Connect Dongle"), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
-	userInterfaceButton[btnPos++].setButton(45, 135, 230, 185, APP_SETTINGS, true, 10, F(""), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
-	userInterfaceButton[btnPos++].setButton(45, 195, 230, 245, APP_SETTINGS, true, 10, F(""), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
-	userInterfaceButton[btnPos++].setButton(45, 260, 220, 300, APP_SETTINGS, true, F(""), ALIGN_CENTER);
+	return app.printMenu(MENU_settings, APP_SETTINGS);
+}
 
-	userInterfaceButton[btnPos++].setButton(250, 75, 435, 125, APP_SETTINGS, true, 10, F("About"), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
-	userInterfaceButton[btnPos++].setButton(250, 135, 435, 185, APP_SETTINGS, true, 10, F(""), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
-	userInterfaceButton[btnPos++].setButton(250, 195, 435, 245, APP_SETTINGS, true, 10, F(""), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
-	userInterfaceButton[btnPos++].setButton(270, 260, 425, 300, APP_SETTINGS, true, F(""), ALIGN_CENTER);
-
-	/*
-	userInterfaceButton[btnPos++].setButton(55, 80, 220, 120, 1, true, F("Memory"), ALIGN_CENTER);
-	userInterfaceButton[btnPos++].setButton(260, 80, 425, 120, 2, true, F("About"), ALIGN_CENTER);
-	userInterfaceButton[btnPos++].setButton(55, 140, 220, 180, 0, true, F("WiFi MAC"), ALIGN_CENTER);
-	userInterfaceButton[btnPos++].setButton(260, 140, 425, 180, 0, true, F("Overclock"), ALIGN_CENTER);
-	userInterfaceButton[btnPos++].setButton(55, 200, 220, 240, 0, true, F("Reset WiFi"), ALIGN_CENTER);
-	userInterfaceButton[btnPos++].setButton(260, 200, 425, 240, 0, true, F("Set Time"), ALIGN_CENTER);
-	userInterfaceButton[btnPos++].setButton(55, 260, 220, 300, 0, true, F("Dongle"), ALIGN_CENTER);
-	userInterfaceButton[btnPos++].setButton(260, 260, 425, 300, 0, true, F("Reset"), ALIGN_CENTER);
-	*/
-	return btnPos;
+uint8_t createCANBusMenu()
+{
+	return app.printMenu(MENU_canBus, APP_CANBUS);
 }
 
 //
@@ -71,17 +34,17 @@ void App::init()
 	this->myApps.reserve(APP_COUNT);
 
 	/*---------------------Menu----------Title----------------App Label---------------Main Function--------------Create Button Function----------Animation-----------------App Exit Function-----*/
-	
-	appManager appObj0(MENU_canBus,    "CAN Bus",         APP_CANBUS, CAPTURE_CANBus, CAPTURE_createMenuBtns);
-	appManager appObj1(MENU_tools,     "Tools",           APP_TOOLS, someFn, createToolBtns);
-	appManager appObj2(MENU_settings,  "Settings",        APP_SETTINGS, someFn, createSettingsBtns);
-	appManager appObj3(MENU_canBus,    "Capture",         APP_CAPTURE, CAPTURE_captureConfig, CAPTURE_createCaptureBtns);
-	appManager appObj4(MENU_sub,       "CaptureLCD",      APP_CAPTURE_LCD, CAPTURE_LCD_scan, CAPTURE_createLCDBtns);
-	appManager appObj5(MENU_canBus,    "Files",           APP_FILES, someFn, CAPTURE_drawCANLogScroll);
-	appManager appObj6(MENU_canBus,    "FilterMask",      APP_FILTER_MASK, FILTERMASK_filterMask, FILTERMASK_createFilterMaskBtns);
-	appManager appObj7(MENU_canBus,    "Send",            APP_SEND, someFn, SEND_createSendBtns);
-	appManager appObj8(MENU_canBus,    "BaudRate",        APP_BAUD_RATE, BAUD_Baud, BAUD_createBaudBtns);
-	
+	appManager appObj0(MENU_canBus,     "CAN Bus",           APP_CANBUS,            CAPTURE_CANBus,             createCANBusMenu);
+	appManager appObj1(MENU_tools,      "Tools",             APP_TOOLS,             someFn,                     createToolMenu);
+	appManager appObj2(MENU_settings,   "Settings",          APP_SETTINGS,          someFn,                     createSettingsMenu);
+	appManager appObj3(MENU_canBus,     "Capture",           APP_CAPTURE,           CAPTURE_captureConfig,      CAPTURE_createCaptureBtns);
+	appManager appObj4(MENU_sub,        "CaptureLCD",        APP_CAPTURE_LCD,       CAPTURE_LCD_scan,           CAPTURE_createLCDBtns);
+	appManager appObj5(MENU_canBus,     "Files",             APP_FILES,             someFn,                     CAPTURE_drawCANLogScroll);
+	appManager appObj6(MENU_canBus,     "FilterMask",        APP_FILTER_MASK,       FILTERMASK_filterMask,      FILTERMASK_createFilterMaskBtns);
+	appManager appObj7(MENU_canBus,     "Send",              APP_SEND,              someFn,                     SEND_createSendBtns);
+	appManager appObj8(MENU_canBus,     "BaudRate",          APP_BAUD_RATE,         BAUD_Baud,                  BAUD_createBaudBtns);
+	appManager appObj9(MENU_tools,      "Get Vin",           APP_GET_VIN,           BAUD_Baud,                  BAUD_createBaudBtns);
+
 	this->myApps.push_back(appObj0);
 	this->myApps.push_back(appObj1);
 	this->myApps.push_back(appObj2);
@@ -91,7 +54,29 @@ void App::init()
 	this->myApps.push_back(appObj6);
 	this->myApps.push_back(appObj7);
 	this->myApps.push_back(appObj8);
+	this->myApps.push_back(appObj9);
 
+}
+
+uint8_t App::printMenu(menus menu, APP_labels label)
+{
+	uint8_t btnPos = 0;
+	uint8_t menuCoordIndex = 0;
+
+	Serial.printf("app.getAppSize(): %d \n", app.getAppSize());
+	for (int i = 0; i < app.getAppSize(); i++)
+	{
+		Serial.printf("app.getMenu(i): %d \n", app.getMenu(i));
+		Serial.printf("app.getLabel(i): %d \n", app.getLabel(i));
+		if ((app.getMenu(i) == menu) && (app.getLabel(i) != label))
+		{
+			userInterfaceButton[btnPos++].setButton(MENU_COORD[menuCoordIndex][0], MENU_COORD[menuCoordIndex][1], MENU_COORD[menuCoordIndex][2], MENU_COORD[menuCoordIndex][3], app.getLabel(i), true, 10, app.getName(i), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
+			menuCoordIndex++;
+			Serial.printf("menuCoordIndex: %d \n", menuCoordIndex);
+		}
+	}
+	Serial.printf("btnPos: %d \n", btnPos);
+	return btnPos;
 }
 
 // Resets variables for page change

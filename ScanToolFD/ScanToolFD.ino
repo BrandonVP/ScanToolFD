@@ -174,7 +174,6 @@ void setup(void)
 	//digitalWrite(6, LOW);
 	//digitalWrite(37, LOW);
 
-
 	/*
 	LED_initialize();
 
@@ -190,8 +189,6 @@ void setup(void)
 	delay(200);
 	LED_RGB((RGB)LED_OFF);
 	*/
-
-
 
 	pinMode(LCD_BL, OUTPUT);
 	digitalWrite(LCD_BL, HIGH);
@@ -226,7 +223,7 @@ void setup(void)
 	Can1.mailboxStatus();
 
 	Can2.begin();
-	Can2.setBaudRate(500000);
+	Can2.setBaudRate(500000); 
 	Can2.setMaxMB(8);
 	Can2.setMB((FLEXCAN_MAILBOX)0, RX, STD);
 	Can2.setMB((FLEXCAN_MAILBOX)1, RX, EXT);
@@ -351,22 +348,17 @@ void CANBus3_IRQHandler2()
 // All background process should be called from here
 void backgroundProcess()
 {
-
 	Can1.events();
 	Can2.events();
 	//Can3.events();
-
 	GUI_buttonMonitor(userInterfaceMenuButton, MENU_BUTTON_SIZE);
 	BATTERY_printLevel();
 	updateTime();
 	MTP.loop();
-
 	//LED_strobe((RGB)LED_OFF);
-
 	CANBus3_IRQHandler();
 	CAPTURE_processSerialCapture();
 	CAPTURE_processWirelessCapture();
-
 	//timedTXSend();
 }
 
@@ -406,11 +398,9 @@ void updateTime()
 
 void debugLoop()
 {
-	//if (Serial2.available())
-	//{
-		//Serial.println(Serial2.read(), 16);
-	//}
-
+	static uint32_t test123 = 0;
+	static bool swapMe = false;
+#if 0
 	static uint32_t timeout123 = millis();
 	static uint16_t rotatingID = 0;
 	if (millis() - timeout123 > 2000)
@@ -441,15 +431,32 @@ void debugLoop()
 		}
 		timeout123 = millis();
 	}
-}
-/*=========================================================
-	Main loop
-===========================================================*/
-// Main loop runs the user interface and calls for background processes
-uint32_t test123 = 0;
-bool swapMe = false;
-void loop(void)
-{
+#endif
+#if 0
+	if (millis() - test123 > 500)
+	{
+		CAN_message_t msg_vehicle;
+		CAN_Frame msgRX;
+
+		msg_vehicle.id = 123;
+		msg_vehicle.buf[0] = 1;
+		msg_vehicle.buf[1] = 2;
+		msg_vehicle.buf[2] = 3;
+		msg_vehicle.buf[3] = 4;
+		msg_vehicle.buf[4] = 5;
+		msg_vehicle.buf[5] = 6;
+		msg_vehicle.buf[6] = 7;
+		msg_vehicle.buf[7] = 8;
+
+		Can1.write(msg_vehicle);
+		Can2.write(msg_vehicle);
+
+		Can3.write(msg_vehicle);
+
+		test123 = millis();
+
+	}
+#endif
 #if 0
 	if (millis() - test123 > 500)
 	{
@@ -478,47 +485,15 @@ void loop(void)
 		test123 = millis();
 		Serial.println(millis());
 	}
-
-	//while (Serial7.available() > 0) {
-		//Serial.printf("Serial7: %c\n", Serial7.read());
-		//and whatever else
-	//}
-	//while (Serial8.available() > 0) {
-		//Serial.printf("Serial8: %c\n", Serial8.read());
-		//and whatever else
-	//}
 #endif
-
-#if 0
-	if (millis() - test123 > 500)
-	{
-		CAN_message_t msg_vehicle;
-		CAN_Frame msgRX;
-
-		msg_vehicle.id = 123;
-		msg_vehicle.buf[0] = 1;
-		msg_vehicle.buf[1] = 2;
-		msg_vehicle.buf[2] = 3;
-		msg_vehicle.buf[3] = 4;
-		msg_vehicle.buf[4] = 5;
-		msg_vehicle.buf[5] = 6;
-		msg_vehicle.buf[6] = 7;
-		msg_vehicle.buf[7] = 8;
-
-		Can1.write(msg_vehicle);
-		Can2.write(msg_vehicle);
-
-
-
-		Can3.write(msg_vehicle);
-
-		test123 = millis();
-
-
-		Serial2.println("Serial2");
-	}
-#endif
+}
+/*=========================================================
+	Main loop
+===========================================================*/
+// Main loop runs the user interface and calls for background processes
+void loop(void)
+{
 	app.run();
 	backgroundProcess();
-	//debugLoop();
+	debugLoop();
 }

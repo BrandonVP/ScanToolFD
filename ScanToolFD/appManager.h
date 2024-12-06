@@ -7,20 +7,19 @@
  ===========================================================================
  */
 
-#ifndef APPMANAGER_H
-#define APPMANAGER_H
-
-#pragma once
-#include "common.h"
-#include "config.h"
-//#include "App.h"
-
 enum menus {
 	MENU_canBus = 0,
 	MENU_tools,
 	MENU_settings,
 	MENU_sub
 };
+
+#ifndef APPMANAGER_H
+#define APPMANAGER_H
+
+#pragma once
+#include "common.h"
+#include "config.h"
 
 class appManager
 {

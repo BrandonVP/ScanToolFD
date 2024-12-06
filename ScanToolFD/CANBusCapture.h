@@ -64,10 +64,8 @@ uint8_t CAPTURE_input_config = 0;
 uint8_t CAPTURE_output_config = 0;
 
 void CAPTURE_clearLocalVar();
-uint8_t CAPTURE_createMenuBtns();
 uint8_t CAPTURE_createCaptureBtns();
 uint8_t CAPTURE_createLCDBtns();
-uint8_t CAPTURE_createFilterMaskBtns();
 void CAPTURE_enableDisableConfigBtn(bool isEnabled);
 void CAPTURE_processSerialCapture();
 void CAPTURE_processSDCapture(int userInput);
@@ -92,17 +90,14 @@ extern bool CAPTURE_isRunning;
 
 
 void CAPTURE_clearLocalVar();
-uint8_t CAPTURE_createMenuBtns();
 uint8_t CAPTURE_createCaptureBtns();
 uint8_t CAPTURE_createLCDBtns();
-uint8_t CAPTURE_createFilterMaskBtns();
 void CAPTURE_processSerialCapture();
 void CAPTURE_processSDCapture(int userInput);
 void CAPTURE_processWirelessCapture();
 void CAPTURE_captureConfig(int userInput);
 void CAPTURE_LCD_scan(int userInput);
 uint8_t CAPTURE_drawCANLogScroll();
-void CAPTURE_filterMask(int userInput);
 void CAPTURE_CANBus(int userInput);
 
 #endif // _CANBUSCAPTURE_C

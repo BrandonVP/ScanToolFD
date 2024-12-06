@@ -4,6 +4,7 @@
 
 #include "common.h"
 #include "config.h"
+#include "appManager.h"
 
 using namespace std;
 
@@ -26,6 +27,7 @@ public:
 	}
 
 	void init();
+	uint8_t printMenu(menus menu, APP_labels label);
 	void appTransition();
 	void newApp(APP_labels);
 	int getAppSize(void);

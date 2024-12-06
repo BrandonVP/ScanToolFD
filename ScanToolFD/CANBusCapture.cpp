@@ -60,28 +60,6 @@ void CAPTURE_clearLocalVar()
 	CAPTURE_hexTotal = 0;
 }
 
-// 
-uint8_t CAPTURE_createMenuBtns()
-{
-	uint8_t btnPos = 0;
-	uint8_t menuCoordIndex = 0;
-
-	Serial.printf("app.getAppSize(): %d \n", app.getAppSize());
-	for (int i = 0; i < app.getAppSize(); i++) 
-	{
-		Serial.printf("app.getMenu(i): %d \n", app.getMenu(i));
-		Serial.printf("app.getLabel(i): %d \n", app.getLabel(i));
-		if ((app.getMenu(i) == MENU_canBus) && (app.getLabel(i) != APP_CANBUS))
-		{
-			userInterfaceButton[btnPos++].setButton(MENU_COORD[menuCoordIndex][0], MENU_COORD[menuCoordIndex][1], MENU_COORD[menuCoordIndex][2], MENU_COORD[menuCoordIndex][3], app.getLabel(i), true, 10, app.getName(i), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
-			menuCoordIndex++;
-			Serial.printf("menuCoordIndex: %d \n", menuCoordIndex);
-		}
-	}
-	Serial.printf("btnPos: %d \n", btnPos);
-	return btnPos;
-}
-
 //
 uint8_t CAPTURE_createCaptureBtns()
 {
@@ -280,7 +258,6 @@ void CAPTURE_setSDFilename(char* filename)
 	strcat(filename, ".txt");
 }
 */
-
 
 void CAPTURE_processSDCapture(int userInput)
 {
@@ -716,7 +693,6 @@ void CAPTURE_LCD_Print(uint32_t id, uint8_t length, uint8_t * data)
 
 	Serial.println(millis() - timerin);
 }
-
 
 uint8_t WIFI_state = 0;
 uint8_t packetIndex = 0;

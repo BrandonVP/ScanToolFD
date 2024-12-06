@@ -23,7 +23,7 @@ void BATTERY_printLevel(void)
 		digitalWrite(BATTERY_ENABLE_READ, LOW);
 		uint16_t batteryVoltage = analogRead(BATTERY_READ);
 		digitalWrite(BATTERY_ENABLE_READ, HIGH);
-		Serial.printf("analogRead: %d \n", batteryVoltage);
+		//Serial.printf("analogRead: %d \n", batteryVoltage);
 		if (batteryVoltage != oldValue)
 		{
 			oldValue = batteryVoltage;
@@ -37,28 +37,28 @@ void BATTERY_printLevel(void)
 // Prints battery level
 void BATTERY_batteryLevelIcon(uint16_t analogValue)
 {
-	if ((analogValue >= 983))
+	if ((analogValue >= 883))
 	{
 		display.fillRect(10, 14, 3, 15, ILI9488_GREEN);
 		display.fillRect(16, 14, 3, 15, ILI9488_GREEN);
 		display.fillRect(22, 14, 3, 15, ILI9488_GREEN);
 		display.fillRect(27, 14, 3, 15, ILI9488_GREEN);
 	}
-	else if (analogValue >= 943) 
+	else if (analogValue >= 843) 
 	{
 		display.fillRect(10, 14, 3, 15, ILI9488_GREEN);
 		display.fillRect(16, 14, 3, 15, ILI9488_GREEN);
 		display.fillRect(22, 14, 3, 15, ILI9488_GREEN);
 		display.fillRect(27, 14, 3, 15, menuBackground);
 	}
-	else if (analogValue >= 900)
+	else if (analogValue >= 800)
 	{
 		display.fillRect(10, 14, 3, 15, ILI9488_GREEN);
 		display.fillRect(16, 14, 3, 15, ILI9488_GREEN);
 		display.fillRect(22, 14, 3, 15, menuBackground);
 		display.fillRect(27, 14, 3, 15, menuBackground);
 	}
-	else if (analogValue >= 863)
+	else if (analogValue >= 763)
 	{
 		display.fillRect(10, 14, 3, 15, ILI9488_GREEN);
 		display.fillRect(16, 14, 3, 15, menuBackground);
