@@ -34,6 +34,7 @@ public:
 	int getMenu(int index);
 	APP_labels getLabel(int index);
 	String getName(int index);
+	APP_labels getActiveApp();
 	void run();
 
 private:

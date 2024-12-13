@@ -20,6 +20,7 @@ enum menus {
 #pragma once
 #include "common.h"
 #include "config.h"
+#include <functional>
 
 class appManager
 {
@@ -31,6 +32,8 @@ private:
 	uint8_t (*printBtnPtr)(void);
 	void (*runAnimationsPtr)(void);
 	void (*callBackPtr)(void);
+
+	std::function<void(void)> CBFunc;
 public:
 	appManager()
 	{
@@ -40,6 +43,8 @@ public:
 	appManager(menus menuLocation, String descriptiveTxt, APP_labels label, void (*appFunc)(int), uint8_t(*printFunc)(void), void (*animationFunc)(void), void (*CBFunc)(void));
 	appManager(menus menuLocation, String descriptiveTxt, APP_labels label, void (*appFunc)(int), uint8_t(*printFunc)(void), void (*animationFunc)(void));
 	appManager(menus menuLocation, String descriptiveTxt, APP_labels label, void (*appFunc)(int), uint8_t(*printFunc)(void));
+	appManager(menus menuLocation, String descriptiveTxt, APP_labels label, void (*appFunc)(int), std::function<uint8_t(void)> CBFunc);
+
 	uint8_t printButtons();
 	bool isPrintButtonsNULL();
 	void runApp(int userInput);

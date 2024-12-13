@@ -1033,12 +1033,3 @@ uint8_t CAPTURE_drawCANLogScroll()
 	display.updateScreen();
 	return 0;
 }
-
-//
-void CAPTURE_CANBus(int userInput)
-{
-	if (userInput >= 0)
-	{
-		app.newApp((APP_labels)userInput);
-	}
-}

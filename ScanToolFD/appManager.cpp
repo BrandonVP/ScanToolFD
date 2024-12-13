@@ -42,6 +42,17 @@ appManager::appManager(menus menuLocation, String descriptiveTxt, APP_labels lab
 	callBackPtr = NULL;
 }
 
+appManager::appManager(menus menuLocation, String descriptiveTxt, APP_labels label, void (*appFunc)(int), std::function<uint8_t(void)> printFunc)
+{
+	assignedMenu = menuLocation;
+	descriptiveName = descriptiveTxt;
+	appLabel = label;
+	runAppPtr = (void(*)(int))appFunc;
+	CBFunc = CBFunc;
+	runAnimationsPtr = NULL;
+	callBackPtr = NULL;
+}
+
 uint8_t appManager::printButtons()
 {
 	return printBtnPtr();

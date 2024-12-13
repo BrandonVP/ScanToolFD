@@ -145,8 +145,8 @@ void setup(void)
 {
 	Serial.begin(115200); // USB is always 12 or 480 Mbit/sec
 	//while (!Serial);
-	Serial1.begin(115200); 
-	Serial4.begin(115200); 
+	Serial1.begin(115200);
+	Serial4.begin(115200);
 	Serial7.setTX(ESP_BLE_TX);
 	Serial7.setRX(ESP_BLE_RX);
 	Serial7.begin(115200);
@@ -223,7 +223,7 @@ void setup(void)
 	Can1.mailboxStatus();
 
 	Can2.begin();
-	Can2.setBaudRate(500000); 
+	Can2.setBaudRate(500000);
 	Can2.setMaxMB(8);
 	Can2.setMB((FLEXCAN_MAILBOX)0, RX, STD);
 	Can2.setMB((FLEXCAN_MAILBOX)1, RX, EXT);
