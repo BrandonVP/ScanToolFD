@@ -162,7 +162,8 @@ void setup(void)
 	pinMode(BATTERY_READ, INPUT);
 
 	GUI_setAppPtr(&app);
-	CAPTURE_setPtrs(&icons);
+	//CAPTURE_setPtrs(&icons);
+
 	//pinMode(2, OUTPUT);
 	//pinMode(3, OUTPUT);
 	//pinMode(4, OUTPUT);
@@ -351,34 +352,29 @@ void CANBus3_IRQHandler2()
 // Set menu or body flags when touched
 bool UserTouchedScreen()
 {
-	static int touchInterval = 0;
-	if (millis() - touchInterval >= 2)
+	if (ts.touched() > 0)
 	{
-		touchInterval = millis();
-		if (ts.touched() > 0)
-		{
-			TS_Point p = ts.getPoint();
-			x = p.y;
-			y = SCREEN_HEIGHT - p.x;
+		TS_Point p = ts.getPoint();
+		x = p.y;
+		y = SCREEN_HEIGHT - p.x;
 
-			//DbgConsole_Printf("x: %d | y: %d\r\n", x, y);
-			if (y <= 50)
-			{
-				GUI_setTouchedMenu(true);
-				GUI_setTouchedBody(false);
-			}
-			else
-			{
-				GUI_setTouchedMenu(false);
-				GUI_setTouchedBody(true);
-			}
-			return true;
+		//DbgConsole_Printf("x: %d | y: %d\r\n", x, y);
+		if (y <= 50)
+		{
+			GUI_setTouchedMenu(true);
+			GUI_setTouchedBody(false);
 		}
 		else
 		{
 			GUI_setTouchedMenu(false);
-			GUI_setTouchedBody(false);
+			GUI_setTouchedBody(true);
 		}
+		return true;
+	}
+	else
+	{
+		GUI_setTouchedMenu(false);
+		GUI_setTouchedBody(false);
 	}
 	return false;
 }
@@ -386,6 +382,7 @@ bool UserTouchedScreen()
 // All background process should be called from here
 void backgroundProcess()
 {
+	UserTouchedScreen();
 	Can1.events();
 	Can2.events();
 	//Can3.events();
@@ -533,5 +530,13 @@ void loop(void)
 {
 	app.run();
 	backgroundProcess();
-	debugLoop();
+	//debugLoop();
+
+	static uint32_t timeout123 = millis();
+
+	if (millis() - timeout123 > 2000)
+	{
+		Serial.println("loop");
+		timeout123 = millis();
+	}
 }

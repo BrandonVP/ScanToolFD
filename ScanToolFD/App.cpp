@@ -62,7 +62,7 @@ void App::init()
     appManager appObj0(MENU_canBus,     "CAN Bus",           APP_CANBUS,            menuInput,                  createMenu);
 	appManager appObj1(MENU_tools,      "Tools",             APP_TOOLS,             menuInput,                  createMenu);
 	appManager appObj2(MENU_settings,   "Settings",          APP_SETTINGS,          menuInput,                  createMenu);
-	appManager appObj3(MENU_canBus,     "Capture",           APP_CAPTURE,           CAPTURE_captureConfig,      CAPTURE_createCaptureBtns);
+    appManager appObj3(MENU_canBus,     "Capture",           APP_CAPTURE,           CAPTURE_captureConfig,      CAPTURE_createCaptureBtns);
 	appManager appObj4(MENU_sub,        "CaptureLCD",        APP_CAPTURE_LCD,       CAPTURE_LCD_scan,           CAPTURE_createLCDBtns);
 	appManager appObj5(MENU_canBus,     "Files",             APP_FILES,             someFn,                     CAPTURE_drawCANLogScroll);
 	appManager appObj6(MENU_canBus,     "FilterMask",        APP_FILTER_MASK,       FILTERMASK_filterMask,      FILTERMASK_createFilterMaskBtns);
@@ -72,10 +72,11 @@ void App::init()
 	appManager appObj10(MENU_settings,  "Get Vin2",          APP_GET_VIN,           BAUD_Baud,                  BAUD_createBaudBtns);
 	appManager appObj11(MENU_tools,     "Get Vin3",          APP_GET_VIN,           BAUD_Baud,                  BAUD_createBaudBtns);
 	appManager appObj12(MENU_tools,     "Get Vin4",          APP_GET_VIN,           BAUD_Baud,                  BAUD_createBaudBtns);
-
+    
 	this->myApps.push_back(appObj0);
 	this->myApps.push_back(appObj1);
 	this->myApps.push_back(appObj2);
+
 	this->myApps.push_back(appObj3);
 	this->myApps.push_back(appObj4);
 	this->myApps.push_back(appObj5);
@@ -86,7 +87,7 @@ void App::init()
 	this->myApps.push_back(appObj10);
 	this->myApps.push_back(appObj11);
 	this->myApps.push_back(appObj12);
-
+    
 }
 
 // Main framework process
@@ -117,6 +118,7 @@ void App::run()
             return;
         }
         hasDrawn = true;
+        display.updateScreen();
     }
 
     // Run any background processes
@@ -193,6 +195,7 @@ void App::appTransition()
     GUI_graphicLoaderState = 0;
     activeApp = nextApp;
     GUI_stopLoadBarTimed();
+    display.useFrameBuffer(true);
 }
 
 //
