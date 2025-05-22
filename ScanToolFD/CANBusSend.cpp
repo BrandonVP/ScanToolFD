@@ -24,8 +24,8 @@ uint8_t SEND_createSendBtns()
 	GUI_drawSquareBtn(425, 55, 475, 180, "", menuBackground, frameBorder, menuBtnText, ALIGN_CENTER);
 	GUI_drawSquareBtn(425, 185, 475, 310, "", menuBackground, frameBorder, menuBtnText, ALIGN_CENTER);
 
-	ICONS_printIcon(433, 100, upArrow_bits, 32, 4, menuBtnTextColor, 1);
-	ICONS_printIcon(433, 230, downArrow_bits, 32, 4, menuBtnTextColor, 1);
+	//ICONS_printIcon(433, 100, upArrow_bits, 32, 4, menuBtnTextColor, 1);
+	//ICONS_printIcon(433, 230, downArrow_bits, 32, 4, menuBtnTextColor, 1);
 
 	// Draw the scroll window
 	for (uint8_t i = 0; i < 6; i++)

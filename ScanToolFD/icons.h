@@ -7,8 +7,8 @@ Description : Icons and print functions
 ===========================================================================
 */
 
-#ifndef _ICONS_h
-#define _ICONS_h
+#ifndef ICONS_H
+#define ICONS_H
 
 #include "common.h"
 
@@ -57,17 +57,16 @@ const uint8_t upArrow_bits[] = {
   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
 };
 
-#ifdef _ICONS_c
+class Icons
+{
+public:
 
-unsigned int ICONS_reverseBits(uint8_t num);
-void ICONS_printIcon(uint16_t x, uint16_t y, const uint8_t icon[], uint8_t maxRow, uint8_t maxColumn, uint16_t color1, uint16_t color2);
+	unsigned int reverseBits(uint8_t num);
+	void printIcon(uint16_t x, uint16_t y, const uint8_t icon[], uint8_t maxRow, uint8_t maxColumn, uint16_t color1, uint16_t color2);
 
-#else
+};
 
-void ICONS_printIcon(uint16_t x, uint16_t y, const uint8_t icon[], uint8_t maxRow, uint8_t maxColumn, uint16_t color1, uint16_t color2);
-
-#endif // _ICONS_c
-#endif // _ICONS_h
+#endif // ICONS_H
 
 
 

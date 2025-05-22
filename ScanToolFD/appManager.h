@@ -1,61 +1,56 @@
 /*
- ===========================================================================
- Name        : appManager.h
- Author      : Brandon Van Pelt
- Created	 : 9/26/2023
- Description : Holds App objects for loading and unloading Apps
- ===========================================================================
- */
-
-enum menus {
-	MENU_canBus = 0,
-	MENU_tools,
-	MENU_settings,
-	MENU_sub
-};
+===========================================================================
+Name        : appManager.h
+Author      : Brandon Van Pelt
+Created	    : 9/26/2023
+Description : Holds App objects for loading and unloading Apps
+===========================================================================
+*/
 
 #ifndef APPMANAGER_H
 #define APPMANAGER_H
 
-#pragma once
 #include "common.h"
-#include "config.h"
 #include <functional>
 
 class appManager
 {
-private:
-	menus assignedMenu;
-	String descriptiveName;
-	APP_labels appLabel;
-	void (*runAppPtr)(int);
-	uint8_t (*printBtnPtr)(void);
-	void (*runAnimationsPtr)(void);
-	void (*callBackPtr)(void);
-
-	std::function<void(void)> CBFunc;
 public:
-	appManager()
-	{
+    appManager()
+    {
+        callBackPtr = NULL;
+        printBtnPtr = NULL;
+        runAnimationsPtr = NULL;
+        runAppPtr = NULL;
+    }
 
-	}
+    appManager(menus menuLocation, String descriptiveTxt, APP_labels label, void (*appFunc)(int), uint8_t(*printFunc)(void), void (*animationFunc)(void), bool (*CBFunc)(int));
+    appManager(menus menuLocation, String descriptiveTxt, APP_labels label, void (*appFunc)(int), uint8_t(*printFunc)(void), void (*animationFunc)(void));
+    appManager(menus menuLocation, String descriptiveTxt, APP_labels label, void (*appFunc)(int), uint8_t(*printFunc)(void));
+    appManager(menus menuLocation, String descriptiveTxt, APP_labels label, void (*appFunc)(int), std::function<uint8_t(void)> CBFunc);
 
-	appManager(menus menuLocation, String descriptiveTxt, APP_labels label, void (*appFunc)(int), uint8_t(*printFunc)(void), void (*animationFunc)(void), void (*CBFunc)(void));
-	appManager(menus menuLocation, String descriptiveTxt, APP_labels label, void (*appFunc)(int), uint8_t(*printFunc)(void), void (*animationFunc)(void));
-	appManager(menus menuLocation, String descriptiveTxt, APP_labels label, void (*appFunc)(int), uint8_t(*printFunc)(void));
-	appManager(menus menuLocation, String descriptiveTxt, APP_labels label, void (*appFunc)(int), std::function<uint8_t(void)> CBFunc);
+    uint8_t printButtons();
+    bool isPrintButtonsNULL();
+    void runApp(int userInput);
+    bool isAppNULL();
+    void runAnimations();
+    bool isAnimationsNULL();
+    bool executeCB(int userInput);
+    bool isExecuteCBNULL();
+    menus getAssignedMenu();
+    String getName();
+    APP_labels getAppLabel();
 
-	uint8_t printButtons();
-	bool isPrintButtonsNULL();
-	void runApp(int userInput);
-	bool isAppNULL();
-	void runAnimations();
-	bool isAnimationsNULL();
-	void executeCB();
-	bool isExecuteCBNULL();
-	menus getAssignedMenu();
-	String getName();
-	APP_labels getAppLabel();
+private:
+    menus assignedMenu;
+    String descriptiveName;
+    APP_labels appLabel;
+    void (*runAppPtr)(int);
+    uint8_t(*printBtnPtr)(void);
+    void (*runAnimationsPtr)(void);
+    bool (*callBackPtr)(int);
+    std::function<void(void)> CBFunc;
+
 };
-#endif
+#endif // APPMANAGER_H
 

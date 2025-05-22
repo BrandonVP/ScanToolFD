@@ -1,3 +1,12 @@
+/*
+===========================================================================
+Name        : App.cpp
+Author      : Brandon Van Pelt
+Created	    : 6/2/2024
+Description : Class to load and run Apps
+===========================================================================
+*/
+
 #include "App.h"
 #include "CANBusCapture.h"
 #include "CANBusSend.h"
@@ -12,6 +21,11 @@ void someFn(int a)
 	// Temporary holder 
 }
 
+int someDraw()
+{
+	return 0;
+}
+
 //
 void menuInput(int userInput)
 {
@@ -21,9 +35,20 @@ void menuInput(int userInput)
 	}
 }
 
+//
 uint8_t createMenu()
 {
-	return app.printMenu((menus)app.getMenu(app.activeApp), app.getLabel(app.activeApp));
+	uint8_t appCount = 0;
+
+	for (int i = 0; i < app.getAppSize(); i++)
+	{
+		if ((app.getMenu(i) == app.getMenu(app.activeApp)) && (app.getLabel(i) != app.getLabel(app.activeApp)))
+		{
+			appCount++;
+		}
+	}
+
+	return app.printMenu((menus)app.getMenu(app.activeApp), app.getLabel(app.activeApp), appCount);
 }
 
 //
@@ -33,7 +58,8 @@ void App::init()
 	this->myApps.reserve(APP_COUNT);
 
 	/*---------------------Menu----------Title----------------App Label---------------Main Function--------------Create Button Function----------Animation-----------------App Exit Function-----*/
-	appManager appObj0(MENU_canBus,     "CAN Bus",           APP_CANBUS,            menuInput,                  createMenu);
+	
+    appManager appObj0(MENU_canBus,     "CAN Bus",           APP_CANBUS,            menuInput,                  createMenu);
 	appManager appObj1(MENU_tools,      "Tools",             APP_TOOLS,             menuInput,                  createMenu);
 	appManager appObj2(MENU_settings,   "Settings",          APP_SETTINGS,          menuInput,                  createMenu);
 	appManager appObj3(MENU_canBus,     "Capture",           APP_CAPTURE,           CAPTURE_captureConfig,      CAPTURE_createCaptureBtns);
@@ -63,99 +89,162 @@ void App::init()
 
 }
 
-uint8_t App::printMenu(menus menu, APP_labels label)
+// Main framework process
+void App::run()
 {
-	uint8_t btnPos = 0;
-	uint8_t menuCoordIndex = 0;
+    // Check if menu was pressed
+    GUI_buttonMonitor(userInterfaceMenuButton, MENU_BUTTON_SIZE);
 
-	//Serial.printf("app.getAppSize(): %d \n", app.getAppSize());
-	for (int i = 0; i < app.getAppSize(); i++)
-	{
-		//Serial.printf("app.getMenu(i): %d \n", app.getMenu(i));
-		//Serial.printf("app.getLabel(i): %d \n", app.getLabel(i));
-		if ((app.getMenu(i) == menu) && (app.getLabel(i) != label))
-		{
-			userInterfaceButton[btnPos++].setButton(MENU_COORD[menuCoordIndex][0], MENU_COORD[menuCoordIndex][1], MENU_COORD[menuCoordIndex][2], MENU_COORD[menuCoordIndex][3], app.getLabel(i), true, 10, app.getName(i), ALIGN_CENTER, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
-			menuCoordIndex++;
-			//Serial.printf("menuCoordIndex: %d \n", menuCoordIndex);
-		}
-	}
-	//Serial.printf("btnPos: %d \n", btnPos);
-	return btnPos;
+    // Draw page
+    if (!hasDrawn)
+    {
+        if (GUI_graphicLoaderState == 0)
+        {
+            GUI_clearAppSpace();
+
+            // Animation
+            if (!myApps[(int)activeApp].isAnimationsNULL())
+            {
+                myApps[(int)activeApp].runAnimations();
+            }
+
+            buttonsOnPage = myApps[(int)activeApp].printButtons();
+            GUI_graphicLoaderState++;
+            return;
+        }
+        if (GUI_drawPage(userInterfaceButton, GUI_graphicLoaderState, buttonsOnPage))
+        {
+            return;
+        }
+        hasDrawn = true;
+    }
+
+    // Run any background processes
+    this->backgroundProcess();
+
+    // Get user input
+    int userInput = GUI_subMenuButtonMonitor(userInterfaceButton, buttonsOnPage);
+
+    // Call buttons or page method
+    myApps[activeApp].runApp(userInput);
+
+    // Load next selected app
+    if (nextApp != activeApp)
+    {
+        if (!myApps[activeApp].isExecuteCBNULL())
+        {
+            if (myApps[activeApp].executeCB(userInput))
+            {
+                return; // Prevent appTransition from loading next app
+            }
+        }
+        this->appTransition();
+    }
+}
+
+// Print the menu buttons by loading a coordinate matrix matching the quantity of buttons assigned to the currently loaded object's assigned menu
+uint8_t App::printMenu(menus menu, APP_labels label, uint8_t numOfButtons)
+{
+    uint8_t btnPos = 0;
+    uint8_t menuCoordIndex = 0;
+
+    // Adjust layout to match buttons on page
+    if (numOfButtons <= 4)
+    {
+        for (int i = 0; i < app.getAppSize(); i++)
+        {
+            if ((app.getMenu(i) == menu) && (app.getLabel(i) != label))
+            {
+                userInterfaceButton[btnPos++].setButton(MENU_4Center[menuCoordIndex][0], MENU_4Center[menuCoordIndex][1], MENU_4Center[menuCoordIndex][2], MENU_4Center[menuCoordIndex][3], app.getLabel(i), true, 10, app.getName(i), GUI_Align_Text_Center, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
+                menuCoordIndex++;
+            }
+        }
+    }
+    else if (numOfButtons <= 6)
+    {
+        for (int i = 0; i < app.getAppSize(); i++)
+        {
+            if ((app.getMenu(i) == menu) && (app.getLabel(i) != label))
+            {
+                userInterfaceButton[btnPos++].setButton(MENU_6Grid[menuCoordIndex][0], MENU_6Grid[menuCoordIndex][1], MENU_6Grid[menuCoordIndex][2], MENU_6Grid[menuCoordIndex][3], app.getLabel(i), true, 10, app.getName(i), GUI_Align_Text_Center, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
+                menuCoordIndex++;
+            }
+        }
+    }
+    else // if (numOfButtons <= 8) // Everything else loads with a maximum of 8 buttons. This can be expanded if another coordinate matrix is added for increasing the button layouts.
+    {
+        for (int i = 0; i < app.getAppSize(); i++)
+        {
+            if ((app.getMenu(i) == menu) && (app.getLabel(i) != label))
+            {
+                userInterfaceButton[btnPos++].setButton(MENU_8Grid[menuCoordIndex][0], MENU_8Grid[menuCoordIndex][1], MENU_8Grid[menuCoordIndex][2], MENU_8Grid[menuCoordIndex][3], app.getLabel(i), true, 10, app.getName(i), GUI_Align_Text_Center, menuBtnColor, menuBtnBorder, BlackBtnColor, menuBtnText);
+                menuCoordIndex++;
+            }
+        }
+    }
+
+    return btnPos;
 }
 
 // Resets variables for page change
 void App::appTransition()
 {
-	hasDrawn = false;
-	graphicLoaderState = 0;
-	activeApp = nextApp;
-	GUI_stopLoadBarTimed();
-	display.useFrameBuffer(true);
-	CAPTURE_clearLocalVar();
+    hasDrawn = false;
+    GUI_graphicLoaderState = 0;
+    activeApp = nextApp;
+    GUI_stopLoadBarTimed();
 }
 
 //
-void App::newApp(APP_labels loadNewApp )
+void App::newApp(APP_labels loadNewApp)
 {
-	nextApp = loadNewApp;
+    nextApp = loadNewApp;
 }
 
 //
 int App::getAppSize(void)
 {
-	return myApps.size();
-}
-
-int App::getMenu(int index)
-{
-	return myApps[index].getAssignedMenu();
-}
-
-APP_labels App::getLabel(int index)
-{
-	return myApps[index].getAppLabel();
-}
-
-String App::getName(int index)
-{
-	return myApps[index].getName();
-}
-
-APP_labels App::getActiveApp()
-{
-	return activeApp;
+    return myApps.size();
 }
 
 //
-void App::run()
+int App::getMenu(int index)
 {
-	// Draw page
-	if (!hasDrawn)
-	{
-		if (graphicLoaderState == 0)
-		{
-			GUI_clearAppSpace();
-			buttonsOnPage = myApps[(int)activeApp].printButtons();
-			graphicLoaderState++;
-			return;
-		}
-		if (GUI_drawPage(userInterfaceButton, graphicLoaderState, buttonsOnPage))
-		{
-			return;
-		}
-		Serial.printf("App: %d\n", (int)activeApp);
-		Serial.println(myApps[(int)activeApp].getName());
-		hasDrawn = true;
-		display.updateScreen();
-	}
+    return myApps[index].getAssignedMenu();
+}
 
-	// Call buttons or page method
-	myApps[activeApp].runApp(GUI_subMenuButtonMonitor(userInterfaceButton, buttonsOnPage));
+//
+APP_labels App::getLabel(int index)
+{
+    return myApps[index].getAppLabel();
+}
 
-	// Load next selected app
-	if (nextApp != activeApp)
-	{
-		this->appTransition();
-	}
+//
+String App::getName(int index)
+{
+    return myApps[index].getName();
+}
+
+//
+APP_labels App::getActiveApp()
+{
+    return activeApp;
+}
+
+//
+void App::backgroundProcess()
+{
+    GUI_sideLoadBarTimed();
+}
+
+//
+uint8_t App::getButtonsOnPage()
+{
+    return buttonsOnPage;
+}
+
+//
+void App::setButtonsOnPage(uint8_t buttons)
+{
+    buttonsOnPage = buttons;
 }

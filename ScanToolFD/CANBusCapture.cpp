@@ -52,6 +52,12 @@ bool CAPTURE_isRunning = false;
 uint32_t CAPTURE_hexTotal = 0;
 extern File myFile;
 
+// Assign app pointer
+void CAPTURE_setPtrs(Icons* icons)
+{
+	CAPTURE_iconPtr = icons;
+}
+
 //
 void CAPTURE_clearLocalVar()
 {
@@ -971,8 +977,8 @@ uint8_t CAPTURE_drawCANLogScroll()
 	GUI_drawSquareBtn(425, 55, 475, 180, "", menuBackground, frameBorder, menuBtnText, ALIGN_CENTER);
 	GUI_drawSquareBtn(425, 185, 475, 310, "", menuBackground, frameBorder, menuBtnText, ALIGN_CENTER);
 
-	ICONS_printIcon(433, 100, upArrow_bits, 32, 4, menuBtnTextColor, 1);
-	ICONS_printIcon(433, 230, downArrow_bits, 32, 4, menuBtnTextColor, 1);
+	CAPTURE_iconPtr->printIcon(433, 100, upArrow_bits, 32, 4, menuBtnTextColor, 1);
+	CAPTURE_iconPtr->printIcon(433, 230, downArrow_bits, 32, 4, menuBtnTextColor, 1);
 
 	GUI_drawSquareBtn(10, 280, 105, 318, "View", OrangeBtnColor, BlackBtnColor, menuBtnText, ALIGN_CENTER);
 	GUI_drawSquareBtn(105, 280, 210, 318, "Play", OrangeBtnColor, BlackBtnColor, menuBtnText, ALIGN_CENTER);

@@ -1,6 +1,16 @@
 #pragma once
 #include <cstdint>
 
+#define FINISH_SIDE_LOADBAR 270
+#define LOADBAR_TURN_OFF 471
+#define LOADBAR_DEFAULT_RUN_TIME 8000
+#define SCREEN_WIDTH 480
+#define SCREEN_HEIGHT 320
+
+#define DISPLAY_CS 28U
+#define DISPLAY_DC 22U
+#define DISPLAY_RST 00U
+
 enum APP_labels {
 	APP_CANBUS = 0,
 	APP_TOOLS,
@@ -24,11 +34,28 @@ enum APP_labels {
 extern APP_labels nextApp;
 extern APP_labels activeApp;
 
+enum menus {
+	MENU_canBus = 0,
+	MENU_tools,
+	MENU_settings,
+	MENU_sub
+};
 
-const uint16_t MENU_COORD[8][4] = { {45,  75, 230, 125}, {250,  75, 435, 125},
-									{45, 135, 230, 185}, {250, 135, 435, 185},
-									{45, 195, 230, 245}, {250, 195, 435, 245},
-									{45, 255, 230, 305}, {250, 255, 435, 305} };
+// Coordinates for different menu button layouts
+const uint16_t MENU_4Center[4][4] = { {145,  75, 335, 125},
+{145, 135, 335, 185},
+{145, 195, 335, 245},
+{145, 255, 335, 305} };
+
+const uint16_t MENU_6Grid[6][4] = { {45, 95, 230, 145},  {250, 95, 435, 145},
+{45, 155, 230, 205}, {250, 155, 435, 205},
+{45, 215, 230, 265}, {250, 215, 435, 265} };
+
+const uint16_t MENU_8Grid[8][4] = { {45,  75, 230, 125}, {250,  75, 435, 125},
+{45, 135, 230, 185}, {250, 135, 435, 185},
+{45, 195, 230, 245}, {250, 195, 435, 245},
+{45, 255, 230, 305}, {250, 255, 435, 305} };
+
 #define SCREEN_WIDTH 480
 #define SCREEN_HEIGHT 320
 #define SD_CARD_CS_PIN 2

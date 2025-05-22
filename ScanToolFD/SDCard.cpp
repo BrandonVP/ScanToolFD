@@ -137,16 +137,16 @@ void SDCard::writeSendMsg(CANBusTXScheduler msgStruct, int size)
 	{
 		if (strcmp(msgStruct.node[i].name, "\0"))
 		{
-			sprintf(buffer, "%s %x %lx %lx %lx %x %x %x %x %x %x %x %x %x \n", msgStruct.node[i].name, msgStruct.node[i].channel, msgStruct.node[i].interval, msgStruct.node[i].id,
-				msgStruct.node[i].data[0], msgStruct.node[i].data[1], msgStruct.node[i].data[2], msgStruct.node[i].data[3], msgStruct.node[i].data[4], msgStruct.node[i].data[5], msgStruct.node[i].data[6], msgStruct.node[i].data[7],
-				msgStruct.node[i].isOn, msgStruct.node[i].isDel);
+			sprintf(buffer, "%s %x %lx %lx %x %x %x %x %x %x %x %x %x %x \n", msgStruct.node[i].name, (unsigned int)msgStruct.node[i].channel, (long unsigned int)msgStruct.node[i].interval, (long unsigned int)msgStruct.node[i].id,
+				(unsigned int)msgStruct.node[i].data[0], (unsigned int)msgStruct.node[i].data[1], (unsigned int)msgStruct.node[i].data[2], (unsigned int)msgStruct.node[i].data[3], (unsigned int)msgStruct.node[i].data[4], 
+				(unsigned int)msgStruct.node[i].data[5], (unsigned int)msgStruct.node[i].data[6], (unsigned int)msgStruct.node[i].data[7], (unsigned int)msgStruct.node[i].isOn, (unsigned int)msgStruct.node[i].isDel);
 			Serial.println(msgStruct.node[i].name);
 		}
 		else
 		{
-			sprintf(buffer, "%s %x %lx %lx %lx %x %x %x %x %x %x %x %x %x \n", "(null)", msgStruct.node[i].channel, msgStruct.node[i].interval, msgStruct.node[i].id,
-				msgStruct.node[i].data[0], msgStruct.node[i].data[1], msgStruct.node[i].data[2], msgStruct.node[i].data[3], msgStruct.node[i].data[4], msgStruct.node[i].data[5], msgStruct.node[i].data[6], msgStruct.node[i].data[7],
-				msgStruct.node[i].isOn, msgStruct.node[i].isDel);
+			sprintf(buffer, "%s %x %lx %lx %x %x %x %x %x %x %x %x %x %x \n", "(null)", (unsigned int)msgStruct.node[i].channel, (long unsigned int)msgStruct.node[i].interval, (long unsigned int)msgStruct.node[i].id,
+				(unsigned int)msgStruct.node[i].data[0], (unsigned int)msgStruct.node[i].data[1], (unsigned int)msgStruct.node[i].data[2], (unsigned int)msgStruct.node[i].data[3], (unsigned int)msgStruct.node[i].data[4], 
+				(unsigned int)msgStruct.node[i].data[5], (unsigned int)msgStruct.node[i].data[6], (unsigned int)msgStruct.node[i].data[7], (unsigned int)msgStruct.node[i].isOn, (unsigned int)msgStruct.node[i].isDel);
 			Serial.println("(null)");
 		}
 
@@ -235,10 +235,10 @@ void SDCard::readFile(char* filename, uint8_t* arrayIn)
 // Reads users saved CAN Bus RX messages
 void SDCard::readSendMsg(CANBusTXScheduler& msgStruct, int size)
 {
-	
+
 	// File created and opened for writing
 	File myFile = SD.open("SYSTEM/CANMsg.txt", FILE_READ);
-	
+
 	if (myFile)
 	{
 		for (uint8_t i = 0; i < 20; i++)
@@ -248,24 +248,27 @@ void SDCard::readSendMsg(CANBusTXScheduler& msgStruct, int size)
 
 			myFile.readBytesUntil('\n', buffer, 51);
 
-			sscanf(buffer, "%s %x %x %x %x %x %x %x %x %x %x %x %x %x", s1, &msgStruct.node[i].channel, &msgStruct.node[i].interval, &msgStruct.node[i].id,
-				&msgStruct.node[i].data[0], &msgStruct.node[i].data[1], &msgStruct.node[i].data[2], &msgStruct.node[i].data[3], &msgStruct.node[i].data[4], 
-				&msgStruct.node[i].data[5], &msgStruct.node[i].data[6], &msgStruct.node[i].data[7], &msgStruct.node[i].isOn, &msgStruct.node[i].isDel);
+			sscanf(buffer, "%s %x %x %x %x %x %x %x %x %x %x %x %x %x", s1, (unsigned int*)&msgStruct.node[i].channel, (unsigned int*)&msgStruct.node[i].interval, (unsigned int*)&msgStruct.node[i].id,
+				(unsigned int*)&msgStruct.node[i].data[0], (unsigned int*)&msgStruct.node[i].data[1], (unsigned int*)&msgStruct.node[i].data[2], (unsigned int*)&msgStruct.node[i].data[3], (unsigned int*)&msgStruct.node[i].data[4],
+				(unsigned int*)&msgStruct.node[i].data[5], (unsigned int*)&msgStruct.node[i].data[6], (unsigned int*)&msgStruct.node[i].data[7], (unsigned int*)&msgStruct.node[i].isOn, (unsigned int*)&msgStruct.node[i].isDel);
 
 			msgStruct.node[i].isOn = false;
 
 			if (!strcmp(s1, "(null)"))
 			{
-				char* temp = '\0';
-				strncpy(msgStruct.node[i].name, "\0", 9);
+				//char* temp = '\0';
+				//strncpy(msgStruct.node[i].name, '\0', 9);
+				msgStruct.node[i].name[0] = '\0';
 			}
 			else if (s1 == NULL)
 			{
-				strncpy(msgStruct.node[i].name, "\0", 9);
+				//strncpy(msgStruct.node[i].name, '\0', 9);
+				msgStruct.node[i].name[0] = '\0';
 			}
-			else if (s1 == "\0")
+			else if (s1[0] == '\0')
 			{
-				strncpy(msgStruct.node[i].name, "\0", 9);
+				//strncpy(msgStruct.node[i].name, '\0', 9);
+				msgStruct.node[i].name[0] = '\0';
 			}
 			else
 			{
@@ -274,7 +277,6 @@ void SDCard::readSendMsg(CANBusTXScheduler& msgStruct, int size)
 		}
 		myFile.close();
 	}
-	
 }
 
 /*

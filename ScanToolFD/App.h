@@ -1,4 +1,12 @@
-#pragma once
+/*
+===========================================================================
+Name        : App.h
+Author      : Brandon Van Pelt
+Created	    : 6/2/2024
+Description : Class to load and run Apps
+===========================================================================
+*/
+
 #ifndef APP_H
 #define APP_H
 
@@ -6,9 +14,8 @@
 #include "config.h"
 #include "appManager.h"
 
-using namespace std;
-
-extern class appManager a; 
+//extern class appManager a; 
+typedef struct appManager appManager;
 
 class App
 {
@@ -19,7 +26,7 @@ public:
 
 	APP_labels nextApp = APP_CANBUS;
 	APP_labels activeApp = APP_CANBUS;
-	vector<appManager> myApps;
+	std::vector<appManager> myApps;
 	uint8_t buttonsOnPage = 0;
 
 	App()
@@ -27,7 +34,8 @@ public:
 	}
 
 	void init();
-	uint8_t printMenu(menus menu, APP_labels label);
+	void run();
+	uint8_t printMenu(menus menu, APP_labels label, uint8_t size);
 	void appTransition();
 	void newApp(APP_labels);
 	int getAppSize(void);
@@ -35,9 +43,8 @@ public:
 	APP_labels getLabel(int index);
 	String getName(int index);
 	APP_labels getActiveApp();
-	void run();
-
-private:
-
+	void backgroundProcess();
+	uint8_t getButtonsOnPage();
+	void setButtonsOnPage(uint8_t buttons);
 };
-#endif
+#endif // APP_H

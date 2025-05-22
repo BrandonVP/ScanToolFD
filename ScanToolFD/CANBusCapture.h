@@ -14,6 +14,7 @@
 #include "cbBuffer.h"
 #include "cbBufferFD.h"
 #include "BaudRate.h"
+#include "icons.h"
 
 typedef enum capture_lcd_btn {
 	BTN_capture_noInput = 1,
@@ -63,6 +64,9 @@ extern bool enableCB3;
 uint8_t CAPTURE_input_config = 0;
 uint8_t CAPTURE_output_config = 0;
 
+Icons* CAPTURE_iconPtr = NULL;
+
+void CAPTURE_setPtrs(Icons* icons);
 void CAPTURE_clearLocalVar();
 uint8_t CAPTURE_createCaptureBtns();
 uint8_t CAPTURE_createLCDBtns();
@@ -87,7 +91,7 @@ extern uint8_t CAPTURE_input_config;
 extern uint8_t CAPTURE_output_config;
 extern bool CAPTURE_isRunning;
 
-
+void CAPTURE_setPtrs(Icons* icons);
 void CAPTURE_clearLocalVar();
 uint8_t CAPTURE_createCaptureBtns();
 uint8_t CAPTURE_createLCDBtns();

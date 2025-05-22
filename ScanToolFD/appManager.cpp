@@ -1,15 +1,15 @@
 /*
- ===========================================================================
- Name        : appManager.cpp
- Author      : Brandon Van Pelt
- Created	 : 9/26/2023
- Description : Holds App objects for loading and unloading Apps
- =========================================================================== 
- */
+===========================================================================
+Name        : appManager.cpp
+Author      : Brandon Van Pelt
+Created	    : 9/26/2023
+Description : Holds App objects for loading and unloading Apps
+===========================================================================
+*/
 
 #include "appManager.h"
 
-appManager::appManager(menus menuLocation, String descriptiveTxt, APP_labels label, void (*appFunc)(int), uint8_t(*printFunc)(void), void (*animationFunc)(void), void (*CBFunc)(void))
+appManager::appManager(menus menuLocation, String descriptiveTxt, APP_labels label, void (*appFunc)(int), uint8_t(*printFunc)(void), void (*animationFunc)(void), bool (*CBFunc)(int))
 {
 	assignedMenu = menuLocation;
 	descriptiveName = descriptiveTxt;
@@ -17,7 +17,7 @@ appManager::appManager(menus menuLocation, String descriptiveTxt, APP_labels lab
 	runAppPtr = (void(*)(int))appFunc;
 	printBtnPtr = (uint8_t(*)(void))printFunc;
 	runAnimationsPtr = (void(*)(void))animationFunc;
-	callBackPtr = (void(*)(void))CBFunc;
+	callBackPtr = (bool(*)(int))CBFunc;
 }
 
 appManager::appManager(menus menuLocation, String descriptiveTxt, APP_labels label, void (*appFunc)(int), uint8_t(*printFunc)(void), void (*animationFunc)(void))
@@ -48,7 +48,6 @@ appManager::appManager(menus menuLocation, String descriptiveTxt, APP_labels lab
 	descriptiveName = descriptiveTxt;
 	appLabel = label;
 	runAppPtr = (void(*)(int))appFunc;
-	CBFunc = CBFunc;
 	runAnimationsPtr = NULL;
 	callBackPtr = NULL;
 }
@@ -83,9 +82,9 @@ bool appManager::isAnimationsNULL()
 	return (runAnimationsPtr == NULL);
 }
 
-void appManager::executeCB()
+bool appManager::executeCB(int userInput)
 {
-	return callBackPtr();
+	return callBackPtr(userInput);
 }
 
 bool appManager::isExecuteCBNULL()

@@ -70,6 +70,7 @@ ILI9488_t3 display = ILI9488_t3(&SPI, TFT_CS, TFT_DC);
 Adafruit_FT6206 ts = Adafruit_FT6206();
 
 App app;
+Icons icons;
 cbBuffer can1Buffer;
 cbBuffer can2Buffer;
 cbBufferFD can3Buffer;
@@ -117,7 +118,7 @@ void drawMenu()
 	while (GUI_drawPage(userInterfaceMenuButton, graphicLoaderState, 3));
 	graphicLoaderState = 0;
 
-	ICONS_printIcon(5, 5, battery_bits, 32, 4, menuBtnTextColor, 1);
+	icons.printIcon(5, 5, battery_bits, 32, 4, menuBtnTextColor, 1);
 	display.updateScreen();
 }
 
@@ -160,6 +161,8 @@ void setup(void)
 	pinMode(BATTERY_ENABLE_READ, OUTPUT);
 	pinMode(BATTERY_READ, INPUT);
 
+	GUI_setAppPtr(&app);
+	CAPTURE_setPtrs(&icons);
 	//pinMode(2, OUTPUT);
 	//pinMode(3, OUTPUT);
 	//pinMode(4, OUTPUT);
@@ -345,6 +348,41 @@ void CANBus3_IRQHandler2()
 /*=========================================================
 	Background Processes
 ===========================================================*/
+// Set menu or body flags when touched
+bool UserTouchedScreen()
+{
+	static int touchInterval = 0;
+	if (millis() - touchInterval >= 2)
+	{
+		touchInterval = millis();
+		if (ts.touched() > 0)
+		{
+			TS_Point p = ts.getPoint();
+			x = p.y;
+			y = SCREEN_HEIGHT - p.x;
+
+			//DbgConsole_Printf("x: %d | y: %d\r\n", x, y);
+			if (y <= 50)
+			{
+				GUI_setTouchedMenu(true);
+				GUI_setTouchedBody(false);
+			}
+			else
+			{
+				GUI_setTouchedMenu(false);
+				GUI_setTouchedBody(true);
+			}
+			return true;
+		}
+		else
+		{
+			GUI_setTouchedMenu(false);
+			GUI_setTouchedBody(false);
+		}
+	}
+	return false;
+}
+
 // All background process should be called from here
 void backgroundProcess()
 {
@@ -398,8 +436,8 @@ void updateTime()
 
 void debugLoop()
 {
-	static uint32_t test123 = 0;
-	static bool swapMe = false;
+	//static uint32_t test123 = 0;
+	//static bool swapMe = false;
 #if 0
 	static uint32_t timeout123 = millis();
 	static uint16_t rotatingID = 0;
